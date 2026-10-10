@@ -199,13 +199,17 @@ function DocumentWorkspace() {
               </select>
             </label>
             <label style={{ display: "grid", gap: 6, fontSize: 14 }}>
-              File
+              File{" "}
+              <span style={{ color: "var(--text-muted)", fontWeight: 400 }}>
+                (required)
+              </span>
               <input
                 name="file"
                 type="file"
                 autoComplete="off"
                 onChange={(e) => setFile(e.target.files?.[0] ?? null)}
                 required
+                aria-required="true"
               />
             </label>
             {error ? (
