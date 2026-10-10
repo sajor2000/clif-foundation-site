@@ -1,0 +1,36 @@
+:root {
+  --space-4: 4px;
+  --space-8: 8px;
+  --space-12: 12px;
+  --space-16: 16px;
+  --space-20: 20px;
+  --space-24: 24px;
+  --space-32: 32px;
+  --space-40: 40px;
+  --space-48: 48px;
+  --space-56: 56px;
+  --space-64: 64px;
+  --space-72: 72px;
+  --space-96: 96px;
+  --space-120: 120px;
+
+  --gutter: clamp(16px, 4vw, 56px);
+  --section-y: clamp(72px, 9vw, 120px);
+  --content-max: 1424px;
+  --measure: 680px;
+  --header-h: 72px;
+
+  --radius-tag: 2px;
+  --radius-control: 3px;
+  --radius-panel: 6px;
+  --border-w: 1px;
+  --rule-active: 2px;
+
+  --control-sm: 36px;
+  --control-md: 44px;
+  --control-lg: 48px;
+  --touch-min: 44px;
+
+  --duration-fast: 120ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+}

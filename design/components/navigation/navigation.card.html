@@ -1,0 +1,20 @@
+<!-- @dsCard group="Components" viewport="700x520" name="Navigation" subtitle="ContextBar, SiteHeader with theme toggle (collapses at narrow widths), SiteFooter" -->
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../../styles.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone@7.24.7/babel.min.js"></script>
+<script src="../_loader.js"></script></head>
+<body><div id="root"></div>
+<script type="text/x-ds">
+const NS = window.CLIFDS;
+const { ContextBar, SiteHeader, SiteFooter } = NS;
+function App() { const [p, setP] = React.useState("research"); const [t, setT] = React.useState("light");
+  React.useEffect(() => { document.documentElement.dataset.theme = t; }, [t]);
+  return (<div style={{ background: "var(--bg-page)", color: "var(--text-primary)" }}><ContextBar /><SiteHeader current={p} onNavigate={setP} theme={t} onToggleTheme={() => setT(t === "dark" ? "light" : "dark")} />
+    <div style={{ height: 40 }} />
+    <div style={{ maxWidth: 420 }}><SiteHeader current={p} onNavigate={setP} /></div>
+    <div style={{ height: 24 }} />
+    <SiteFooter links={[{ label: "Mission" }, { label: "Our Work" }, { label: "CLIF Consortium ↗", href: "https://clif-icu.com/" }, { label: "GitHub ↗" }]} /></div>);
+}
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script></body></html>

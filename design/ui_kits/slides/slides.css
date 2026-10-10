@@ -1,0 +1,34 @@
+/* CLIF Foundation slide layer — 1920×1080. Import after ../../styles.css */
+.slide { box-sizing: border-box; padding: 88px 120px 48px; display: flex; flex-direction: column; font-family: var(--font-sans); background: var(--bg-page); color: var(--text-primary); }
+.slide.ink { background: var(--bg-inverse); color: var(--text-inverse); }
+.s-eyebrow { font-family: var(--font-mono); font-size: var(--slide-mono); color: var(--text-eyebrow); }
+.ink .s-eyebrow { color: var(--signal-400); }
+.s-display { margin: 0; font-family: var(--font-display); font-weight: 600; font-size: var(--slide-display); line-height: .95; letter-spacing: -0.04em; text-wrap: balance; }
+.s-title { margin: 20px 0 44px; font-family: var(--font-display); font-weight: 600; font-size: var(--slide-title); line-height: 1; letter-spacing: -0.035em; text-wrap: balance; }
+.s-h3 { font-family: var(--font-display); font-weight: 600; font-size: var(--slide-h3); letter-spacing: -0.02em; line-height: 1.1; }
+.s-body { font-size: var(--slide-body); line-height: 1.4; }
+.s-small { font-size: var(--slide-small); line-height: 1.4; color: var(--text-body); }
+.ink .s-small { color: var(--text-inverse-body); }
+.s-mono { font-family: var(--font-mono); font-size: var(--slide-mono); }
+.s-index { font-family: var(--font-mono); font-size: 220px; line-height: 1; letter-spacing: -0.04em; color: var(--signal-400); }
+.s-panel { border: 1px solid var(--ink-950); border-radius: var(--radius-panel); background: var(--bg-figure); overflow: hidden; }
+.s-panel-head { padding: 16px 28px; border-bottom: 1px solid var(--ink-950); font-family: var(--font-mono); font-size: var(--slide-mono); display: flex; justify-content: space-between; gap: 24px; }
+.s-row { padding: 20px 28px; border-bottom: 1px solid var(--border-subtle); }
+.s-row:last-child { border-bottom: 0; }
+.s-callout { background: var(--bg-inverse); color: var(--text-inverse); border-radius: var(--radius-panel); padding: 32px 40px; display: grid; grid-template-columns: 320px 1fr; gap: 32px; }
+.s-callout > :first-child { font-family: var(--font-mono); font-size: var(--slide-mono); color: var(--signal-400); }
+.s-list { margin: 0; padding: 0; list-style: none; border-top: 2px solid var(--ink-950); }
+.s-list > li { padding: 22px 0; border-bottom: 1px solid var(--border); font-size: var(--slide-body); display: flex; gap: 28px; }
+.ink .s-list { border-top-color: var(--ink-50); } .ink .s-list > li { border-bottom-color: var(--border-inverse); }
+.s-tag { font-family: var(--font-mono); font-size: var(--slide-mono); padding: 3px 12px; border-radius: var(--radius-control); border: 1px solid var(--ink-950); white-space: nowrap; }
+.s-tag.proposed, .s-tag.decision { background: var(--signal-400); color: var(--ink-950); }
+.s-tag.existing, .s-tag.discussion { background: var(--ink-950); color: var(--ink-50); }
+.s-tag.info { background: transparent; border-color: var(--ink-600); color: var(--text-body); }
+.s-foot { margin-top: auto; padding-top: 24px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; font-family: var(--font-mono); font-size: var(--slide-mono); color: var(--text-muted); }
+.ink .s-foot { border-top-color: var(--border-inverse); color: var(--text-inverse-muted); }
+.s-lockup { display: flex; align-items: center; gap: 14px; color: var(--text-primary); }
+.s-lockup img { height: 30px; display: block; }
+.s-lockup .rule { width: 1px; height: 22px; background: currentColor; }
+.s-lockup .word { font-family: var(--font-display); font-weight: 600; font-size: var(--slide-mono); }
+.ink .s-lockup { color: var(--text-inverse); }
+.logo-ink { filter: brightness(0); }

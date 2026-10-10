@@ -1,0 +1,6 @@
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg-page); color: var(--text-primary); font-family: var(--font-sans); font-size: var(--type-body); line-height: var(--leading-body); -webkit-font-smoothing: antialiased; }
+a { color: inherit; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+a:hover { text-decoration-thickness: 2px; }
+:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 3px; border-radius: var(--radius-tag); }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }

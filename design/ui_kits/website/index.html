@@ -1,0 +1,95 @@
+<!-- @dsCard group="Website" viewport="1280x900" name="CLIF Foundation website" subtitle="Click-through: Home, Research, Support composed from DS components" -->
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CLIF Foundation — UI kit</title>
+<link rel="stylesheet" href="../../styles.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone@7.24.7/babel.min.js"></script>
+<script src="../../components/_loader.js"></script></head>
+<body><div id="root"></div>
+<script type="text/x-ds">
+const NS = window.CLIFDS;
+const { ContextBar, SiteHeader, SiteFooter, Button, TextLink, Tag, FilterChip, SectionHeader, DataPanel, KeyValueList, PublicationRow } = NS;
+const wrap = { maxWidth: "var(--content-max)", margin: "0 auto", padding: "0 var(--gutter)" };
+const PROGRAMS = [
+  ["impl_support", "Implementation support", "Guidance for health systems converting EHR data to CLIF, building on the ETL Guide and DQA Framework."],
+  ["education", "Education", "Courses and workshops for clinicians and data scientists learning to work with CLIF-formatted data."],
+  ["oss_stewardship", "Open-source stewardship", "Sustained maintenance of the specification, data dictionary, and tools released under the Apache License 2.0."],
+  ["convening", "Convening", "Forums for sites and contributors to coordinate on future versions of the standard."]
+];
+const PUBS = [
+  [2026, "Federation, Not Centralization: A New Paradigm for EHR-Based Critical Care Research", "Annals of the American Thoracic Society", "journal", "https://academic.oup.com/annalsats/advance-article/doi/10.1093/annalsats/aaoaf067/8435347"],
+  [2026, "Federated generative event models for tokenized electronic health records", "arXiv", "preprint", "https://arxiv.org/abs/2608.02939"],
+  [2025, "Prone Positioning in a North American Cohort of Hypoxemic Patients on Mechanical Ventilation", "medRxiv", "preprint", "https://www.medrxiv.org/content/10.1101/2025.09.03.25334942v1"],
+  [2025, "The Epidemiology of ICU Readmissions Across Ten Health Systems", "Critical Care Explorations", "journal", "https://journals.lww.com/ccejournal/fulltext/2025/11000/the_epidemiology_of_icu_readmissions_across_ten.1.aspx"],
+  [2025, "A common longitudinal intensive care unit data format (CLIF) for critical illness research", "Intensive Care Medicine", "journal", "https://link.springer.com/article/10.1007/s00134-025-07848-7"]
+];
+
+function Home({ go }) {
+  return (<>
+    <section style={{ ...wrap, paddingTop: "clamp(56px,9vw,128px)", paddingBottom: 64, display: "flex", flexWrap: "wrap", gap: "48px 64px", alignItems: "flex-end" }}>
+      <div style={{ flex: "1 1 560px", display: "grid", gap: 28 }}>
+        <span style={{ fontFamily: "var(--font-mono)", fontSize: 13, color: "var(--text-eyebrow)" }}>Common Longitudinal ICU data Format</span>
+        <h1 style={{ margin: 0, fontFamily: "var(--font-display)", fontWeight: 600, fontSize: "var(--type-display-xl)", lineHeight: "var(--leading-display)", letterSpacing: "var(--tracking-display)", textWrap: "balance" }}>Open infrastructure for critical care data.</h1>
+        <p style={{ margin: 0, fontSize: "var(--type-lead)", lineHeight: 1.55, color: "var(--text-body)", maxWidth: 620 }}>CLIF Foundation proposes to fund the education, implementation support, and open-source stewardship that help more hospitals adopt CLIF.</p>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}><Button size="lg" onClick={() => go("support")}>Support CLIF</Button><Button size="lg" variant="secondary">Read the mission</Button></div>
+      </div>
+      <DataPanel title="organization.record" meta="1 row" style={{ flex: "0 1 380px" }}>
+        <KeyValueList rows={[{ k: "name", v: "CLIF Foundation" }, { k: "supports", v: "Common Longitudinal ICU data Format" }, { k: "license", v: "Apache License 2.0" }, { k: "research_by", v: "CLIF Consortium" }, { k: "status", v: <Tag status="proposed" /> }]} />
+      </DataPanel>
+    </section>
+    <section style={{ ...wrap, paddingTop: "var(--section-y)", display: "grid", gap: 32 }}>
+      <SectionHeader index="02" label="Our work" title="Four proposed programs" action={<TextLink href="#">Program details</TextLink>} />
+      <DataPanel title="program_id · name · scope" meta="all proposed">
+        {PROGRAMS.map(([id, n, s]) => <div key={id} style={{ display: "flex", flexWrap: "wrap", gap: "8px 24px", padding: "22px 20px", borderBottom: "1px solid var(--border-subtle)", alignItems: "baseline" }}>
+          <span style={{ flex: "0 0 150px", fontFamily: "var(--font-mono)", fontSize: 13, color: "var(--link)" }}>{id}</span>
+          <span style={{ flex: "0 0 260px", fontSize: 20, fontWeight: 500 }}>{n}</span>
+          <span style={{ flex: "1 1 280px", fontSize: 16, color: "var(--text-body)" }}>{s}</span>
+          <Tag status="proposed" /></div>)}
+      </DataPanel>
+    </section>
+    <section style={{ ...wrap, paddingTop: "var(--section-y)", paddingBottom: "var(--section-y)", display: "grid", gap: 24 }}>
+      <SectionHeader index="04" label="Research using CLIF" title="Recent publications" action={<TextLink href="#" onClick={e => { e.preventDefault(); go("research"); }}>All research</TextLink>} />
+      <div style={{ borderTop: "1px solid var(--ink-950)" }}>{PUBS.slice(0, 3).map(p => <PublicationRow key={p[1]} year={p[0]} title={p[1]} venue={p[2]} type={p[3]} href={p[4]} />)}</div>
+    </section>
+  </>);
+}
+function Research() {
+  const [f, setF] = React.useState("all");
+  const list = PUBS.filter(p => f === "all" || p[3] === f);
+  return (<section style={{ ...wrap, paddingTop: "clamp(56px,8vw,112px)", paddingBottom: "var(--section-y)", display: "grid", gap: 48 }}>
+    <SectionHeader size="page" level={1} index="03" label="research_and_resources" title="Research built on CLIF" lead="Studies listed here are conducted and published by the CLIF Consortium and the original investigators. Each entry links to the original source." />
+    <div style={{ display: "grid", gap: 16 }}>
+      <div role="group" aria-label="Filter publications" style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+        {[["all", "All"], ["journal", "Journals"], ["preprint", "Preprints"]].map(([k, l]) => <FilterChip key={k} label={l} count={PUBS.filter(p => k === "all" || p[3] === k).length} pressed={f === k} onClick={() => setF(k)} />)}
+      </div>
+      <p aria-live="polite" style={{ margin: 0, fontFamily: "var(--font-mono)", fontSize: 12, color: "var(--text-muted)" }}>Showing {list.length} of {PUBS.length}</p>
+      <div style={{ borderTop: "1px solid var(--ink-950)" }}>{list.map(p => <PublicationRow key={p[1]} year={p[0]} title={p[1]} venue={p[2]} type={p[3]} href={p[4]} />)}</div>
+    </div>
+  </section>);
+}
+function Support() {
+  const m = "mailto:info@clificufoundation.org?subject=";
+  return (<section style={{ ...wrap, paddingTop: "clamp(56px,8vw,120px)", paddingBottom: "var(--section-y)", display: "grid", gap: 56 }}>
+    <div style={{ display: "flex", flexWrap: "wrap", gap: "40px 80px", alignItems: "flex-end" }}>
+      <div style={{ flex: "1 1 560px" }}><SectionHeader size="page" level={1} index="05" label="support" title="Giving starts with a conversation." /></div>
+      <div style={{ flex: "1 1 380px", display: "grid", gap: 20 }}>
+        <p style={{ margin: 0, fontSize: 18, color: "var(--text-body)" }}>We are not accepting online payments. Email us to discuss a gift, a partnership, or another way to help.</p>
+        <div><Button size="lg" href="mailto:info@clificufoundation.org">info@clificufoundation.org</Button></div>
+      </div>
+    </div>
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,260px),1fr))", gap: 16 }}>
+      {[["01", "Donors", "Email a gift inquiry", m + "Gift%20inquiry"], ["02", "Institutional partners", "Email a partnership inquiry", m + "Partnership%20inquiry"], ["03", "Clinicians", "Start with CLIF 101", "https://clif-icu.com/clif-101"], ["04", "Technical contributors", "Contribute on GitHub", "https://github.com/Common-Longitudinal-ICU-data-Format/CLIF"]].map(([n, who, cta, href]) =>
+        <DataPanel key={n} title={n} meta={who}><div style={{ padding: "16px 20px" }}><TextLink href={href} external={href.startsWith("http")}>{cta}</TextLink></div></DataPanel>)}
+    </div>
+    <p style={{ margin: 0, fontSize: 15, color: "var(--text-muted)", maxWidth: 760 }}>Information about the Foundation’s legal and tax status will be published here once confirmed. Please ask us directly before making a gift.</p>
+  </section>);
+}
+function App() {
+  const [page, setPage] = React.useState("home");
+  const go = p => { setPage(["home", "research", "support"].includes(p) ? p : "home"); window.scrollTo(0, 0); };
+  return (<div><ContextBar /><SiteHeader current={page} onNavigate={go} />
+    <main>{page === "home" && <Home go={go} />}{page === "research" && <Research />}{page === "support" && <Support />}</main>
+    <SiteFooter links={[{ label: "Research & Resources", onClick: e => { e.preventDefault(); go("research"); } }, { label: "Support CLIF", onClick: e => { e.preventDefault(); go("support"); } }, { label: "CLIF Consortium ↗", href: "https://clif-icu.com/" }, { label: "GitHub ↗", href: "https://github.com/Common-Longitudinal-ICU-data-Format/CLIF" }]} /></div>);
+}
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script></body></html>

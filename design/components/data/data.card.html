@@ -1,0 +1,19 @@
+<!-- @dsCard group="Components" viewport="700x400" name="Data" subtitle="DataPanel, KeyValueList, PublicationRow" -->
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../../styles.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone@7.24.7/babel.min.js"></script>
+<script src="../_loader.js"></script></head>
+<body style="padding:24px"><div id="root"></div>
+<script type="text/x-ds">
+const NS = window.CLIFDS;
+const { DataPanel, KeyValueList, PublicationRow, Tag } = NS;
+ReactDOM.createRoot(document.getElementById("root")).render(<div style={{ display: "grid", gap: 24 }}>
+  <DataPanel title="organization.record" meta="1 row">
+    <KeyValueList rows={[{ k: "name", v: "CLIF Foundation" }, { k: "license", v: "Apache License 2.0" }, { k: "research_by", v: "CLIF Consortium" }, { k: "status", v: <Tag status="proposed" /> }]} />
+  </DataPanel>
+  <div style={{ borderTop: "1px solid var(--border-strong)" }}>
+    <PublicationRow year={2025} title="The Epidemiology of ICU Readmissions Across Ten Health Systems" venue="Critical Care Explorations" type="journal" href="#" />
+  </div>
+</div>);
+</script></body></html>

@@ -1,0 +1,30 @@
+<!-- @dsCard group="Components" viewport="700x260" name="Core" subtitle="Button, TextLink, Tag, FilterChip" -->
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../../styles.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone@7.24.7/babel.min.js"></script>
+<script src="../_loader.js"></script></head>
+<body style="padding:24px"><div id="root"></div>
+<script type="text/x-ds">
+const NS = window.CLIFDS;
+const { Button, TextLink, Tag, FilterChip } = NS;
+function App() {
+  const [f, setF] = React.useState("All");
+  return (<div style={{ display: "grid", gap: 20 }}>
+    <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
+      <Button>Support CLIF</Button><Button variant="secondary">Read the mission</Button><Button variant="ghost">Mission</Button><Button size="sm">Small</Button><Button size="lg">Large</Button>
+    </div>
+    <div style={{ display: "flex", gap: 10, background: "var(--bg-inverse)", padding: 16, borderRadius: 6, alignItems: "center" }}>
+      <Button variant="inverse">Support CLIF</Button><TextLink href="#" inverse>info@clificufoundation.org</TextLink>
+    </div>
+    <div style={{ display: "flex", gap: 16, flexWrap: "wrap", alignItems: "center" }}>
+      <TextLink href="#">Program details</TextLink><TextLink href="#" external>CLIF Consortium</TextLink>
+      <Tag status="proposed" /><Tag status="existing" /><Tag>journal</Tag>
+    </div>
+    <div role="group" aria-label="Filter" style={{ display: "flex", gap: 6 }}>
+      {[["All", 6], ["Journals", 4], ["Preprints", 2]].map(([l, c]) => <FilterChip key={l} label={l} count={c} pressed={f === l} onClick={() => setF(l)} />)}
+    </div>
+  </div>);
+}
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script></body></html>

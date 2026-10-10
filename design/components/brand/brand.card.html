@@ -1,0 +1,18 @@
+<!-- @dsCard group="Components" viewport="700x330" name="Brand" subtitle="Lockup, SectionHeader" -->
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../../styles.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone@7.24.7/babel.min.js"></script>
+<script src="../_loader.js"></script></head>
+<body style="padding:24px"><div id="root"></div>
+<script type="text/x-ds">
+const NS = window.CLIFDS;
+const { Lockup, SectionHeader, TextLink } = NS;
+ReactDOM.createRoot(document.getElementById("root")).render(<div style={{ display: "grid", gap: 28 }}>
+  <div style={{ display: "flex", gap: 16 }}>
+    <div style={{ flex: 1, padding: 20, border: "1px solid var(--border)", borderRadius: 6 }}><Lockup /></div>
+    <div style={{ flex: 1, padding: 20, background: "var(--bg-inverse)", borderRadius: 6 }}><Lockup tone="inverse" /></div>
+  </div>
+  <SectionHeader index="02" label="Our work" title="Four proposed programs" action={<TextLink href="#">Program details</TextLink>} />
+</div>);
+</script></body></html>

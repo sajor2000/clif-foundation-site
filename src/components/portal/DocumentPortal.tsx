@@ -1,0 +1,403 @@
+"use client";
+
+import { useAuth } from "@clerk/nextjs";
+import { useMutation, useQuery } from "convex/react";
+import { Exit } from "effect";
+import Link from "next/link";
+import { useState } from "react";
+import { api } from "../../../convex/_generated/api";
+import type { Id } from "../../../convex/_generated/dataModel";
+import { Button } from "@/components/core/Button";
+import { validateDocumentMeta } from "@/lib/effect/documents";
+import { Effect } from "effect";
+
+const CATEGORIES = ["governance", "legal", "meeting", "other"] as const;
+
+function clerkReady() {
+  return Boolean(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY);
+}
+
+function convexReady() {
+  return Boolean(process.env.NEXT_PUBLIC_CONVEX_URL);
+}
+
+export function DocumentPortal() {
+  if (!clerkReady()) {
+    return (
+      <PortalFrame>
+        <StatusPanel
+          title="Clerk not configured"
+          body="Set NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY and CLERK_SECRET_KEY to enable the board portal. Public pages work without Clerk."
+        />
+      </PortalFrame>
+    );
+  }
+
+  if (!convexReady()) {
+    return (
+      <PortalFrame>
+        <StatusPanel
+          title="Convex not configured"
+          body="Set NEXT_PUBLIC_CONVEX_URL (from npx convex dev) to load board documents."
+        />
+      </PortalFrame>
+    );
+  }
+
+  return <AuthenticatedPortal />;
+}
+
+function AuthenticatedPortal() {
+  const { isLoaded, isSignedIn } = useAuth();
+
+  if (!isLoaded) {
+    return (
+      <PortalFrame>
+        <StatusPanel title="Loading portal…" body="Checking board session." />
+      </PortalFrame>
+    );
+  }
+
+  if (!isSignedIn) {
+    return (
+      <PortalFrame>
+        <StatusPanel
+          title="Board sign-in required"
+          body="This route is for board members. Sign in with your Clerk account."
+          action={<Button href="/portal/sign-in">Sign in</Button>}
+        />
+      </PortalFrame>
+    );
+  }
+
+  return <DocumentWorkspace />;
+}
+
+function DocumentWorkspace() {
+  const docs = useQuery(api.documents.listDocuments);
+  const generateUploadUrl = useMutation(api.documents.generateUploadUrl);
+  const saveDocument = useMutation(api.documents.saveDocument);
+
+  const [title, setTitle] = useState("");
+  const [category, setCategory] =
+    useState<(typeof CATEGORIES)[number]>("governance");
+  const [file, setFile] = useState<File | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+
+  async function onUpload(e: React.FormEvent) {
+    e.preventDefault();
+    setError(null);
+    if (!file) {
+      setError("Choose a file to upload.");
+      return;
+    }
+
+    const metaExit = await Effect.runPromiseExit(
+      validateDocumentMeta({
+        title,
+        category,
+        contentType: file.type || "application/octet-stream",
+      }),
+    );
+
+    if (!Exit.isSuccess(metaExit)) {
+      setError("Invalid document metadata. Check title and category.");
+      return;
+    }
+
+    const meta = metaExit.value;
+    setUploading(true);
+    try {
+      const uploadUrl = await generateUploadUrl();
+      const result = await fetch(uploadUrl, {
+        method: "POST",
+        headers: { "Content-Type": meta.contentType },
+        body: file,
+      });
+      if (!result.ok) {
+        throw new Error("Upload failed");
+      }
+      const { storageId } = (await result.json()) as {
+        storageId: Id<"_storage">;
+      };
+      await saveDocument({
+        storageId,
+        title: meta.title,
+        category: meta.category,
+        contentType: meta.contentType,
+      });
+      setTitle("");
+      setFile(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Upload failed");
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  return (
+    <PortalFrame>
+      <div style={{ display: "grid", gap: 40 }}>
+        <section style={{ display: "grid", gap: 16 }}>
+          <h2
+            style={{
+              margin: 0,
+              fontFamily: "var(--font-display)",
+              fontWeight: 600,
+              fontSize: 28,
+            }}
+          >
+            Upload a document
+          </h2>
+          <form
+            onSubmit={onUpload}
+            style={{
+              display: "grid",
+              gap: 14,
+              maxWidth: 520,
+              border: "1px solid var(--border-strong)",
+              borderRadius: 6,
+              padding: 20,
+              background: "var(--bg-figure)",
+            }}
+          >
+            <label style={{ display: "grid", gap: 6, fontSize: 14 }}>
+              Title
+              <input
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                required
+                maxLength={200}
+                style={inputStyle}
+              />
+            </label>
+            <label style={{ display: "grid", gap: 6, fontSize: 14 }}>
+              Category
+              <select
+                value={category}
+                onChange={(e) =>
+                  setCategory(e.target.value as (typeof CATEGORIES)[number])
+                }
+                style={inputStyle}
+              >
+                {CATEGORIES.map((c) => (
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label style={{ display: "grid", gap: 6, fontSize: 14 }}>
+              File
+              <input
+                type="file"
+                onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+                required
+              />
+            </label>
+            {error ? (
+              <p role="alert" style={{ margin: 0, color: "var(--status-error)", fontSize: 14 }}>
+                {error}
+              </p>
+            ) : null}
+            <Button type="submit" disabled={uploading}>
+              {uploading ? "Uploading…" : "Upload document"}
+            </Button>
+          </form>
+        </section>
+
+        <section style={{ display: "grid", gap: 16 }}>
+          <h2
+            style={{
+              margin: 0,
+              fontFamily: "var(--font-display)",
+              fontWeight: 600,
+              fontSize: 28,
+            }}
+          >
+            Documents
+          </h2>
+          {docs === undefined ? (
+            <p style={{ color: "var(--text-muted)" }}>Loading documents…</p>
+          ) : docs.length === 0 ? (
+            <p style={{ color: "var(--text-muted)" }}>
+              No documents yet. Upload the first board file above.
+            </p>
+          ) : (
+            <ul
+              style={{
+                margin: 0,
+                padding: 0,
+                listStyle: "none",
+                borderTop: "1px solid var(--border-strong)",
+              }}
+            >
+              {docs.map((doc) => (
+                <DocumentRow key={doc._id} doc={doc} />
+              ))}
+            </ul>
+          )}
+        </section>
+      </div>
+    </PortalFrame>
+  );
+}
+
+function DocumentRow({
+  doc,
+}: {
+  doc: {
+    _id: Id<"documents">;
+    title: string;
+    category: string;
+    storageId: Id<"_storage">;
+    contentType: string;
+    createdAt: number;
+  };
+}) {
+  const url = useQuery(api.documents.getDocumentUrl, {
+    storageId: doc.storageId,
+  });
+
+  return (
+    <li
+      style={{
+        display: "flex",
+        flexWrap: "wrap",
+        gap: "8px 24px",
+        padding: "18px 0",
+        borderBottom: "1px solid var(--border)",
+        alignItems: "baseline",
+      }}
+    >
+      <span style={{ flex: "1 1 240px", fontWeight: 500, fontSize: 17 }}>
+        {url ? (
+          <a href={url} target="_blank" rel="noopener noreferrer" style={{ color: "var(--link)" }}>
+            {doc.title} ↗
+          </a>
+        ) : (
+          doc.title
+        )}
+      </span>
+      <span
+        style={{
+          fontFamily: "var(--font-mono)",
+          fontSize: 12,
+          color: "var(--text-muted)",
+        }}
+      >
+        {doc.category}
+      </span>
+      <span
+        style={{
+          fontFamily: "var(--font-mono)",
+          fontSize: 12,
+          color: "var(--text-muted)",
+        }}
+      >
+        {new Date(doc.createdAt).toISOString().slice(0, 10)}
+      </span>
+    </li>
+  );
+}
+
+function PortalFrame({ children }: { children: React.ReactNode }) {
+  return (
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "var(--bg-page)",
+        color: "var(--text-primary)",
+        fontFamily: "var(--font-sans)",
+      }}
+    >
+      <header
+        style={{
+          borderBottom: "1px solid var(--border)",
+          padding: "18px var(--gutter)",
+          display: "flex",
+          justifyContent: "space-between",
+          gap: 16,
+          alignItems: "center",
+        }}
+      >
+        <div style={{ display: "grid", gap: 4 }}>
+          <span
+            style={{
+              fontFamily: "var(--font-display)",
+              fontWeight: 600,
+              fontSize: 18,
+            }}
+          >
+            CLIF Foundation board portal
+          </span>
+          <span
+            style={{
+              fontFamily: "var(--font-mono)",
+              fontSize: 12,
+              color: "var(--text-muted)",
+            }}
+          >
+            /portal · not linked from public navigation
+          </span>
+        </div>
+        <Link href="/" className="linkish">
+          Public site →
+        </Link>
+      </header>
+      <main className="page-wrap" style={{ paddingTop: 48, paddingBottom: 80 }}>
+        {children}
+      </main>
+    </div>
+  );
+}
+
+function StatusPanel({
+  title,
+  body,
+  action,
+}: {
+  title: string;
+  body: string;
+  action?: React.ReactNode;
+}) {
+  return (
+    <div
+      style={{
+        border: "1px solid var(--border-strong)",
+        borderRadius: 6,
+        background: "var(--bg-figure)",
+        padding: 28,
+        display: "grid",
+        gap: 14,
+        maxWidth: 560,
+      }}
+    >
+      <h1
+        style={{
+          margin: 0,
+          fontFamily: "var(--font-display)",
+          fontWeight: 600,
+          fontSize: 32,
+          letterSpacing: "-0.02em",
+        }}
+      >
+        {title}
+      </h1>
+      <p style={{ margin: 0, color: "var(--text-body)", lineHeight: 1.55 }}>{body}</p>
+      {action}
+    </div>
+  );
+}
+
+const inputStyle: React.CSSProperties = {
+  height: 44,
+  padding: "0 12px",
+  border: "1px solid var(--border-strong)",
+  borderRadius: 3,
+  background: "var(--bg-page)",
+  color: "var(--text-primary)",
+  fontFamily: "var(--font-sans)",
+  fontSize: 15,
+};

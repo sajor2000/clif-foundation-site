@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Funnel+Display:wght@400..800&family=Funnel+Sans:wght@300..700&family=Spline+Sans+Mono:wght@400;500&display=swap">
+<style>
+:root{--bg-page:#F5F6F3;--bg-panel:#EAECE7;--bg-figure:#FFFFFF;--bg-figure-alt:#F9FAF7;--bg-inverse:#EAECE7;--bg-hover:#EAECE7;--text-primary:#0E1111;--text-body:#3D423E;--text-muted:#555B55;--text-inverse:#0E1111;--text-inverse-body:#3D423E;--text-inverse-muted:#555B55;--link:#12495E;--link-hover:#0D3B4C;--accent:#3A9B78;--accent-text:#12495E;--logo-inverse-filter:brightness(0);--accent-on:#0E1111;--accent-tint:#B9E3D0;--action-primary-bg:#0E1111;--action-primary-fg:#F5F6F3;--action-primary-hover:#12495E;--status-existing-bg:#0E1111;--status-existing-fg:#F5F6F3;--border-strong:#0E1111;--border:#CDD1CA;--border-subtle:#DFE2DC;--border-inverse:#CDD1CA;--grid-line:#E6E8E3;--grid-dot:#D5D9D1;--logo-filter:brightness(0);--focus:#0E1111;color-scheme:light}
+[data-theme="dark"]{--bg-page:#0E1111;--bg-panel:#161A18;--bg-figure:#1F2421;--bg-figure-alt:#1A1F1D;--bg-inverse:#1A1F1D;--bg-hover:#242927;--text-primary:#F5F6F3;--text-body:#C4C9C3;--text-muted:#9AA19B;--text-inverse:#F5F6F3;--text-inverse-body:#C4C9C3;--text-inverse-muted:#9AA19B;--border-inverse:#3A3F3C;--link:#3A9B78;--link-hover:#4FB08A;--accent-text:#3A9B78;--logo-inverse-filter:none;--accent-tint:#1F4A3A;--action-primary-bg:#3A9B78;--action-primary-fg:#0E1111;--action-primary-hover:#4FB08A;--status-existing-bg:#F5F6F3;--status-existing-fg:#0E1111;--border-strong:#5A605B;--border:#2A2F2C;--border-subtle:#242927;--grid-line:#242927;--grid-dot:#2A2F2C;--logo-filter:brightness(0) invert(1);--focus:#3A9B78;color-scheme:dark}
+html,body{margin:0;background:var(--bg-page);-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+a{color:inherit;text-decoration-thickness:1px;text-underline-offset:3px}
+a:hover{text-decoration-thickness:2px}
+:focus-visible{outline:2px solid var(--focus);outline-offset:3px;border-radius:2px}
+@media (prefers-reduced-motion:no-preference){[data-theme]{transition:background-color 120ms,color 120ms}}
+</style>
+</helmet>
+<div ref="{{ rootRef }}" data-theme="{{ themeAttr }}" style="min-height:100vh;background:var(--bg-page);color:var(--text-primary);font-family:'Funnel Sans',sans-serif;font-size:17px;line-height:1.6">
+<a href="#main" style="position:absolute;left:-9999px;top:8px;background:var(--action-primary-bg);color:var(--action-primary-fg);padding:10px 14px;border-radius:3px;z-index:10" style-focus="left:8px">Skip to content</a>
+
+<div style="background:var(--bg-inverse);color:var(--text-inverse-body);font-family:'Funnel Sans',sans-serif;font-size:13px;line-height:1.4">
+<div style="max-width:1424px;margin:0 auto;padding:9px clamp(16px,4vw,56px);display:flex;flex-wrap:wrap;gap:6px 24px;justify-content:space-between">
+<span>An Illinois nonprofit supporting adoption of the CLIF standard · 501(c)(3) application pending</span>
+<a href="https://clif-icu.com/" style="color:var(--accent-text)">Research is conducted by the CLIF Consortium ↗</a>
+</div>
+</div>
+
+<header style="border-bottom:1px solid var(--border);background:var(--bg-page);position:sticky;top:0;z-index:5">
+<div style="max-width:1424px;margin:0 auto;padding:0 clamp(16px,4vw,56px);min-height:72px;display:flex;align-items:center;justify-content:space-between;gap:24px">
+<a href="#" onClick="{{ goHome }}" aria-label="CLIF Foundation home" style="text-decoration:none;display:flex;align-items:center;gap:14px;flex:none">
+<img src="https://clif-icu.com/images/logos/clif_logo_transparent_FINAL_cropped.png" alt="CLIF" style="height:34px;display:block;filter:var(--logo-filter)">
+<span style="width:1px;height:24px;background:var(--bg-inverse)"></span>
+<span style="font-family:'Funnel Display',sans-serif;font-weight:600;font-size:17px;letter-spacing:-0.005em">Foundation</span>
+</a>
+<sc-if value="{{ wide }}" hint-placeholder-val="{{ true }}">
+<nav aria-label="Primary" style="display:flex;align-items:center;gap:2px;font-size:15px;font-weight:500">
+<sc-for list="{{ navItems }}" as="n" hint-placeholder-count="4">
+<a href="#" onClick="{{ n.go }}" aria-current="{{ n.current }}" style="text-decoration:none;height:72px;padding:0 14px;display:flex;align-items:center;border-bottom:2px solid {{ n.bar }};margin-bottom:-1px" style-hover="background:var(--bg-hover)">{{ n.label }}</a>
+</sc-for>
+<a href="#" onClick="{{ goSupport }}" aria-current="{{ supportCurrent }}" style="margin-left:14px;text-decoration:none;background:var(--action-primary-bg);color:var(--action-primary-fg);padding:0 18px;height:42px;display:inline-flex;align-items:center;border-radius:3px" style-hover="background:var(--action-primary-hover)">Support CLIF</a>
+</nav>
+</sc-if>
+<div style="display:flex;align-items:center;gap:8px;flex:none">
+<button onClick="{{ toggleTheme }}" aria-label="{{ themeLabel }}" title="{{ themeLabel }}" aria-pressed="{{ themePressed }}" style="height:44px;padding:0 12px;border:1px solid var(--border-strong);border-radius:3px;background:transparent;color:var(--text-primary);cursor:pointer;display:inline-flex;align-items:center;gap:8px;font:500 14px 'Funnel Sans',sans-serif" style-hover="background:var(--bg-hover)"><span aria-hidden="true" style="width:14px;height:14px;border-radius:50%;border:1.5px solid currentColor;background:linear-gradient(90deg,currentColor 50%,transparent 50%)"></span><span>{{ themeShort }}</span></button>
+<sc-if value="{{ narrow }}" hint-placeholder-val="{{ false }}">
+<button onClick="{{ toggleMenu }}" aria-expanded="{{ menuExpanded }}" aria-controls="mobile-menu" style="height:44px;padding:0 16px;border:1px solid var(--border-strong);border-radius:3px;background:{{ menuBtnBg }};color:{{ menuBtnFg }};font:500 15px 'Funnel Sans',sans-serif;cursor:pointer">{{ menuLabel }}</button>
+</sc-if>
+</div>
+</div>
+<sc-if value="{{ menuVisible }}" hint-placeholder-val="{{ false }}">
+<nav id="mobile-menu" aria-label="Primary" style="padding:8px clamp(16px,4vw,56px) 24px;display:grid;border-top:1px solid var(--border);background:var(--bg-page)">
+<sc-for list="{{ navItems }}" as="n" hint-placeholder-count="4">
+<a href="#" onClick="{{ n.go }}" aria-current="{{ n.current }}" style="min-height:56px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);text-decoration:none;font-family:'Funnel Display',sans-serif;font-weight:600;font-size:22px"><span>{{ n.label }}</span><span style="font-family:'Spline Sans Mono',monospace;font-size:12px;font-weight:400;color:var(--text-muted)">{{ n.no }}</span></a>
+</sc-for>
+<a href="#" onClick="{{ goSupport }}" style="margin-top:20px;text-decoration:none;background:var(--action-primary-bg);color:var(--action-primary-fg);height:52px;display:flex;align-items:center;justify-content:center;border-radius:3px;font-weight:500">Support CLIF</a>
+</nav>
+</sc-if>
+</header>
+
+<main id="main" tabIndex="-1" style="outline:none">
+
+<!-- ================= HOME ================= -->
+<sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+<div>
+<section style="max-width:1424px;margin:0 auto;padding:clamp(56px,9vw,128px) clamp(16px,4vw,56px) clamp(40px,5vw,64px);display:flex;flex-wrap:wrap;gap:48px 64px;align-items:flex-end">
+<div style="flex:1 1 560px;min-width:0;display:grid;gap:28px">
+<span style="font-family:'Funnel Sans',sans-serif;font-weight:500;font-size:13px;letter-spacing:.01em;color:var(--link)">An Illinois nonprofit for critical care data</span>
+<h1 style="font-family:'Funnel Display',sans-serif;font-weight:600;font-size:clamp(40px,6.4vw,88px);line-height:.98;letter-spacing:-0.035em;margin:0;text-wrap:balance">Open infrastructure for critical care data.</h1>
+<p style="font-size:clamp(17px,1.5vw,20px);line-height:1.55;margin:0;max-width:620px;color:var(--text-body);text-wrap:pretty">Every hospital records intensive care differently. CLIF is a free, open standard that makes those records comparable, so clinicians at many hospitals can study critical illness together. CLIF Foundation proposes to fund the training, hands-on help, and long-term upkeep that let more hospitals use it.</p>
+<div style="display:flex;flex-wrap:wrap;gap:10px">
+<a href="#" onClick="{{ goSupport }}" style="text-decoration:none;background:var(--action-primary-bg);color:var(--action-primary-fg);padding:0 22px;height:48px;display:inline-flex;align-items:center;border-radius:3px;font-weight:500;font-size:16px" style-hover="background:var(--action-primary-hover)">Support CLIF</a>
+<a href="#" onClick="{{ goMission }}" style="text-decoration:none;border:1px solid var(--border-strong);padding:0 22px;height:48px;display:inline-flex;align-items:center;border-radius:3px;font-weight:500;font-size:16px" style-hover="background:var(--bg-hover)">Read the mission</a>
+</div>
+</div>
+<dl style="flex:0 1 380px;min-width:0;margin:0;border:1px solid var(--border-strong);border-radius:6px;background:var(--bg-figure);font-family:'Spline Sans Mono',monospace;font-size:13px;line-height:1.45">
+<div style="padding:12px 16px;border-bottom:1px solid var(--border-strong);display:flex;justify-content:space-between;gap:12px"><span>organization.record</span><span style="color:var(--text-muted)">1 row</span></div>
+<sc-for list="{{ orgRecord }}" as="r" hint-placeholder-count="5">
+<div style="display:flex;flex-wrap:wrap;gap:4px 16px;padding:11px 16px;border-bottom:1px solid var(--border-subtle)"><dt style="flex:0 0 130px;color:var(--text-muted)">{{ r.k }}</dt><dd style="margin:0;flex:1 1 160px">{{ r.v }}</dd></div>
+</sc-for>
+<div style="padding:11px 16px;display:flex;flex-wrap:wrap;gap:4px 16px"><dt style="flex:0 0 130px;color:var(--text-muted)">status</dt><dd style="margin:0"><span style="background:var(--accent);color:var(--accent-on);padding:2px 8px;border-radius:2px">proposed</span></dd></div>
+</dl>
+</section>
+<section aria-label="In plain terms" style="max-width:1424px;margin:0 auto;padding:0 clamp(16px,4vw,56px) clamp(64px,8vw,112px)">
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));border-top:1px solid var(--border-strong)">
+<div style="display:grid;gap:12px;align-content:start;padding:28px 24px 32px 0;border-bottom:1px solid var(--border)"><span style="font-family:'Funnel Sans',sans-serif;font-weight:500;font-size:12px;letter-spacing:.01em;color:var(--link)">What CLIF is</span><h2 style="margin:0;font-family:'Funnel Display',sans-serif;font-weight:600;font-size:24px;letter-spacing:-0.015em">A shared format for ICU records</h2><p style="margin:0;font-size:16px;line-height:1.6;color:var(--text-body);text-wrap:pretty">Ventilators, infusions, labs and vital signs are stored differently at every hospital. CLIF puts them in one common layout so the same question can be asked at any site. It is open source and free to use.</p></div>
+<div style="display:grid;gap:12px;align-content:start;padding:28px 24px 32px;border-bottom:1px solid var(--border)"><span style="font-family:'Funnel Sans',sans-serif;font-weight:500;font-size:12px;letter-spacing:.01em;color:var(--link)">Why a Foundation</span><h2 style="margin:0;font-family:'Funnel Display',sans-serif;font-weight:600;font-size:24px;letter-spacing:-0.015em">The Consortium does research. The Foundation would help hospitals adopt.</h2><p style="margin:0;font-size:16px;line-height:1.6;color:var(--text-body);text-wrap:pretty">The CLIF Consortium is a network of academic centers that built the standard and runs studies with it. Getting a new hospital started takes training, technical help and maintenance that research grants do not cover. The Foundation would fund that work.</p></div>
+<div style="display:grid;gap:12px;align-content:start;padding:28px 0 32px 24px;border-bottom:1px solid var(--border)"><span style="font-family:'Funnel Sans',sans-serif;font-weight:500;font-size:12px;letter-spacing:.01em;color:var(--link)">What a gift funds</span><h2 style="margin:0;font-family:'Funnel Display',sans-serif;font-weight:600;font-size:24px;letter-spacing:-0.015em">Training, implementation help and upkeep</h2><p style="margin:0;font-size:16px;line-height:1.6;color:var(--text-body);text-wrap:pretty">Gifts would support courses for clinicians and data teams, hands-on help for hospitals converting their records, and maintenance of the open specification and tools. No gift funds research or touches patient data.</p><a href="#" onClick="{{ goSupport }}" style="color:var(--link);font-size:15px;font-weight:500;min-height:44px;display:inline-flex;align-items:center">How to give →</a></div>
+</div>
+</section>
+
+<section aria-labelledby="fig-stay" style="max-width:1424px;margin:0 auto;padding:0 clamp(16px,4vw,56px) clamp(80px,9vw,128px)">
+<figure style="margin:0;border:1px solid var(--border-strong);border-radius:6px;background:var(--bg-figure);overflow:hidden">
+<div style="display:flex;flex-wrap:wrap;gap:6px 24px;justify-content:space-between;align-items:center;padding:14px 20px;border-bottom:1px solid var(--border-strong);font-family:'Funnel Sans',sans-serif;font-size:14px">
+<span style="font-family:'Funnel Sans',sans-serif;font-size:14px" id="fig-stay">One ICU stay, as CLIF records it</span>
+<span style="font-family:'Spline Sans Mono',monospace;font-size:13px;color:var(--text-muted)">Illustrative schematic · not patient data</span>
+</div>
+<div style="padding:16px 20px 8px;overflow:hidden">
+<div style="display:flex;flex-wrap:wrap;column-gap:16px;padding-bottom:8px">
+<span style="flex:0 0 220px"></span>
+<div style="flex:1 1 320px;position:relative;height:16px;font-family:'Spline Sans Mono',monospace;font-size:11px;color:var(--text-muted)">
+<sc-for list="{{ hourTicks }}" as="t" hint-placeholder-count="7"><span style="position:absolute;top:0;transform:translateX({{ t.shift }});left:{{ t.left }}">{{ t.label }}</span></sc-for>
+</div>
+</div>
+<sc-for list="{{ rows }}" as="r" hint-placeholder-count="8">
+<div style="display:flex;flex-wrap:wrap;column-gap:16px;align-items:center;border-top:1px solid var(--border-subtle)">
+<span style="flex:0 0 220px;font-family:'Spline Sans Mono',monospace;font-size:13px;padding:8px 0 2px">{{ r.table }}</span>
+<div style="flex:1 1 320px;position:relative;height:36px;background-image:linear-gradient(90deg,var(--grid-line) 1px,transparent 1px);background-size:16.6667% 100%">
+<sc-for list="{{ r.marks }}" as="m" hint-placeholder-count="0"><span style="position:absolute;top:{{ m.top }};left:{{ m.left }};width:{{ m.width }};height:{{ m.height }};background:{{ m.bg }};border:{{ m.border }};border-radius:{{ m.radius }};color:{{ m.fg }};font-family:'Spline Sans Mono',monospace;font-size:11px;display:flex;align-items:center;padding:0 {{ m.pad }};white-space:nowrap;overflow:hidden">{{ m.label }}</span></sc-for>
+</div>
+</div>
+</sc-for>
+</div>
+<figcaption style="display:flex;gap:10px 28px;flex-wrap:wrap;padding:14px 20px;border-top:1px solid var(--border-strong);font-size:13px;color:var(--text-body)">
+<span>Simplified to show the idea. The full specification and mCIDE are maintained by the CLIF Consortium at <a href="https://clif-icu.com/data-dictionary" style="color:var(--link)">clif-icu.com ↗</a>.</span>
+<span style="display:inline-flex;gap:8px;align-items:center"><span style="width:14px;height:10px;background:var(--status-existing-bg);border-radius:2px"></span>Interval</span>
+<span style="display:inline-flex;gap:8px;align-items:center"><span style="width:14px;height:10px;background:var(--accent);color:var(--accent-on);border:1px solid var(--border-strong);border-radius:2px"></span>Highlighted interval</span>
+<span style="display:inline-flex;gap:8px;align-items:center"><span style="width:8px;height:8px;background:var(--status-existing-bg);border-radius:50%"></span>Discrete measurement</span>
+</figcaption>
+</figure>
+</section>
+
+<section class="dark" style="background:var(--bg-inverse);color:var(--text-inverse)">
+<div style="max-width:1424px;margin:0 auto;padding:clamp(72px,9vw,120px) clamp(16px,4vw,56px);display:grid;gap:56px">
+<div style="display:flex;flex-wrap:wrap;gap:24px 64px;align-items:flex-end">
+<div style="flex:1 1 440px;display:grid;gap:18px">
+<span style="font-family:'Funnel Sans',sans-serif;font-weight:500;font-size:12px;letter-spacing:.01em;color:var(--accent-text)">01 — How CLIF research works</span>
+<h2 style="font-family:'Funnel Display',sans-serif;font-weight:600;font-size:clamp(30px,3.6vw,48px);line-height:1.04;letter-spacing:-0.03em;margin:0">Data stays at each hospital. Code travels.</h2>
+</div>
+<p style="flex:1 1 400px;margin:0;font-size:18px;line-height:1.6;color:var(--text-inverse-body)">The CLIF Consortium conducts federated research: each site converts its EHR data to CLIF locally, runs shared analysis code, and returns only aggregate results. The Foundation’s proposed work helps more sites reach that first step.</p>
+</div>
+<div style="display:grid;gap:0">
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px">
+<sc-for list="{{ sites }}" as="s" hint-placeholder-count="5">
+<div style="display:grid;gap:0">
+<div style="border:1px solid var(--border-inverse);border-radius:4px;padding:14px 16px;display:grid;gap:10px;font-family:'Spline Sans Mono',monospace;font-size:12px">
+<span style="display:flex;justify-content:space-between"><span>{{ s.name }}</span><span style="color:var(--accent-text)" aria-hidden="true">●</span></span>
+<span style="color:var(--text-inverse-muted);line-height:1.7">EHR → CLIF tables<br>run shared code</span>
+</div>
+<div style="height:36px;display:flex;justify-content:center"><span style="width:1px;background:repeating-linear-gradient(var(--accent) 0 4px,transparent 4px 8px)"></span></div>
+</div>
+</sc-for>
+</div>
+<div style="border:1px solid var(--accent);border-radius:4px;padding:16px 20px;display:flex;flex-wrap:wrap;gap:10px 28px;justify-content:space-between;align-items:center;font-family:'Funnel Sans',sans-serif;font-size:13px">
+<span style="color:var(--accent-text)">Aggregate results only</span>
+<span style="color:var(--text-inverse-body)">No patient-level data leaves an institution</span>
+</div>
+</div>
+</div>
+</section>
+
+<section aria-labelledby="flow-title" style="max-width:1424px;margin:0 auto;padding:clamp(72px,9vw,120px) clamp(16px,4vw,56px) 0;display:grid;gap:40px">
+<div style="display:flex;flex-wrap:wrap;gap:24px 64px;align-items:flex-end">
+<div style="flex:1 1 480px;display:grid;gap:14px"><span style="font-family:'Funnel Sans',sans-serif;font-weight:500;font-size:12px;letter-spacing:.01em;color:var(--link)">02 — How CLIF organizes ICU data</span><h2 id="flow-title" style="font-family:'Funnel Display',sans-serif;font-weight:600;font-size:clamp(30px,3.6vw,48px);line-height:1.04;letter-spacing:-0.03em;margin:0;text-wrap:balance">Life support, as connected tables.</h2></div>
+<p style="flex:1 1 380px;margin:0;font-size:17px;line-height:1.6;color:var(--text-body)">Ventilation, vasoactive infusions, renal replacement, and ECMO are recorded by different devices and systems. CLIF gives each its own table, timestamps every row, and links them all to the same hospitalization.</p>
+</div>
+
+<figure style="margin:0;border:1px solid var(--border-strong);border-radius:6px;background:var(--bg-figure-alt);overflow:hidden">
+<div style="display:flex;flex-wrap:wrap;gap:6px 24px;justify-content:space-between;align-items:center;padding:12px 20px;border-bottom:1px solid var(--border-strong);background:var(--bg-figure);font-family:'Funnel Sans',sans-serif;font-size:14px"><span style="font-family:'Spline Sans Mono',monospace;font-size:13px">clif.schema · life support view</span><span style="font-family:'Funnel Sans',sans-serif;font-size:14px;color:var(--text-muted)">Simplified for illustration · full spec and mCIDE at clif-icu.com</span></div>
+<div style="overflow-x:auto">
+<div style="position:relative;width:1240px;height:690px;margin:0 auto;background-image:radial-gradient(var(--grid-dot) 1px,transparent 1px);background-size:16px 16px">
+<span style="position:absolute;left:21px;top:12px;font-family:'Spline Sans Mono',monospace;font-size:11px;background:var(--accent);color:var(--accent-on);border:1px solid var(--border-strong);border-radius:2px;padding:1px 8px">life support</span>
+<span style="position:absolute;left:21px;top:494px;font-family:'Spline Sans Mono',monospace;font-size:11px;background:var(--bg-figure);border:1px solid var(--border-strong);border-radius:2px;padding:1px 8px">clinical context</span>
+<span style="position:absolute;left:620px;top:250px;transform:translateX(-50%);font-family:'Spline Sans Mono',monospace;font-size:10.5px;background:var(--bg-figure-alt);padding:0 6px;color:var(--text-body)">joined on hospitalization_id</span>
+<span style="position:absolute;left:620px;top:470px;transform:translateX(-50%);font-family:'Spline Sans Mono',monospace;font-size:10.5px;background:var(--bg-figure-alt);padding:0 6px;color:var(--text-body)">joined on hospitalization_id</span>
+{{ schemaLines }}
+<sc-for list="{{ schemaBoxes }}" as="b" hint-placeholder-count="6">
+<div style="position:absolute;left:{{ b.x }}px;top:{{ b.y }}px;width:{{ b.w }}px;border:1px solid var(--border-strong);border-radius:4px;background:var(--bg-figure);overflow:hidden;box-shadow:{{ b.shadow }}">
+<div style="height:36px;padding:0 12px;display:flex;align-items:center;justify-content:space-between;gap:8px;border-bottom:1px solid var(--border-strong);background:{{ b.headBg }};color:{{ b.headFg }};font-family:'Spline Sans Mono',monospace;font-size:12px;font-weight:500"><span>{{ b.name }}</span><span style="font-weight:400;font-size:10px;opacity:.85;white-space:nowrap">{{ b.kind }}</span></div>
+<sc-for list="{{ b.fields }}" as="f" hint-placeholder-count="4"><div style="height:22px;padding:0 12px;display:flex;align-items:center;justify-content:space-between;gap:8px;font-family:'Spline Sans Mono',monospace;font-size:11px;border-bottom:1px solid var(--border-subtle)"><span style="color:{{ f.color }};white-space:nowrap">{{ f.name }}</span><span style="font-size:9.5px;padding:0 5px;border-radius:2px;background:{{ f.tagBg }};color:{{ f.fg }};line-height:15px;white-space:nowrap">{{ f.tag }}</span></div></sc-for>
+</div>
+</sc-for>
+</div>
+</div>
+<figcaption style="display:flex;flex-wrap:wrap;gap:10px 24px;padding:12px 20px;border-top:1px solid var(--border-strong);background:var(--bg-figure);font-size:13px;color:var(--text-body);align-items:center">
+<span style="display:inline-flex;gap:6px;align-items:center"><span style="font-family:'Spline Sans Mono',monospace;font-size:10px;background:var(--status-existing-bg);color:var(--status-existing-fg);border-radius:2px;padding:0 5px">key</span>links rows to a hospitalization</span>
+<span style="display:inline-flex;gap:6px;align-items:center"><span style="font-family:'Spline Sans Mono',monospace;font-size:10px;background:var(--accent-tint);border-radius:2px;padding:0 5px">time</span>every event is timestamped</span>
+<span style="display:inline-flex;gap:6px;align-items:center"><span style="font-family:'Spline Sans Mono',monospace;font-size:10px;background:var(--bg-panel);border-radius:2px;padding:0 5px">mCIDE</span>shared permissible values</span>
+<span style="display:inline-flex;gap:6px;align-items:center"><span style="font-family:'Spline Sans Mono',monospace;font-size:10px;border:1px solid var(--border);border-radius:2px;padding:0 5px">value</span>measured or set value</span>
+<sc-if value="{{ diagramScroll }}" hint-placeholder-val="{{ false }}"><span style="font-family:'Funnel Sans',sans-serif;font-size:12px;color:var(--text-muted)">Scroll the diagram sideways →</span></sc-if>
+</figcaption>
+</figure>
+
+<figure style="margin:0;border:1px solid var(--border-strong);border-radius:6px;background:var(--bg-figure);overflow:hidden">
+<div style="display:flex;flex-wrap:wrap;gap:6px 24px;justify-content:space-between;align-items:center;padding:12px 20px;border-bottom:1px solid var(--border-strong);font-family:'Funnel Sans',sans-serif;font-size:14px"><span style="font-family:'Spline Sans Mono',monospace;font-size:13px">tables → questions</span><span style="font-family:'Funnel Sans',sans-serif;font-size:14px;color:var(--text-muted)">Which CLIF tables an analysis would draw on</span></div>
+<div style="overflow-x:auto">
+<div style="position:relative;width:1240px;height:{{ flowH }}px;margin:0 auto">
+{{ flowLines }}
+<span style="position:absolute;left:20px;top:14px;font-family:'Spline Sans Mono',monospace;font-size:11px;color:var(--text-muted)">CLIF table</span>
+<sc-for list="{{ flowLeft }}" as="t" hint-placeholder-count="6">
+<div style="position:absolute;left:20px;top:{{ t.y }}px;width:300px;height:44px;border:1px solid var(--border-strong);border-radius:4px;background:{{ t.bg }};color:{{ t.fg }};display:flex;align-items:center;justify-content:space-between;padding:0 14px;font-family:'Spline Sans Mono',monospace;font-size:12px"><span>{{ t.name }}</span><span style="font-size:10px;color:var(--text-body);white-space:nowrap">{{ t.kind }}</span></div>
+</sc-for>
+<sc-for list="{{ flowGroups }}" as="g" hint-placeholder-count="3">
+<div style="position:absolute;left:740px;top:{{ g.y }}px;width:480px;display:flex;justify-content:space-between;align-items:center;gap:8px;height:24px"><span style="font-family:'Funnel Display',sans-serif;font-weight:600;font-size:16px">{{ g.title }}</span></div>
+</sc-for>
+<sc-for list="{{ flowRight }}" as="q" hint-placeholder-count="6">
+<div style="position:absolute;left:740px;top:{{ q.y }}px;width:480px;height:52px;border:1px solid var(--border-strong);border-style:{{ q.border }};border-radius:4px;background:var(--bg-figure);display:flex;align-items:center;padding:0 14px;font-size:14.5px;line-height:1.3">{{ q.q }}</div>
+</sc-for>
+</div>
+</div>
+<figcaption style="display:flex;flex-wrap:wrap;gap:10px 24px;padding:12px 20px;border-top:1px solid var(--border-strong);font-size:13px;color:var(--text-body);align-items:center">
+<span style="display:inline-flex;gap:8px;align-items:center"><span style="width:28px;height:0;border-top:2px solid var(--border-strong)"></span>Topic of a published CLIF Consortium study</span>
+<span style="display:inline-flex;gap:8px;align-items:center"><span style="width:28px;height:0;border-top:2px dashed var(--border-strong)"></span>Potential use · illustrative, not a current program or validated measure</span>
+</figcaption>
+</figure>
+
+<div style="display:grid;gap:20px">
+<h3 style="margin:0;font-family:'Funnel Display',sans-serif;font-weight:600;font-size:clamp(24px,2.4vw,32px);letter-spacing:-0.02em">What ICU data needs, and what CLIF provides</h3>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,360px),1fr));border-top:1px solid var(--border-strong);border-left:1px solid var(--border)">
+<sc-for list="{{ needs }}" as="n" hint-placeholder-count="6">
+<div style="display:grid;grid-template-rows:auto auto 1fr auto;gap:10px;padding:22px 20px;border-right:1px solid var(--border);border-bottom:1px solid var(--border)">
+<span style="font-family:'Funnel Sans',sans-serif;font-weight:500;font-size:11px;letter-spacing:.01em;color:var(--link)">{{ n.n }} need</span>
+<span style="font-size:19px;font-weight:500;line-height:1.3">{{ n.need }}</span>
+<span style="font-size:15px;line-height:1.5;color:var(--text-body)">{{ n.how }}</span>
+<code style="justify-self:start;font-family:'Spline Sans Mono',monospace;font-size:11.5px;background:var(--bg-inverse);color:var(--accent-text);border-radius:3px;padding:4px 8px">{{ n.ex }}</code>
+</div>
+</sc-for>
+</div>
+</div>
+</section>
+
+<section style="max-width:1424px;margin:0 auto;padding:clamp(72px,9vw,120px) clamp(16px,4vw,56px) 0;display:grid;gap:32px">
+<div style="display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between;align-items:flex-end">
+<div style="display:grid;gap:14px"><span style="font-family:'Funnel Sans',sans-serif;font-weight:500;font-size:12px;letter-spacing:.01em;color:var(--link)">03 — Our work</span><h2 style="font-family:'Funnel Display',sans-serif;font-weight:600;font-size:clamp(30px,3.6vw,48px);line-height:1.04;letter-spacing:-0.03em;margin:0">Four proposed programs</h2></div>
+<a href="#" onClick="{{ goWork }}" style="color:var(--link);font-size:15px;min-height:44px;display:inline-flex;align-items:center">Program details</a>
+</div>
+<div style="border:1px solid var(--border-strong);border-radius:6px;overflow:hidden;background:var(--bg-figure)">
+<div style="display:flex;flex-wrap:wrap;font-family:'Spline Sans Mono',monospace;font-size:12px;color:var(--text-muted);background:var(--bg-panel);border-bottom:1px solid var(--border-strong);padding:12px 20px;gap:16px"><span style="flex:0 0 150px">program_id</span><span style="flex:1 1 200px">name · scope</span><span style="flex:0 0 90px">status</span></div>
+<sc-for list="{{ programs }}" as="p" hint-placeholder-count="4">
+<a href="#" onClick="{{ goWork }}" style="display:flex;flex-wrap:wrap;gap:8px 16px;padding:22px 20px;border-bottom:1px solid var(--border-subtle);text-decoration:none;align-items:baseline" style-hover="background:var(--bg-page)">
+<span style="flex:0 0 150px;font-family:'Funnel Sans',sans-serif;font-weight:500;font-size:13px;letter-spacing:.01em;color:var(--link)">{{ p.id }}</span>
+<span style="flex:1 1 320px;display:flex;flex-wrap:wrap;gap:6px 24px;align-items:baseline"><span style="flex:0 0 260px;font-size:20px;font-weight:500;line-height:1.3">{{ p.name }}</span><span style="flex:1 1 280px;font-size:16px;line-height:1.55;color:var(--text-body)">{{ p.scope }}</span></span>
+<span style="flex:0 0 90px;font-family:'Spline Sans Mono',monospace;font-size:12px">proposed</span>
+</a>
+</sc-for>
+</div>
+</section>
+
+<section style="max-width:1424px;margin:0 auto;padding:clamp(72px,9vw,120px) clamp(16px,4vw,56px);display:flex;flex-wrap:wrap;gap:48px 72px;align-items:flex-start">
+<div style="flex:1 1 380px;display:grid;gap:18px">
+<span style="font-family:'Funnel Sans',sans-serif;font-weight:500;font-size:12px;letter-spacing:.01em;color:var(--link)">04 — Inside the standard</span>
+<h2 style="font-family:'Funnel Display',sans-serif;font-weight:600;font-size:clamp(28px,3.2vw,42px);line-height:1.08;letter-spacing:-0.025em;margin:0">Shared vocabularies make multicenter code portable.</h2>
+<p style="margin:0;font-size:17px;line-height:1.6;color:var(--text-body);max-width:520px">CLIF’s minimum Common ICU Data Elements (mCIDE) map each site’s local terms to the same permissible values, so one analysis runs the same way everywhere.</p>
+<a href="https://clif-icu.com/data-dictionary" style="color:var(--link);font-size:15px;min-height:44px;display:inline-flex;align-items:center">Data Dictionary on clif-icu.com ↗</a>
+</div>
+<div style="flex:1 1 440px;min-width:0;border:1px solid var(--border-strong);border-radius:6px;background:var(--bg-figure);font-family:'Spline Sans Mono',monospace;font-size:13px;overflow:hidden">
+<div style="padding:12px 20px;border-bottom:1px solid var(--border-strong);display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between"><span>respiratory_support.device_category</span><span style="color:var(--text-muted)">mCIDE</span></div>
+<div style="display:flex;gap:16px;padding:10px 20px;color:var(--text-muted);border-bottom:1px solid var(--border-subtle);font-size:12px"><span style="flex:1 1 0">site-local device_name</span><span style="flex:1 1 0">device_category</span></div>
+<sc-for list="{{ mappings }}" as="m" hint-placeholder-count="5">
+<div style="display:flex;gap:16px;padding:11px 20px;border-bottom:1px solid var(--border-subtle);align-items:center"><span style="flex:1 1 0;color:var(--text-body);min-width:0">{{ m.local }}</span><span style="flex:1 1 0;min-width:0"><span style="background:var(--status-existing-bg);color:var(--status-existing-fg);padding:3px 8px;border-radius:2px;white-space:nowrap">{{ m.cat }}</span></span></div>
+</sc-for>
+<div style="padding:11px 20px;color:var(--text-muted);font-size:13px;font-family:'Funnel Sans',sans-serif">Example local terms are illustrative.</div>
+</div>
+</section>
+
+<section style="background:var(--bg-panel)">
+<div style="max-width:1424px;margin:0 auto;padding:clamp(72px,9vw,112px) clamp(16px,4vw,56px);display:flex;flex-wrap:wrap;gap:40px 72px">
+<div style="flex:0 1 340px;display:grid;gap:16px;align-content:start"><span style="font-family:'Funnel Sans',sans-serif;font-weight:500;font-size:12px;letter-spacing:.01em;color:var(--link)">05 — Research using CLIF</span><h2 style="font-family:'Funnel Display',sans-serif;font-weight:600;font-size:clamp(28px,3.2vw,42px);line-height:1.08;letter-spacing:-0.025em;margin:0">Recent publications</h2><p style="margin:0;font-size:16px;line-height:1.55;color:var(--text-muted)">Conducted by the CLIF Consortium and the original investigators.</p><a href="#" onClick="{{ goResearch }}" style="color:var(--link);font-size:15px;min-height:44px;display:inline-flex;align-items:center">All research &amp; resources</a></div>
+<div style="flex:1 1 520px;min-width:0;border-top:1px solid var(--border-strong)">
+<sc-for list="{{ homePubs }}" as="p" hint-placeholder-count="3">
+<a href="{{ p.url }}" style="display:flex;flex-wrap:wrap;gap:6px 24px;padding:22px 0;border-bottom:1px solid var(--border);text-decoration:none;align-items:baseline" style-hover="color:var(--link)"><span style="flex:0 0 56px;font-family:'Spline Sans Mono',monospace;font-size:13px;color:var(--text-muted)">{{ p.year }}</span><span style="flex:1 1 360px;font-size:19px;font-weight:500;line-height:1.35">{{ p.title }}</span><span style="flex:0 1 220px;font-size:14px;color:var(--text-muted)">{{ p.venue }} ↗</span></a>
+</sc-for>
+</div>
+</div>
+</section>
+
+<section style="max-width:1424px;margin:0 auto;padding:clamp(72px,9vw,112px) clamp(16px,4vw,56px);display:grid;gap:36px">
+<div style="display:grid;gap:14px"><span style="font-family:'Funnel Sans',sans-serif;font-weight:500;font-size:12px;letter-spacing:.01em;color:var(--link)">06 — Where to start</span><h2 style="font-family:'Funnel Display',sans-serif;font-weight:600;font-size:clamp(28px,3.2vw,42px);letter-spacing:-0.025em;margin:0">Choose your path</h2></div>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));border-top:1px solid var(--border-strong)">
+<sc-for list="{{ paths }}" as="p" hint-placeholder-count="4">
+<a href="{{ p.href }}" onClick="{{ p.onClick }}" style="display:grid;gap:10px;align-content:start;padding:24px 24px 28px 0;border-bottom:1px solid var(--border);text-decoration:none" style-hover="color:var(--link)"><span style="font-family:'Funnel Sans',sans-serif;font-weight:500;font-size:12px;letter-spacing:.01em;color:var(--link)">{{ p.n }}</span><span style="font-family:'Funnel Display',sans-serif;font-size:24px;font-weight:600;letter-spacing:-0.01em">{{ p.who }} {{ p.arrow }}</span><span style="font-size:15px;line-height:1.5;color:var(--text-muted)">{{ p.cta }}</span></a>
+</sc-for>
+</div>
+</section>
+</div>
+</sc-if>
+
+<!-- ================= MISSION ================= -->
+<sc-if value="{{ isMission }}" hint-placeholder-val="{{ false }}">
+<div>
+<section style="max-width:1424px;margin:0 auto;padding:clamp(56px,8vw,112px) clamp(16px,4vw,56px) clamp(48px,6vw,80px);display:grid;gap:24px">
+<span style="font-family:'Funnel Sans',sans-serif;font-weight:500;font-size:13px;letter-spacing:.01em;color:var(--link)">01 / mission</span>
+<h1 style="font-family:'Funnel Display',sans-serif;font-weight:600;font-size:clamp(38px,5.6vw,76px);line-height:1;letter-spacing:-0.035em;margin:0;max-width:1100px;text-wrap:balance">Make the CLIF standard practical for any hospital to adopt.</h1>
+</section>
+<section style="max-width:1424px;margin:0 auto;padding:0 clamp(16px,4vw,56px) clamp(72px,8vw,112px);display:flex;flex-wrap:wrap;gap:40px 72px">
+<div style="flex:0 1 300px;font-family:'Spline Sans Mono',monospace;font-size:12px;color:var(--text-muted);display:grid;gap:8px;align-content:start"><span>Draft mission statement</span><span style="background:var(--accent);color:var(--accent-on);padding:2px 8px;border-radius:2px;justify-self:start">proposed</span></div>
+<div style="flex:1 1 560px;display:grid;gap:22px;font-size:clamp(18px,1.6vw,21px);line-height:1.6;max-width:760px">
+<p style="margin:0">CLIF Foundation is an Illinois nonprofit corporation formed to support wider adoption of the Common Longitudinal ICU data Format, an open-source standard for organizing critical care EHR data.</p>
+<p style="margin:0;color:var(--text-body)">Its proposed work focuses on what helps a new institution get started and keep going: clear education, practical implementation help, and long-term care of the open specification and tools.</p>
+</div>
+</section>
+<section style="background:var(--bg-panel)">
+<div style="max-width:1424px;margin:0 auto;padding:clamp(72px,8vw,112px) clamp(16px,4vw,56px);display:grid;gap:40px">
+<h2 style="font-family:'Funnel Display',sans-serif;font-weight:600;font-size:clamp(28px,3.2vw,42px);letter-spacing:-0.025em;margin:0">Two organizations, distinct roles</h2>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:24px">
+<div style="background:var(--bg-figure);border:1px solid var(--border-strong);border-radius:6px;overflow:hidden">
+<div style="padding:14px 20px;border-bottom:1px solid var(--border-strong);display:flex;justify-content:space-between;gap:12px;font-family:'Spline Sans Mono',monospace;font-size:12px"><span>CLIF Consortium</span><span style="color:var(--text-muted)">existing</span></div>
+<ul style="margin:0;padding:0;list-style:none">
+<li style="padding:16px 20px;border-bottom:1px solid var(--border-subtle)">Conducts federated, privacy-preserving multicenter research</li>
+<li style="padding:16px 20px;border-bottom:1px solid var(--border-subtle)">Network of clinician-scientists, data scientists, and academic medical centers</li>
+<li style="padding:16px 20px;border-bottom:1px solid var(--border-subtle)">Publishes the data dictionary, ETL guide, and open-source tools</li>
+<li style="padding:16px 20px"><a href="https://clif-icu.com/" style="color:var(--link)">clif-icu.com ↗</a></li>
+</ul>
+</div>
+<div style="background:var(--bg-figure);border:1px solid var(--border-strong);border-radius:6px;overflow:hidden">
+<div style="padding:14px 20px;border-bottom:1px solid var(--border-strong);display:flex;justify-content:space-between;gap:12px;font-family:'Spline Sans Mono',monospace;font-size:12px;background:var(--accent);color:var(--accent-on)"><span>CLIF Foundation</span><span>proposed</span></div>
+<ul style="margin:0;padding:0;list-style:none">
+<li style="padding:16px 20px;border-bottom:1px solid var(--border-subtle)">Would support adoption through education and implementation help</li>
+<li style="padding:16px 20px;border-bottom:1px solid var(--border-subtle)">Would sustain maintenance of the open specification and tools</li>
+<li style="padding:16px 20px;border-bottom:1px solid var(--border-subtle)">Does not conduct research or hold patient data</li>
+<li style="padding:16px 20px"><a href="#" onClick="{{ goWork }}" style="color:var(--link)">Proposed programs</a></li>
+</ul>
+</div>
+</div>
+</div>
+</section>
+<section style="max-width:1424px;margin:0 auto;padding:clamp(72px,8vw,112px) clamp(16px,4vw,56px);display:flex;flex-wrap:wrap;gap:40px 72px">
+<h2 style="flex:0 1 360px;font-family:'Funnel Display',sans-serif;font-weight:600;font-size:clamp(28px,3.2vw,42px);line-height:1.08;letter-spacing:-0.025em;margin:0">Proposed principles</h2>
+<ol style="flex:1 1 520px;margin:0;padding:0;list-style:none;border-top:1px solid var(--border-strong)">
+<sc-for list="{{ principles }}" as="p" hint-placeholder-count="4">
+<li style="display:flex;flex-wrap:wrap;gap:6px 24px;padding:22px 0;border-bottom:1px solid var(--border);align-items:baseline"><span style="flex:0 0 40px;font-family:'Funnel Sans',sans-serif;font-weight:500;font-size:13px;letter-spacing:.01em;color:var(--link)">{{ p.n }}</span><span style="flex:0 0 240px;font-size:19px;font-weight:500">{{ p.t }}</span><span style="flex:1 1 280px;color:var(--text-body);font-size:16px">{{ p.d }}</span></li>
+</sc-for>
+</ol>
+</section>
+</div>
+</sc-if>
+
+<!-- ================= OUR WORK ================= -->
+<sc-if value="{{ isWork }}" hint-placeholder-val="{{ false }}">
+<div>
+<section style="max-width:1424px;margin:0 auto;padding:clamp(56px,8vw,112px) clamp(16px,4vw,56px) clamp(40px,5vw,64px);display:flex;flex-wrap:wrap;gap:32px 72px;align-items:flex-end">
+<div style="flex:1 1 560px;display:grid;gap:24px"><span style="font-family:'Funnel Sans',sans-serif;font-weight:500;font-size:13px;letter-spacing:.01em;color:var(--link)">02 / our_work</span><h1 style="font-family:'Funnel Display',sans-serif;font-weight:600;font-size:clamp(38px,5.6vw,76px);line-height:1;letter-spacing:-0.035em;margin:0">Proposed programs</h1></div>
+<p style="flex:1 1 360px;margin:0;font-size:17px;line-height:1.6;color:var(--text-body);border-left:1px solid var(--border-strong);padding-left:20px">All four programs are in planning. None are funded or operating. Each builds on resources the CLIF Consortium already publishes.</p>
+</section>
+<section style="max-width:1424px;margin:0 auto;padding:0 clamp(16px,4vw,56px) clamp(72px,8vw,112px);display:grid;gap:20px">
+<sc-for list="{{ programs }}" as="p" hint-placeholder-count="4">
+<article style="border:1px solid var(--border-strong);border-radius:6px;background:var(--bg-figure);overflow:hidden">
+<div style="display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-between;padding:12px 20px;border-bottom:1px solid var(--border-strong);font-family:'Spline Sans Mono',monospace;font-size:12px"><span style="color:var(--link)">{{ p.id }}</span><span>status: proposed</span></div>
+<div style="display:flex;flex-wrap:wrap;gap:24px 56px;padding:28px 20px 32px">
+<div style="flex:1 1 360px;display:grid;gap:12px;align-content:start"><h2 style="font-family:'Funnel Display',sans-serif;font-weight:600;font-size:clamp(24px,2.4vw,32px);letter-spacing:-0.02em;margin:0;line-height:1.1">{{ p.name }}</h2><p style="margin:0;font-size:17px;line-height:1.6;color:var(--text-body);max-width:560px">{{ p.scope }}</p></div>
+<dl style="flex:1 1 320px;margin:0;display:grid;font-size:15px;border-top:1px solid var(--border-subtle)">
+<div style="display:flex;flex-wrap:wrap;gap:4px 16px;padding:12px 0;border-bottom:1px solid var(--border-subtle)"><dt style="flex:0 0 110px;font-family:'Spline Sans Mono',monospace;font-size:12px;color:var(--text-muted);padding-top:2px">serves</dt><dd style="margin:0;flex:1 1 180px">{{ p.serves }}</dd></div>
+<div style="display:flex;flex-wrap:wrap;gap:4px 16px;padding:12px 0;border-bottom:1px solid var(--border-subtle)"><dt style="flex:0 0 110px;font-family:'Spline Sans Mono',monospace;font-size:12px;color:var(--text-muted);padding-top:2px">builds_on</dt><dd style="margin:0;flex:1 1 180px"><a href="{{ p.baseUrl }}" style="color:var(--link)">{{ p.base }} ↗</a></dd></div>
+</dl>
+</div>
+</article>
+</sc-for>
+<div style="display:flex;flex-wrap:wrap;gap:16px 32px;align-items:center;justify-content:space-between;padding:28px 0 0;border-top:1px solid var(--border-strong);margin-top:20px">
+<p style="margin:0;font-size:18px;max-width:640px">Interested in shaping or supporting a program? Start with an email.</p>
+<a href="mailto:info@clificufoundation.org?subject=Program%20inquiry" style="text-decoration:none;background:var(--action-primary-bg);color:var(--action-primary-fg);padding:0 22px;height:48px;display:inline-flex;align-items:center;border-radius:3px;font-weight:500" style-hover="background:var(--action-primary-hover)">info@clificufoundation.org</a>
+</div>
+</section>
+</div>
+</sc-if>
+
+<!-- ================= RESEARCH ================= -->
+<sc-if value="{{ isResearch }}" hint-placeholder-val="{{ false }}">
+<div>
+<section style="max-width:1424px;margin:0 auto;padding:clamp(56px,8vw,112px) clamp(16px,4vw,56px) clamp(40px,5vw,64px);display:flex;flex-wrap:wrap;gap:32px 72px;align-items:flex-end">
+<div style="flex:1 1 560px;display:grid;gap:24px"><span style="font-family:'Funnel Sans',sans-serif;font-weight:500;font-size:13px;letter-spacing:.01em;color:var(--link)">03 / research_and_resources</span><h1 style="font-family:'Funnel Display',sans-serif;font-weight:600;font-size:clamp(38px,5.6vw,76px);line-height:1;letter-spacing:-0.035em;margin:0">Research built on CLIF</h1></div>
+<p style="flex:1 1 360px;margin:0;font-size:17px;line-height:1.6;color:var(--text-body);border-left:1px solid var(--border-strong);padding-left:20px">Studies listed here are conducted and published by the CLIF Consortium and the original investigators. Each entry links to the original source.</p>
+</section>
+<section style="max-width:1424px;margin:0 auto;padding:0 clamp(16px,4vw,56px) clamp(72px,8vw,112px);display:grid;gap:clamp(56px,6vw,88px)">
+<div style="display:grid;gap:18px">
+<div style="display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between;align-items:center">
+<h2 style="font-family:'Funnel Display',sans-serif;font-weight:600;font-size:clamp(26px,2.8vw,36px);letter-spacing:-0.02em;margin:0">Publications</h2>
+<div role="group" aria-label="Filter publications" style="display:flex;flex-wrap:wrap;gap:6px">
+<sc-for list="{{ filters }}" as="f" hint-placeholder-count="3"><button onClick="{{ f.onClick }}" aria-pressed="{{ f.pressed }}" style="height:44px;padding:0 16px;border-radius:3px;border:1px solid var(--border-strong);font:500 14px 'Funnel Sans',sans-serif;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:6px;background:{{ f.bg }};color:{{ f.fg }}">{{ f.label }} <span style="font-family:'Spline Sans Mono',monospace;font-size:12px;opacity:.8">{{ f.count }}</span></button></sc-for>
+</div>
+</div>
+<p aria-live="polite" style="margin:0;font-family:'Spline Sans Mono',monospace;font-size:12px;color:var(--text-muted)">{{ pubCount }}</p>
+<div style="border-top:1px solid var(--border-strong)">
+<sc-for list="{{ pubs }}" as="p" hint-placeholder-count="6">
+<div style="display:flex;flex-wrap:wrap;gap:8px 24px;padding:22px 0;border-bottom:1px solid var(--border);align-items:baseline">
+<span style="flex:0 0 56px;font-family:'Spline Sans Mono',monospace;font-size:13px;color:var(--text-muted)">{{ p.year }}</span>
+<div style="flex:1 1 420px;display:grid;gap:8px;min-width:0"><a href="{{ p.url }}" style="font-size:19px;font-weight:500;line-height:1.35;text-decoration:none" style-hover="color:var(--link);text-decoration:underline">{{ p.title }}</a><span style="display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;font-size:15px;color:var(--text-muted)"><span>{{ p.venue }} ↗</span><span style="font-family:'Spline Sans Mono',monospace;font-size:11px;border:1px solid var(--text-muted);border-radius:2px;padding:1px 6px">{{ p.typeLabel }}</span></span></div>
+</div>
+</sc-for>
+</div>
+</div>
+
+<div style="display:grid;gap:18px">
+<div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:baseline"><h2 style="font-family:'Funnel Display',sans-serif;font-weight:600;font-size:clamp(26px,2.8vw,36px);letter-spacing:-0.02em;margin:0">Resources</h2><span style="font-size:15px;color:var(--text-muted)">Maintained by the CLIF Consortium</span></div>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));column-gap:48px;border-top:1px solid var(--border-strong)">
+<sc-for list="{{ resources }}" as="r" hint-placeholder-count="6">
+<a href="{{ r.url }}" style="display:flex;justify-content:space-between;gap:16px;min-height:68px;padding:12px 0;align-items:center;border-bottom:1px solid var(--border);text-decoration:none" style-hover="color:var(--link)"><span style="display:grid;gap:2px"><span style="font-size:17px;font-weight:500">{{ r.name }}</span><span style="font-family:'Spline Sans Mono',monospace;font-size:12px;color:var(--text-muted)">{{ r.note }}</span></span><span aria-hidden="true">↗</span></a>
+</sc-for>
+</div>
+</div>
+</section>
+</div>
+</sc-if>
+
+<!-- ================= BOARD ================= -->
+<sc-if value="{{ isBoard }}" hint-placeholder-val="{{ false }}">
+<div>
+<section style="max-width:1424px;margin:0 auto;padding:clamp(56px,8vw,112px) clamp(16px,4vw,56px) clamp(40px,5vw,64px);display:flex;flex-wrap:wrap;gap:32px 72px;align-items:flex-end">
+<div style="flex:1 1 560px;display:grid;gap:24px"><span style="font-family:'Funnel Sans',sans-serif;font-weight:500;font-size:13px;letter-spacing:.01em;color:var(--link)">04 / board_and_governance</span><h1 style="font-family:'Funnel Display',sans-serif;font-weight:600;font-size:clamp(38px,5.6vw,76px);line-height:1;letter-spacing:-0.035em;margin:0">Board of directors</h1></div>
+<p style="flex:1 1 360px;margin:0;font-size:17px;line-height:1.6;color:var(--text-body);border-left:1px solid var(--border-strong);padding-left:20px">Board appointments are proposed and not yet confirmed. Names and affiliations will be published once appointments are final.</p>
+</section>
+<section style="max-width:1424px;margin:0 auto;padding:0 clamp(16px,4vw,56px) clamp(72px,8vw,112px)">
+<div style="border:1px solid var(--border-strong);border-radius:6px;background:var(--bg-figure);overflow:hidden">
+<div style="display:flex;flex-wrap:wrap;gap:16px;padding:12px 20px;background:var(--bg-panel);border-bottom:1px solid var(--border-strong);font-family:'Spline Sans Mono',monospace;font-size:12px;color:var(--text-muted)"><span style="flex:0 0 160px">seat</span><span style="flex:1 1 200px">name</span><span style="flex:1 1 200px">affiliation</span><span style="flex:0 0 90px">status</span></div>
+<sc-for list="{{ seats }}" as="s" hint-placeholder-count="5">
+<div style="display:flex;flex-wrap:wrap;gap:4px 16px;padding:20px;border-bottom:1px solid var(--border-subtle);align-items:baseline"><span style="flex:0 0 160px;font-size:18px;font-weight:500">{{ s.role }}</span><span style="flex:1 1 200px;color:var(--text-muted)">To be announced</span><span style="flex:1 1 200px;color:var(--text-muted)">—</span><span style="flex:0 0 90px;font-family:'Spline Sans Mono',monospace;font-size:12px">proposed</span></div>
+</sc-for>
+</div>
+</section>
+<section style="background:var(--bg-panel)">
+<div style="max-width:1424px;margin:0 auto;padding:clamp(72px,8vw,112px) clamp(16px,4vw,56px);display:flex;flex-wrap:wrap;gap:40px 72px">
+<div style="flex:1 1 400px;display:grid;gap:16px;align-content:start"><h2 style="font-family:'Funnel Display',sans-serif;font-weight:600;font-size:clamp(28px,3.2vw,42px);line-height:1.08;letter-spacing:-0.025em;margin:0">Relationship to the Consortium</h2><p style="margin:0;font-size:17px;line-height:1.6;color:var(--text-body);max-width:520px">The CLIF Consortium maintains its own governance for research, data, and the standard. The Foundation’s proposed role is limited to supporting adoption.</p><a href="https://clif-icu.com/governance" style="color:var(--link);font-size:15px;min-height:44px;display:inline-flex;align-items:center">Consortium governance ↗</a></div>
+<div style="flex:1 1 440px;border-top:1px solid var(--border-strong)">
+<span style="display:block;font-family:'Spline Sans Mono',monospace;font-size:12px;color:var(--text-muted);padding:14px 0">governing_documents</span>
+<sc-for list="{{ docs }}" as="d" hint-placeholder-count="3">
+<div style="display:flex;flex-wrap:wrap;gap:4px 16px;justify-content:space-between;min-height:60px;padding:12px 0;align-items:center;border-top:1px solid var(--border)"><span style="font-size:17px">{{ d.name }}</span><span style="font-family:'Spline Sans Mono',monospace;font-size:12px;color:var(--text-muted)">{{ d.status }}</span></div>
+</sc-for>
+</div>
+</div>
+</section>
+</div>
+</sc-if>
+
+<!-- ================= SUPPORT ================= -->
+<sc-if value="{{ isSupport }}" hint-placeholder-val="{{ false }}">
+<div>
+<section style="max-width:1424px;margin:0 auto;padding:clamp(56px,8vw,120px) clamp(16px,4vw,56px) clamp(56px,6vw,96px);display:flex;flex-wrap:wrap;gap:40px 80px;align-items:flex-end">
+<div style="flex:1 1 560px;display:grid;gap:24px"><span style="font-family:'Funnel Sans',sans-serif;font-weight:500;font-size:13px;letter-spacing:.01em;color:var(--link)">05 / support</span><h1 style="font-family:'Funnel Display',sans-serif;font-weight:600;font-size:clamp(40px,6vw,84px);line-height:.98;letter-spacing:-0.035em;margin:0;text-wrap:balance">Giving starts with a conversation.</h1></div>
+<div style="flex:1 1 380px;display:grid;gap:20px">
+<p style="margin:0;font-size:18px;line-height:1.55;color:var(--text-body)">We are not accepting online payments. Email us to discuss a gift, a partnership, or another way to help.</p>
+<div style="display:flex;gap:10px;flex-wrap:wrap">
+<a href="mailto:info@clificufoundation.org" style="text-decoration:none;background:var(--action-primary-bg);color:var(--action-primary-fg);padding:0 22px;min-height:48px;display:inline-flex;align-items:center;border-radius:3px;font-weight:500;font-size:16px;word-break:break-all" style-hover="background:var(--action-primary-hover)">info@clificufoundation.org</a>
+<button onClick="{{ copyEmail }}" style="min-height:48px;padding:0 18px;border-radius:3px;border:1px solid var(--border-strong);background:transparent;font:500 15px 'Funnel Sans',sans-serif;color:var(--text-primary);cursor:pointer"><span aria-live="polite">{{ copyLabel }}</span></button>
+</div>
+</div>
+</section>
+<section style="max-width:1424px;margin:0 auto;padding:0 clamp(16px,4vw,56px) clamp(72px,8vw,112px)">
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:16px">
+<sc-for list="{{ paths }}" as="p" hint-placeholder-count="4">
+<div style="display:grid;grid-template-rows:auto auto 1fr auto;gap:12px;padding:22px 20px;border:1px solid var(--border-strong);border-radius:6px;background:var(--bg-figure)">
+<span style="font-family:'Funnel Sans',sans-serif;font-weight:500;font-size:12px;letter-spacing:.01em;color:var(--link)">{{ p.n }}</span>
+<h2 style="margin:0;font-family:'Funnel Display',sans-serif;font-size:24px;font-weight:600;letter-spacing:-0.01em">{{ p.who }}</h2>
+<p style="margin:0;font-size:16px;line-height:1.55;color:var(--text-body)">{{ p.body }}</p>
+<a href="{{ p.href }}" onClick="{{ p.onClick }}" style="color:var(--link);font-size:15px;font-weight:500;min-height:44px;display:flex;align-items:center;border-top:1px solid var(--border-subtle);margin-top:8px">{{ p.cta }}</a>
+</div>
+</sc-for>
+</div>
+</section>
+<section style="max-width:1424px;margin:0 auto;padding:0 clamp(16px,4vw,56px) clamp(72px,8vw,112px);display:flex;flex-wrap:wrap;gap:40px 72px">
+<div style="flex:1 1 360px;display:grid;gap:14px;align-content:start"><h2 style="font-family:'Funnel Display',sans-serif;font-weight:600;font-size:clamp(28px,3.2vw,42px);line-height:1.08;letter-spacing:-0.025em;margin:0">What a gift would fund</h2><p style="margin:0;font-size:17px;line-height:1.6;color:var(--text-body);text-wrap:pretty">Four proposed programs, all aimed at helping hospitals use CLIF. None are funded or operating yet; gifts would start them.</p><a href="#" onClick="{{ goWork }}" style="color:var(--link);font-size:15px;min-height:44px;display:inline-flex;align-items:center">Program details</a></div>
+<ul style="flex:1 1 520px;margin:0;padding:0;list-style:none;border-top:1px solid var(--border-strong)">
+<li style="padding:20px 0;border-bottom:1px solid var(--border);display:flex;flex-wrap:wrap;gap:6px 20px"><span style="flex:0 0 32px;font-family:'Funnel Sans',sans-serif;font-weight:500;font-size:13px;color:var(--link);padding-top:4px">01</span><div style="flex:1 1 320px;display:grid;gap:6px"><span style="font-size:18px;font-weight:500">Education</span><span style="font-size:15px;line-height:1.55;color:var(--text-body)">Courses and workshops so clinicians and data teams can work with CLIF data.</span></div></li>
+<li style="padding:20px 0;border-bottom:1px solid var(--border);display:flex;flex-wrap:wrap;gap:6px 20px"><span style="flex:0 0 32px;font-family:'Funnel Sans',sans-serif;font-weight:500;font-size:13px;color:var(--link);padding-top:4px">02</span><div style="flex:1 1 320px;display:grid;gap:6px"><span style="font-size:18px;font-weight:500">Implementation help</span><span style="font-size:15px;line-height:1.55;color:var(--text-body)">Hands-on guidance for a hospital converting its records to the standard.</span></div></li>
+<li style="padding:20px 0;border-bottom:1px solid var(--border);display:flex;flex-wrap:wrap;gap:6px 20px"><span style="flex:0 0 32px;font-family:'Funnel Sans',sans-serif;font-weight:500;font-size:13px;color:var(--link);padding-top:4px">03</span><div style="flex:1 1 320px;display:grid;gap:6px"><span style="font-size:18px;font-weight:500">Upkeep of the open standard</span><span style="font-size:15px;line-height:1.55;color:var(--text-body)">Maintaining the specification, data dictionary and free tools that everyone relies on.</span></div></li>
+<li style="padding:20px 0;border-bottom:1px solid var(--border);display:flex;flex-wrap:wrap;gap:6px 20px"><span style="flex:0 0 32px;font-family:'Funnel Sans',sans-serif;font-weight:500;font-size:13px;color:var(--link);padding-top:4px">04</span><div style="flex:1 1 320px;display:grid;gap:6px"><span style="font-size:18px;font-weight:500">Convening</span><span style="font-size:15px;line-height:1.55;color:var(--text-body)">Bringing adopting hospitals together to agree on future versions.</span></div></li>
+</ul>
+</section>
+<section style="background:var(--bg-panel)">
+<div style="max-width:1424px;margin:0 auto;padding:clamp(72px,8vw,104px) clamp(16px,4vw,56px);display:flex;flex-wrap:wrap;gap:40px 72px">
+<div style="flex:1 1 360px;display:grid;gap:14px;align-content:start"><h2 style="font-family:'Funnel Display',sans-serif;font-weight:600;font-size:clamp(28px,3.2vw,42px);line-height:1.08;letter-spacing:-0.025em;margin:0">How giving works</h2><p style="margin:0;font-size:17px;line-height:1.6;color:var(--text-body);text-wrap:pretty">There is no online donation form. Every gift begins with a short email and a conversation.</p></div>
+<ol style="flex:1 1 520px;margin:0;padding:0;list-style:none;border-top:1px solid var(--border-strong)">
+<li style="padding:20px 0;border-bottom:1px solid var(--border);display:flex;flex-wrap:wrap;gap:6px 20px"><span style="flex:0 0 32px;font-family:'Funnel Sans',sans-serif;font-weight:500;font-size:13px;color:var(--link);padding-top:4px">1</span><div style="flex:1 1 320px;display:grid;gap:6px"><span style="font-size:18px;font-weight:500">Email us</span><span style="font-size:15px;line-height:1.55;color:var(--text-body)">Write to info@clificufoundation.org with your name and what you are considering.</span></div></li>
+<li style="padding:20px 0;border-bottom:1px solid var(--border);display:flex;flex-wrap:wrap;gap:6px 20px"><span style="flex:0 0 32px;font-family:'Funnel Sans',sans-serif;font-weight:500;font-size:13px;color:var(--link);padding-top:4px">2</span><div style="flex:1 1 320px;display:grid;gap:6px"><span style="font-size:18px;font-weight:500">We talk</span><span style="font-size:15px;line-height:1.55;color:var(--text-body)">We reply to arrange a call about your interests and the proposed programs.</span></div></li>
+<li style="padding:20px 0;border-bottom:1px solid var(--border);display:flex;flex-wrap:wrap;gap:6px 20px"><span style="flex:0 0 32px;font-family:'Funnel Sans',sans-serif;font-weight:500;font-size:13px;color:var(--link);padding-top:4px">3</span><div style="flex:1 1 320px;display:grid;gap:6px"><span style="font-size:18px;font-weight:500">Terms in writing</span><span style="font-size:15px;line-height:1.55;color:var(--text-body)">Gift purpose, timing and acknowledgment would be confirmed in writing before anything is transferred.</span></div></li>
+<li style="padding:20px 0;border-bottom:1px solid var(--border);display:flex;flex-wrap:wrap;gap:6px 20px"><span style="flex:0 0 32px;font-family:'Funnel Sans',sans-serif;font-weight:500;font-size:13px;color:var(--link);padding-top:4px">4</span><div style="flex:1 1 320px;display:grid;gap:6px"><span style="font-size:18px;font-weight:500">Tax status, stated plainly</span><span style="font-size:15px;line-height:1.55;color:var(--text-body)">CLIF Foundation is an Illinois nonprofit corporation with an EIN. Our application for 501(c)(3) recognition is pending with the IRS. Until it is approved, we cannot promise that a gift is tax-deductible; please ask your tax adviser.</span></div></li>
+</ol>
+</div>
+</section>
+<section style="max-width:1424px;margin:0 auto;padding:clamp(72px,8vw,104px) clamp(16px,4vw,56px);display:flex;flex-wrap:wrap;gap:32px 72px;align-items:flex-start">
+<div style="flex:1 1 360px;display:grid;gap:14px"><h2 style="font-family:'Funnel Display',sans-serif;font-weight:600;font-size:clamp(28px,3.2vw,42px);line-height:1.08;letter-spacing:-0.025em;margin:0">Who is behind it</h2></div>
+<div style="flex:1 1 520px;display:grid;gap:18px;font-size:17px;line-height:1.6;color:var(--text-body);max-width:720px"><p style="margin:0">CLIF was built by the CLIF Consortium, a network of clinician-scientists and data scientists at academic medical centers. CLIF Foundation was incorporated in Illinois to carry out adoption work that sits outside the Consortium’s research mission.</p><p style="margin:0">Board seats are proposed and will be named here once confirmed. Governing documents will be published on the same page.</p><a href="#" onClick="{{ goBoard }}" style="color:var(--link);font-size:15px;font-weight:500;min-height:44px;display:inline-flex;align-items:center">Board and governance →</a></div>
+</section>
+<section style="background:var(--bg-panel)">
+<div style="max-width:1424px;margin:0 auto;padding:clamp(72px,8vw,104px) clamp(16px,4vw,56px);display:flex;flex-wrap:wrap;gap:32px 72px">
+<div style="flex:1 1 360px;display:grid;gap:14px;align-content:start"><h2 style="font-family:'Funnel Display',sans-serif;font-weight:600;font-size:clamp(28px,3.2vw,42px);line-height:1.08;letter-spacing:-0.025em;margin:0">What to include in your email</h2><p style="margin:0;font-size:17px;line-height:1.6;color:var(--text-body)">A short note is enough. We will reply to arrange a conversation.</p></div>
+<ul style="flex:1 1 440px;margin:0;padding:0;list-style:none;border-top:1px solid var(--border-strong)">
+<li style="padding:18px 0;border-bottom:1px solid var(--border);display:flex;gap:20px"><span style="font-family:'Funnel Sans',sans-serif;font-weight:500;font-size:13px;letter-spacing:.01em;color:var(--link);padding-top:3px">01</span>Your name and organization, if any</li>
+<li style="padding:18px 0;border-bottom:1px solid var(--border);display:flex;gap:20px"><span style="font-family:'Funnel Sans',sans-serif;font-weight:500;font-size:13px;letter-spacing:.01em;color:var(--link);padding-top:3px">02</span>The kind of support you are considering</li>
+<li style="padding:18px 0;border-bottom:1px solid var(--border);display:flex;gap:20px"><span style="font-family:'Funnel Sans',sans-serif;font-weight:500;font-size:13px;letter-spacing:.01em;color:var(--link);padding-top:3px">03</span>Any program area you would like to discuss</li>
+</ul>
+<p style="flex:1 1 100%;margin:0;font-size:15px;line-height:1.6;color:var(--text-muted);max-width:760px;padding-top:8px">CLIF Foundation is incorporated as a nonprofit in Illinois and has an EIN. Recognition as a 501(c)(3) public charity is pending with the IRS; we will post the determination letter here when it arrives. Until then, deductibility of gifts cannot be assured.</p>
+</div>
+</section>
+</div>
+</sc-if>
+
+</main>
+
+<footer class="dark" style="background:var(--bg-inverse);color:var(--text-inverse)">
+<div style="max-width:1424px;margin:0 auto;padding:clamp(56px,6vw,80px) clamp(16px,4vw,56px) 40px;display:grid;gap:48px">
+<div style="display:flex;flex-wrap:wrap;gap:40px 64px;justify-content:space-between">
+<div style="flex:1 1 320px;display:grid;gap:20px;align-content:start">
+<span style="display:flex;align-items:center;gap:14px"><img src="https://clif-icu.com/images/logos/clif_logo_white_email.png" alt="CLIF" style="height:32px;filter:var(--logo-inverse-filter)"><span style="width:1px;height:22px;background:var(--bg-page)"></span><span style="font-family:'Funnel Display',sans-serif;font-weight:600;font-size:16px">Foundation</span></span>
+<p style="margin:0;font-size:14px;line-height:1.6;color:var(--text-inverse-body);max-width:420px">An Illinois nonprofit corporation supporting adoption of the Common Longitudinal ICU data Format. Application for 501(c)(3) recognition is pending. Research is credited to the CLIF Consortium and its investigators.</p>
+<a href="mailto:info@clificufoundation.org" style="color:var(--accent-text);font-family:'Spline Sans Mono',monospace;font-size:14px;min-height:44px;display:inline-flex;align-items:center;justify-self:start">info@clificufoundation.org</a>
+</div>
+<nav aria-label="Footer" style="flex:0 1 420px;display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:4px 32px;font-size:15px">
+<sc-for list="{{ footerLinks }}" as="l" hint-placeholder-count="8"><a href="{{ l.href }}" onClick="{{ l.onClick }}" style="text-decoration:none;min-height:44px;display:flex;align-items:center;color:var(--text-inverse)" style-hover="color:var(--accent-text)">{{ l.label }}</a></sc-for>
+</nav>
+</div>
+<div style="border-top:1px solid var(--border-inverse);padding-top:20px;display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-between;font-family:'Funnel Sans',sans-serif;font-size:13px;color:var(--text-inverse-muted)"><span>CLIF is open source under the Apache License 2.0</span><span>Design proposal · October 2026</span></div>
+</div>
+</footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;system&quot;,&quot;light&quot;,&quot;dark&quot;],&quot;default&quot;:&quot;system&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Theme&quot;},&quot;startPage&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;home&quot;,&quot;mission&quot;,&quot;work&quot;,&quot;research&quot;,&quot;board&quot;,&quot;support&quot;],&quot;default&quot;:&quot;home&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+class Component extends DCLogic {
+  state = { page: null, menu: false, width: 1280, filter: 'All', copied: false, theme: null, systemDark: false };
+  rootRef = React.createRef();
+  componentDidMount() {
+    let saved = null, theme = null; try { saved = localStorage.getItem('clif-site-page'); theme = localStorage.getItem('clif-site-theme'); } catch (e) {}
+    this._mq = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+    this._onMq = () => this.setState({ systemDark: !!(this._mq && this._mq.matches) });
+    if (this._mq && this._mq.addEventListener) this._mq.addEventListener('change', this._onMq);
+    this.setState({ page: saved || this.props.startPage || 'home', theme, systemDark: !!(this._mq && this._mq.matches) });
+    const el = this.rootRef.current;
+    if (el && window.ResizeObserver) {
+      this._ro = new ResizeObserver(([e]) => this.setState({ width: e.contentRect.width }));
+      this._ro.observe(el);
+    }
+  }
+  componentWillUnmount() { this._ro && this._ro.disconnect(); clearTimeout(this._t); if (this._mq && this._mq.removeEventListener) this._mq.removeEventListener('change', this._onMq); }
+  componentDidUpdate(pp) { if (pp.startPage !== this.props.startPage && this.props.startPage) this.setState({ page: this.props.startPage }); if (pp.theme !== this.props.theme && this.state.theme) this.setState({ theme: null }); try { document.documentElement.dataset.theme = this.effectiveTheme(); } catch (e) {} }
+  effectiveTheme() { const t = this.state.theme || this.props.theme || 'system'; return t === 'system' ? (this.state.systemDark ? 'dark' : 'light') : t; }
+  toggleTheme = () => { const next = this.effectiveTheme() === 'dark' ? 'light' : 'dark'; try { localStorage.setItem('clif-site-theme', next); } catch (e) {} this.setState({ theme: next }); };
+  go(page) {
+    return e => {
+      if (e && e.preventDefault) e.preventDefault();
+      try { localStorage.setItem('clif-site-page', page); } catch (err) {}
+      this.setState({ page, menu: false });
+      const sc = document.scrollingElement || document.documentElement; sc.scrollTop = 0;
+      const m = document.getElementById('main'); m && m.focus && m.focus({ preventScroll: true });
+    };
+  }
+  copyEmail = () => {
+    try { navigator.clipboard.writeText('info@clificufoundation.org'); } catch (e) {}
+    this.setState({ copied: true }); clearTimeout(this._t);
+    this._t = setTimeout(() => this.setState({ copied: false }), 1800);
+  };
+  buildDiagrams() {
+    const h = React.createElement;
+    const F = (name, kind) => ({ name, tag: kind, fg: kind === 'key' ? 'var(--status-existing-fg)' : 'var(--text-primary)', color: kind === 'key' ? 'var(--text-primary)' : 'var(--text-body)',
+      tagBg: kind === 'key' ? 'var(--status-existing-bg)' : kind === 'time' ? 'var(--accent-tint)' : kind === 'mCIDE' ? 'var(--bg-panel)' : 'transparent' });
+    const fix = f => f.tag === 'key' ? { ...f, tagStyle: 1 } : f;
+    const W = 280, top = 40, mid = 300, bot = 520;
+    const xs = [21, 327, 633, 939];
+    const LS = { headBg: 'var(--accent)', headFg: 'var(--accent-on)' }, CX = { headBg: 'var(--bg-figure)', headFg: 'var(--text-primary)' };
+    const boxes = [
+      { name: 'respiratory_support', kind: 'ventilation', x: xs[0], y: top, ...LS, fields: [F('hospitalization_id','key'), F('recorded_dttm','time'), F('device_category','mCIDE'), F('mode_category','mCIDE'), F('fio2_set','value'), F('peep_set','value')] },
+      { name: 'medication_admin_continuous', kind: 'infusions', x: xs[1], y: top, ...LS, fields: [F('hospitalization_id','key'), F('admin_dttm','time'), F('med_category','mCIDE'), F('med_dose','value'), F('med_dose_unit','value')] },
+      { name: 'crrt_therapy', kind: 'renal', x: xs[2], y: top, ...LS, fields: [F('hospitalization_id','key'), F('recorded_dttm','time'), F('crrt_mode_category','mCIDE')] },
+      { name: 'ecmo_mcs', kind: 'circulatory', x: xs[3], y: top, ...LS, fields: [F('hospitalization_id','key'), F('recorded_dttm','time'), F('device_category','mCIDE')] },
+      { name: 'patient', kind: 'person', x: xs[0], y: mid + 22, ...CX, fields: [F('patient_id','key'), F('sex_category','mCIDE'), F('race_category','mCIDE')] },
+      { name: 'hospitalization', kind: 'hub', x: 480, y: mid, headBg: 'var(--status-existing-bg)', headFg: 'var(--status-existing-fg)', shadow: '0 0 0 4px var(--accent)', fields: [F('hospitalization_id','key'), F('patient_id','key'), F('admission_dttm','time'), F('discharge_dttm','time')] },
+      { name: 'position', kind: 'proning', x: xs[3], y: mid + 22, ...LS, fields: [F('hospitalization_id','key'), F('recorded_dttm','time'), F('position_category','mCIDE')] },
+      { name: 'adt', kind: 'location', x: xs[0], y: bot, ...CX, fields: [F('hospitalization_id','key'), F('in_dttm','time'), F('out_dttm','time'), F('location_category','mCIDE')] },
+      { name: 'vitals', kind: 'monitoring', x: xs[1], y: bot, ...CX, fields: [F('hospitalization_id','key'), F('recorded_dttm','time'), F('vital_category','mCIDE'), F('vital_value','value')] },
+      { name: 'labs', kind: 'results', x: xs[2], y: bot, ...CX, fields: [F('hospitalization_id','key'), F('lab_result_dttm','time'), F('lab_category','mCIDE'), F('lab_value_numeric','value')] },
+      { name: 'patient_assessments', kind: 'bedside scores', x: xs[3], y: bot, ...CX, fields: [F('hospitalization_id','key'), F('recorded_dttm','time'), F('assessment_category','mCIDE'), F('numerical_value','value')] }
+    ].map(b => ({ shadow: 'none', ...b, w: b.name === 'hospitalization' ? W : W, hgt: 36 + b.fields.length * 22 + 2 }));
+    const hub = boxes.find(b => b.name === 'hospitalization');
+    const hubTop = hub.y, hubBot = hub.y + hub.hgt;
+    const entries = [hub.x + 40, hub.x + 107, hub.x + 173, hub.x + 240];
+    const paths = [];
+    const line = (d, dash) => paths.push(h('path', { key: paths.length, d, fill: 'none', stroke: 'var(--text-primary)', strokeWidth: 1.5, strokeDasharray: dash || undefined }));
+    const dot = (x, y) => paths.push(h('circle', { key: paths.length, cx: x, cy: y, r: 3.5, fill: 'var(--text-primary)' }));
+    boxes.filter(b => b.y === top).forEach((b, i) => { const cx = b.x + b.w / 2, y1 = b.y + b.hgt, my = 258 - i * 0; line('M' + cx + ' ' + y1 + ' V ' + (my - 12 + i * 8) + ' H ' + entries[i] + ' V ' + hubTop); dot(cx, y1); dot(entries[i], hubTop); });
+    boxes.filter(b => b.y === bot).forEach((b, i) => { const cx = b.x + b.w / 2, y1 = b.y; line('M' + cx + ' ' + y1 + ' V ' + (492 - i * 8) + ' H ' + entries[i] + ' V ' + hubBot); dot(cx, y1); dot(entries[i], hubBot); });
+    const pat = boxes.find(b => b.name === 'patient'), pos = boxes.find(b => b.name === 'position');
+    const rowY = r => hub.y + 36 + r * 22 + 11;
+    line('M' + (pat.x + pat.w) + ' ' + (pat.y + 47) + ' H 420 V ' + rowY(1) + ' H ' + hub.x); dot(pat.x + pat.w, pat.y + 47); dot(hub.x, rowY(1));
+    line('M' + pos.x + ' ' + (pos.y + 47) + ' H 860 V ' + rowY(0) + ' H ' + (hub.x + hub.w)); dot(pos.x, pos.y + 47); dot(hub.x + hub.w, rowY(0));
+    const schemaLines = h('svg', { width: 1240, height: 690, style: { position: 'absolute', left: 0, top: 0, pointerEvents: 'none' }, 'aria-hidden': 'true' }, paths);
+
+    const left = [
+      ['respiratory_support', 'ventilation', true], ['medication_admin_continuous', 'infusions', true], ['position', 'proning', true],
+      ['labs', 'results', false], ['patient_assessments', 'bedside scores', false], ['adt', 'location', false]
+    ].map(([name, kind, ls], i) => ({ name, kind, bg: ls ? 'var(--accent)' : 'var(--bg-figure)', fg: ls ? 'var(--accent-on)' : 'var(--text-primary)', y: 40 + i * 64 }));
+    const groups = [
+      { title: 'Multicenter research', tag: 'today · Consortium', tagBg: 'var(--status-existing-bg)', tagFg: 'var(--status-existing-fg)', solid: true,
+        qs: [['Prone positioning in hypoxemic patients on mechanical ventilation', ['position', 'respiratory_support', 'labs']], ['ICU readmissions across health systems', ['adt']]] },
+      { title: 'Quality reporting', tag: 'potential', tagBg: 'var(--accent)', tagFg: 'var(--accent-on)',
+        qs: [['Lung-protective ventilation: hours at low tidal volume', ['respiratory_support']], ['Spontaneous awakening and breathing trial practice', ['medication_admin_continuous', 'respiratory_support', 'patient_assessments']]] },
+      { title: 'Patient safety reporting', tag: 'potential', tagBg: 'var(--accent)', tagFg: 'var(--accent-on)',
+        qs: [['Early ICU readmission after transfer out', ['adt']], ['Prolonged continuous sedation exposure', ['medication_admin_continuous', 'patient_assessments']]] }
+    ];
+    let y = 10; const flowGroups = [], flowRight = [], fpaths = [];
+    groups.forEach(g => {
+      flowGroups.push({ ...g, y }); y += 32;
+      g.qs.forEach(([q, ts]) => {
+        flowRight.push({ q, y, border: g.solid ? 'solid' : 'dashed' });
+        const ty = y + 26;
+        ts.forEach(t => { const L = left.find(l => l.name === t); const ly = L.y + 22;
+          fpaths.push(h('path', { key: fpaths.length, d: 'M320 ' + ly + ' C 530 ' + ly + ', 530 ' + ty + ', 740 ' + ty, fill: 'none', stroke: 'var(--text-primary)', strokeWidth: 1.5, strokeDasharray: g.solid ? undefined : '5 4', opacity: 0.85 }));
+          fpaths.push(h('circle', { key: fpaths.length, cx: 320, cy: ly, r: 3.5, fill: 'var(--text-primary)' }));
+          fpaths.push(h('circle', { key: fpaths.length, cx: 740, cy: ty, r: 3.5, fill: 'var(--text-primary)' }));
+        });
+        y += 62;
+      });
+      y += 10;
+    });
+    const flowH = Math.max(y, 40 + left.length * 64) + 10;
+    const flowLines = h('svg', { width: 1240, height: flowH, style: { position: 'absolute', left: 0, top: 0, pointerEvents: 'none' }, 'aria-hidden': 'true' }, fpaths);
+    return {
+      schemaBoxes: boxes, schemaLines, flowLeft: left, flowGroups, flowRight, flowLines, flowH,
+      needs: [
+        { n: '01', need: 'Minute-level timing', how: 'Every row carries a timestamp, so ventilator changes, infusion titrations, and labs line up on one clock.', ex: 'recorded_dttm · admin_dttm' },
+        { n: '02', need: 'Life support over time', how: 'Device, mode, and medication categories describe when each therapy starts, changes, and stops.', ex: 'device_category = "IMV"' },
+        { n: '03', need: 'Same meaning at every site', how: 'mCIDE maps local terms to shared permissible values.', ex: 'med_category = "norepinephrine"' },
+        { n: '04', need: 'Quality you can check', how: 'The DQA Framework tests completeness and plausibility before analysis.', ex: 'DQA Framework' },
+        { n: '05', need: 'Privacy at multicenter scale', how: 'Federated analysis: code runs at each site and only aggregate results are shared.', ex: 'aggregate results only' },
+        { n: '06', need: 'Open and testable', how: 'Open-source tools under Apache 2.0, and MIMIC-IV in CLIF format for testing code without institutional access.', ex: 'MIMIC-IV-Ext-CLIF' }
+      ]
+    };
+  }
+  renderVals() {
+    const page = this.state.page || this.props.startPage || 'home';
+    const narrow = this.state.width < 1000;
+    const navDefs = [['mission', 'Mission', '01'], ['work', 'Our Work', '02'], ['research', 'Research & Resources', '03'], ['board', 'Board & Governance', '04']];
+    const navItems = navDefs.map(([id, label, no]) => ({ label, no, go: this.go(id), current: page === id ? 'page' : undefined, bar: page === id ? 'var(--text-primary)' : 'transparent' }));
+
+    const H = 72, pct = h => (h / H * 100) + '%';
+    const seg = (a, b, label, hi) => ({ left: pct(a), width: pct(b - a), top: '6px', height: '24px', bg: hi ? 'var(--accent)' : 'var(--status-existing-bg)', fg: 'var(--status-existing-fg)', border: '0', radius: '2px', pad: '8px', label });
+    const hiSeg = (a, b, label) => ({ ...seg(a, b, label, true), fg: 'var(--accent-on)', border: '1px solid var(--border-strong)' });
+    const out = (a, b, label) => ({ ...seg(a, b, label), bg: 'transparent', fg: 'var(--text-primary)', border: '1px solid var(--border-strong)' });
+    const dot = h => ({ left: 'calc(' + pct(h) + ' - 4px)', width: '8px', top: '14px', height: '8px', bg: 'var(--text-primary)', fg: 'var(--text-primary)', border: '0', radius: '50%', pad: '0', label: '' });
+    const tick = h => ({ left: pct(h), width: '1px', top: '8px', height: '20px', bg: 'var(--text-body)', fg: 'var(--text-primary)', border: '0', radius: '0', pad: '0', label: '' });
+    const vit = []; for (let h = 0; h <= 71; h += (h > 4 && h < 52 ? 1 : 2)) vit.push(tick(h + 0.5));
+
+    const programs = [
+      { id: 'impl_support', name: 'Implementation support', scope: 'Guidance for health systems converting EHR data to CLIF, building on the ETL Guide and DQA Framework.', serves: 'Health system data teams', base: 'ETL Guide', baseUrl: 'https://clif-icu.com/etl-guide' },
+      { id: 'education', name: 'Education', scope: 'Courses and workshops for clinicians and data scientists learning to work with CLIF-formatted data.', serves: 'Clinicians, data scientists, trainees', base: 'CLIF 101', baseUrl: 'https://clif-icu.com/clif-101' },
+      { id: 'oss_stewardship', name: 'Open-source stewardship', scope: 'Sustained maintenance of the specification, data dictionary, and tools released under the Apache License 2.0.', serves: 'Technical contributors, adopting sites', base: 'GitHub repository', baseUrl: 'https://github.com/Common-Longitudinal-ICU-data-Format/CLIF' },
+      { id: 'convening', name: 'Convening', scope: 'Forums for sites and contributors to coordinate on future versions of the standard.', serves: 'Adopting sites and contributors', base: 'mCIDE expansion process', baseUrl: 'https://clif-icu.com/mcide-explorer' }
+    ];
+    const allPubs = [
+      { year: 2026, title: 'Federated generative event models for tokenized electronic health records', venue: 'arXiv', type: 'Preprint', url: 'https://arxiv.org/abs/2608.02939' },
+      { year: 2026, title: 'Federation, Not Centralization: A New Paradigm for EHR-Based Critical Care Research', venue: 'Annals of the American Thoracic Society', type: 'Journal', url: 'https://academic.oup.com/annalsats/advance-article/doi/10.1093/annalsats/aaoaf067/8435347' },
+      { year: 2025, title: 'Prone Positioning in a North American Cohort of Hypoxemic Patients on Mechanical Ventilation', venue: 'medRxiv', type: 'Preprint', url: 'https://www.medrxiv.org/content/10.1101/2025.09.03.25334942v1' },
+      { year: 2025, title: 'The Epidemiology of ICU Readmissions Across Ten Health Systems', venue: 'Critical Care Explorations', type: 'Journal', url: 'https://journals.lww.com/ccejournal/fulltext/2025/11000/the_epidemiology_of_icu_readmissions_across_ten.1.aspx' },
+      { year: 2025, title: 'Correspondence on “A common longitudinal intensive care unit data format (CLIF) for critical illness research” – Author’s reply', venue: 'Intensive Care Medicine', type: 'Journal', url: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC12617075/' },
+      { year: 2025, title: 'A common longitudinal intensive care unit data format (CLIF) for critical illness research', venue: 'Intensive Care Medicine', type: 'Journal', url: 'https://link.springer.com/article/10.1007/s00134-025-07848-7' }
+    ].map(p => ({ ...p, typeLabel: p.type.toLowerCase() }));
+    const fmap = { All: null, Journals: 'Journal', Preprints: 'Preprint' };
+    const f = this.state.filter;
+    const pubs = allPubs.filter(p => !fmap[f] || p.type === fmap[f]);
+    const m = 'mailto:info@clificufoundation.org?subject=';
+    const paths = [
+      { n: '01', who: 'Donors', arrow: '→', body: 'Individuals and foundations interested in supporting proposed programs.', cta: 'Email a gift inquiry', href: m + 'Gift%20inquiry' },
+      { n: '02', who: 'Institutional partners', arrow: '→', body: 'Health systems and organizations exploring CLIF adoption.', cta: 'Email a partnership inquiry', href: m + 'Partnership%20inquiry' },
+      { n: '03', who: 'Clinicians', arrow: '↗', body: 'Learn the format first, then tell us about education needs.', cta: 'Start with CLIF 101 ↗', href: 'https://clif-icu.com/clif-101' },
+      { n: '04', who: 'Technical contributors', arrow: '↗', body: 'Specifications, ETL pipelines, and tools are open source.', cta: 'Contribute on GitHub ↗', href: 'https://github.com/Common-Longitudinal-ICU-data-Format/CLIF' }
+    ];
+    return {
+      rootRef: this.rootRef,
+      wide: !narrow, narrow, menuVisible: narrow && this.state.menu,
+      themeAttr: this.effectiveTheme(), toggleTheme: this.toggleTheme, themeLabel: this.effectiveTheme() === 'dark' ? 'Switch to light mode' : 'Switch to dark mode', themeShort: this.effectiveTheme() === 'dark' ? 'Dark' : 'Light', themePressed: this.effectiveTheme() === 'dark' ? 'true' : 'false',
+      menuExpanded: this.state.menu ? 'true' : 'false', menuLabel: this.state.menu ? 'Close' : 'Menu',
+      menuBtnBg: this.state.menu ? 'var(--action-primary-bg)' : 'transparent', menuBtnFg: this.state.menu ? 'var(--action-primary-fg)' : 'var(--text-primary)',
+      toggleMenu: () => this.setState(s => ({ menu: !s.menu })),
+      navItems, supportCurrent: page === 'support' ? 'page' : undefined,
+      isHome: page === 'home', isMission: page === 'mission', isWork: page === 'work', isResearch: page === 'research', isBoard: page === 'board', isSupport: page === 'support',
+      goHome: this.go('home'), goMission: this.go('mission'), goWork: this.go('work'), goResearch: this.go('research'), goSupport: this.go('support'), goBoard: this.go('board'),
+      orgRecord: [
+        { k: 'name', v: 'CLIF Foundation' }, { k: 'supports', v: 'Common Longitudinal ICU data Format' },
+        { k: 'entity', v: 'Illinois nonprofit corporation' }, { k: 'tax_status', v: '501(c)(3) application pending' }, { k: 'research_by', v: 'CLIF Consortium' }, { k: 'contact', v: 'info@clificufoundation.org' }
+      ],
+      rows: [
+        { table: 'adt', marks: [out(0, 5, 'ed'), seg(5, 52, 'icu'), out(52, 72, 'ward')] },
+        { table: 'vitals', marks: vit },
+        { table: 'labs', marks: [1, 6, 12, 18, 24, 30, 36, 48, 60, 70].map(dot) },
+        { table: 'respiratory_support', marks: [seg(6, 30, 'IMV'), out(30, 40, 'NIPPV'), out(40, 54, 'High Flow NC'), out(54, 72, 'Room Air')] },
+        { table: 'position', marks: [hiSeg(10, 26, 'prone')] },
+        { table: 'medication_admin_continuous', marks: [hiSeg(8, 26, 'norepinephrine'), out(27, 42, 'propofol')] },
+        { table: 'patient_assessments', marks: [2, 8, 12, 16, 20, 24, 28, 32, 36, 44, 52, 64].map(dot) },
+        { table: 'hospitalization', marks: [out(0, 72, 'admission → discharge')] }
+      ],
+      hourTicks: [0, 12, 24, 36, 48, 60, 72].map((h, i, a) => ({ left: pct(h), label: h + 'h', shift: i === 0 ? '0' : i === a.length - 1 ? '-100%' : '-50%' })),
+      sites: ['A', 'B', 'C', 'D', 'E'].map(l => ({ name: 'Site ' + l })),
+      ...this.buildDiagrams(),
+      diagramScroll: this.state.width < 1360,
+      programs,
+      mappings: [{ local: 'Vent - Servo-u', cat: 'IMV' }, { local: 'BiPAP mask', cat: 'NIPPV' }, { local: 'HFNC Optiflow 40L', cat: 'High Flow NC' }, { local: 'NC 2L', cat: 'Nasal Cannula' }, { local: 'RA', cat: 'Room Air' }],
+      homePubs: allPubs.filter((p, i) => i === 1 || i === 3 || i === 5).map(p => ({ ...p, venue: p.venue.replace('American Thoracic Society', 'ATS') })),
+      paths: paths.map(p => ({ ...p, onClick: undefined })),
+      principles: [
+        { n: '01', t: 'Open by default', d: 'Specifications, tools, and educational material stay openly licensed.' },
+        { n: '02', t: 'Credit where it belongs', d: 'Research is attributed to the Consortium and the original investigators.' },
+        { n: '03', t: 'Privacy-preserving', d: 'Support federated approaches in which patient data stays with each institution.' },
+        { n: '04', t: 'Practical first', d: 'Prioritize what helps a new site go from EHR extract to valid CLIF tables.' }
+      ],
+      filters: Object.keys(fmap).map(label => ({
+        label, count: allPubs.filter(p => !fmap[label] || p.type === fmap[label]).length,
+        pressed: label === f ? 'true' : 'false', bg: label === f ? 'var(--action-primary-bg)' : 'transparent', fg: label === f ? 'var(--action-primary-fg)' : 'var(--text-primary)',
+        onClick: () => this.setState({ filter: label })
+      })),
+      pubs, pubCount: 'Showing ' + pubs.length + ' of ' + allPubs.length + ' publications',
+      resources: [
+        { name: 'CLIF 101', note: 'start a CLIF project', url: 'https://clif-icu.com/clif-101' },
+        { name: 'ETL Guide', note: 'EHR → CLIF conversion', url: 'https://clif-icu.com/etl-guide' },
+        { name: 'Data Dictionary', note: 'CLIF 2.1.0', url: 'https://clif-icu.com/data-dictionary' },
+        { name: 'DQA Framework', note: 'data quality assessment', url: 'https://clif-icu.com/data-quality' },
+        { name: 'mCIDE Explorer', note: 'minimum common ICU data elements', url: 'https://clif-icu.com/mcide-explorer' },
+        { name: 'MIMIC-IV in CLIF format', note: 'PhysioNet · Zewei Liao et al.', url: 'https://physionet.org/content/mimic-iv-ext-clif/1.1.0/' }
+      ],
+      seats: ['Chair', 'Treasurer', 'Secretary', 'Director', 'Director'].map(role => ({ role })),
+      docs: [{ name: 'Bylaws', status: 'published when adopted' }, { name: 'Conflict-of-interest policy', status: 'published when adopted' }, { name: 'Organizational status', status: 'published when confirmed' }],
+      copyEmail: this.copyEmail, copyLabel: this.state.copied ? 'Copied' : 'Copy address',
+      footerLinks: [
+        ...navDefs.map(([id, label]) => ({ label, href: '#', onClick: this.go(id) })),
+        { label: 'Support CLIF', href: '#', onClick: this.go('support') },
+        { label: 'CLIF Consortium ↗', href: 'https://clif-icu.com/' },
+        { label: 'GitHub ↗', href: 'https://github.com/Common-Longitudinal-ICU-data-Format/CLIF' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

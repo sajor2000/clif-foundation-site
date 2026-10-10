@@ -1,0 +1,132 @@
+:root {
+  /* Ink — cool green-gray neutral scale */
+  --ink-950: #0E1111;
+  --ink-900: #1A1F1D;
+  --ink-800: #2A2F2C;
+  --ink-750: #3D423E;
+  --ink-700: #3A3F3C;
+  --ink-600: #555B55;
+  --ink-500: #737A74;
+  --ink-400: #9AA19B;
+  --ink-300: #C4C9C3;
+  --ink-200: #CDD1CA;
+  --ink-150: #DFE2DC;
+  --ink-100: #EAECE7;
+  --ink-50:  #F5F6F3;
+  --ink-0:   #FFFFFF;
+
+  /* Signal — one accent family: jade green (100–500) for fills and actions on ink; petrol (700–800) for text, links and actions on light */
+  --signal-100: #DCEFE6;
+  --signal-300: #B9E3D0;
+  --signal-400: #3A9B78;
+  --signal-500: #2E8B6A;
+  --signal-700: #12495E;
+  --signal-800: #0D3B4C;
+
+  /* Logo only — never used in UI */
+  --crimson-logo: #841839;
+
+  /* Data visualization — categorical, light grounds (all >= 3:1 on white) */
+  --viz-1: #0E1111;
+  --viz-2: #0B7A70;
+  --viz-3: #B87500;
+  --viz-4: #6B4FBB;
+  --viz-5: #737A74;
+  --viz-highlight: #3A9B78;
+  /* Data visualization — dark grounds (all >= 7:1 on ink) */
+  --viz-d-1: #3A9B78;
+  --viz-d-2: #7FB8E6;
+  --viz-d-3: #F2B84B;
+  --viz-d-4: #A893F0;
+  --viz-d-5: #9AA19B;
+
+  /* Semantic — surfaces */
+  --bg-page: var(--ink-50);
+  --bg-panel: var(--ink-100);
+  --bg-figure: var(--ink-0);
+  --bg-figure-alt: #F9FAF7;
+  --bg-hover: var(--ink-100);
+  /* Contrast bands (context bar, network band, footer): panel-gray in light, raised dark in dark */
+  --bg-inverse: var(--ink-100);
+  --text-inverse: var(--ink-950);
+  --text-inverse-body: var(--ink-750);
+  --text-inverse-muted: var(--ink-600);
+  --border-inverse: var(--ink-200);
+
+  /* Semantic — text */
+  --text-primary: var(--ink-950);
+  --text-body: var(--ink-750);
+  --text-muted: var(--ink-600);
+  --text-eyebrow: var(--signal-700);
+
+  /* Semantic — links & actions */
+  --link: var(--signal-700);
+  --link-hover: var(--signal-800);
+  --accent-text: var(--signal-700);          /* the green family as text: petrol in light, green in dark */
+  --action-primary-bg: var(--ink-950);
+  --action-primary-fg: var(--ink-50);
+  --action-primary-hover: var(--signal-700);
+  --action-secondary-border: var(--ink-950);
+  --action-secondary-hover: var(--ink-100);
+
+  /* Semantic — borders */
+  --border-strong: var(--ink-950);
+  --border: var(--ink-200);
+  --border-subtle: var(--ink-150);
+  --grid-line: #E6E8E3;
+  --grid-dot: #D5D9D1;
+
+  /* Semantic — accent, focus, status */
+  --accent: var(--signal-400);               /* fill only; never text on light */
+  --accent-on: var(--ink-950);
+  --accent-tint: var(--signal-300);
+  --focus-ring: var(--ink-950);
+  --status-proposed-bg: var(--signal-400);
+  --status-proposed-fg: var(--ink-950);
+  --status-existing-bg: var(--ink-950);
+  --status-existing-fg: var(--ink-50);
+  --status-error: #B42318;
+
+  /* Logo: one-color PNG filtered until official SVGs arrive */
+  --logo-filter: brightness(0);
+  --logo-inverse-filter: brightness(0);
+  color-scheme: light;
+}
+
+/* Dark mode — a token swap, not a second design. Set data-theme="dark" on <html> or the app root. */
+[data-theme="dark"] {
+  --bg-page: var(--ink-950);
+  --bg-panel: #161A18;
+  --bg-figure: #1F2421;
+  --bg-figure-alt: var(--ink-900);
+  --bg-hover: #242927;
+  --bg-inverse: var(--ink-900);
+  --text-inverse: var(--ink-50);
+  --text-inverse-body: var(--ink-300);
+  --text-inverse-muted: var(--ink-400);
+  --border-inverse: var(--ink-700);
+  --text-primary: var(--ink-50);
+  --text-body: var(--ink-300);
+  --text-muted: var(--ink-400);
+  --text-eyebrow: var(--signal-400);
+  --link: var(--signal-400);
+  --link-hover: #4FB08A;
+  --accent-text: var(--signal-400);
+  --action-primary-bg: var(--signal-400);
+  --action-primary-fg: var(--ink-950);
+  --action-primary-hover: #4FB08A;
+  --action-secondary-border: var(--ink-50);
+  --action-secondary-hover: #242927;
+  --border-strong: #5A605B;
+  --border: var(--ink-800);
+  --border-subtle: #242927;
+  --grid-line: #242927;
+  --grid-dot: var(--ink-800);
+  --accent-tint: #1F4A3A;
+  --focus-ring: var(--signal-400);
+  --status-existing-bg: var(--ink-50);
+  --status-existing-fg: var(--ink-950);
+  --logo-filter: brightness(0) invert(1);
+  --logo-inverse-filter: none;
+  color-scheme: dark;
+}

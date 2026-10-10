@@ -1,0 +1,96 @@
+@import "tailwindcss";
+@import "../styles/colors.css";
+@import "../styles/typography.css";
+@import "../styles/spacing.css";
+@import "../styles/base.css";
+
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 8px;
+  background: var(--action-primary-bg);
+  color: var(--action-primary-fg);
+  padding: 10px 14px;
+  border-radius: 3px;
+  z-index: 10;
+}
+
+.skip-link:focus {
+  left: 8px;
+}
+
+.page-wrap {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding-left: var(--gutter);
+  padding-right: var(--gutter);
+}
+
+.eyebrow {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 13px;
+  letter-spacing: 0.01em;
+  color: var(--link);
+}
+
+.display-xl {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: var(--type-display-xl);
+  line-height: var(--leading-display);
+  letter-spacing: var(--tracking-display);
+  margin: 0;
+  text-wrap: balance;
+}
+
+.display-l {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: var(--type-display-l);
+  line-height: 1;
+  letter-spacing: var(--tracking-display);
+  margin: 0;
+  text-wrap: balance;
+}
+
+.h2 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: var(--type-h2);
+  line-height: 1.04;
+  letter-spacing: -0.03em;
+  margin: 0;
+  text-wrap: balance;
+}
+
+.body-muted {
+  color: var(--text-body);
+}
+
+.band {
+  background: var(--bg-panel);
+}
+
+.band-inverse {
+  background: var(--bg-inverse);
+  color: var(--text-inverse);
+}
+
+.hairline-list {
+  border-top: 1px solid var(--border-strong);
+}
+
+.linkish {
+  color: var(--link);
+  font-size: 15px;
+  font-weight: 500;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.linkish:hover {
+  text-decoration: underline;
+}

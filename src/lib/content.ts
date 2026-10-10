@@ -1,0 +1,320 @@
+export const CONTACT_EMAIL = "info@clificufoundation.org";
+export const CONSORTIUM_URL = "https://clif-icu.com/";
+export const GITHUB_URL =
+  "https://github.com/Common-Longitudinal-ICU-data-Format/CLIF";
+
+export const NAV_ITEMS = [
+  { href: "/mission", label: "Mission", id: "mission", index: "01" },
+  { href: "/our-work", label: "Our Work", id: "work", index: "02" },
+  {
+    href: "/research",
+    label: "Research & Resources",
+    id: "research",
+    index: "03",
+  },
+  {
+    href: "/board",
+    label: "Board & Governance",
+    id: "board",
+    index: "04",
+  },
+] as const;
+
+export const ORG_RECORD = [
+  { k: "name", v: "CLIF Foundation" },
+  { k: "supports", v: "Common Longitudinal ICU data Format" },
+  { k: "entity", v: "Illinois nonprofit corporation" },
+  { k: "tax_status", v: "501(c)(3) application pending" },
+  { k: "research_by", v: "CLIF Consortium" },
+  { k: "contact", v: CONTACT_EMAIL },
+] as const;
+
+export const PROGRAMS = [
+  {
+    id: "impl_support",
+    name: "Implementation support",
+    scope:
+      "Guidance for health systems converting EHR data to CLIF, building on the ETL Guide and DQA Framework.",
+    serves: "Health system data teams",
+    base: "ETL Guide",
+    baseUrl: "https://clif-icu.com/etl-guide",
+  },
+  {
+    id: "education",
+    name: "Education",
+    scope:
+      "Courses and workshops for clinicians and data scientists learning to work with CLIF-formatted data.",
+    serves: "Clinicians, data scientists, trainees",
+    base: "CLIF 101",
+    baseUrl: "https://clif-icu.com/clif-101",
+  },
+  {
+    id: "oss_stewardship",
+    name: "Open-source stewardship",
+    scope:
+      "Sustained maintenance of the specification, data dictionary, and tools released under the Apache License 2.0.",
+    serves: "Technical contributors, adopting sites",
+    base: "GitHub repository",
+    baseUrl: GITHUB_URL,
+  },
+  {
+    id: "convening",
+    name: "Convening",
+    scope:
+      "Forums for sites and contributors to coordinate on future versions of the standard.",
+    serves: "Adopting sites and contributors",
+    base: "mCIDE expansion process",
+    baseUrl: "https://clif-icu.com/mcide-explorer",
+  },
+] as const;
+
+export type PubType = "Journal" | "Preprint";
+
+export const PUBLICATIONS: Array<{
+  year: number;
+  title: string;
+  venue: string;
+  type: PubType;
+  url: string;
+}> = [
+  {
+    year: 2026,
+    title:
+      "Federated generative event models for tokenized electronic health records",
+    venue: "arXiv",
+    type: "Preprint",
+    url: "https://arxiv.org/abs/2608.02939",
+  },
+  {
+    year: 2026,
+    title:
+      "Federation, Not Centralization: A New Paradigm for EHR-Based Critical Care Research",
+    venue: "Annals of the American Thoracic Society",
+    type: "Journal",
+    url: "https://academic.oup.com/annalsats/advance-article/doi/10.1093/annalsats/aaoaf067/8435347",
+  },
+  {
+    year: 2025,
+    title:
+      "Prone Positioning in a North American Cohort of Hypoxemic Patients on Mechanical Ventilation",
+    venue: "medRxiv",
+    type: "Preprint",
+    url: "https://www.medrxiv.org/content/10.1101/2025.09.03.25334942v1",
+  },
+  {
+    year: 2025,
+    title: "The Epidemiology of ICU Readmissions Across Ten Health Systems",
+    venue: "Critical Care Explorations",
+    type: "Journal",
+    url: "https://journals.lww.com/ccejournal/fulltext/2025/11000/the_epidemiology_of_icu_readmissions_across_ten.1.aspx",
+  },
+  {
+    year: 2025,
+    title:
+      "Correspondence on “A common longitudinal intensive care unit data format (CLIF) for critical illness research” – Author’s reply",
+    venue: "Intensive Care Medicine",
+    type: "Journal",
+    url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC12617075/",
+  },
+  {
+    year: 2025,
+    title:
+      "A common longitudinal intensive care unit data format (CLIF) for critical illness research",
+    venue: "Intensive Care Medicine",
+    type: "Journal",
+    url: "https://link.springer.com/article/10.1007/s00134-025-07848-7",
+  },
+];
+
+export const HOME_PUBS = PUBLICATIONS.filter((_, i) => i === 1 || i === 3 || i === 5).map(
+  (p) => ({
+    ...p,
+    venue: p.venue.replace("American Thoracic Society", "ATS"),
+  }),
+);
+
+export const RESOURCES = [
+  {
+    name: "CLIF 101",
+    note: "start a CLIF project",
+    url: "https://clif-icu.com/clif-101",
+  },
+  {
+    name: "ETL Guide",
+    note: "EHR → CLIF conversion",
+    url: "https://clif-icu.com/etl-guide",
+  },
+  {
+    name: "Data Dictionary",
+    note: "CLIF 2.1.0",
+    url: "https://clif-icu.com/data-dictionary",
+  },
+  {
+    name: "DQA Framework",
+    note: "data quality assessment",
+    url: "https://clif-icu.com/data-quality",
+  },
+  {
+    name: "mCIDE Explorer",
+    note: "minimum common ICU data elements",
+    url: "https://clif-icu.com/mcide-explorer",
+  },
+  {
+    name: "MIMIC-IV in CLIF format",
+    note: "PhysioNet · Zewei Liao et al.",
+    url: "https://physionet.org/content/mimic-iv-ext-clif/1.1.0/",
+  },
+] as const;
+
+export const PRINCIPLES = [
+  {
+    n: "01",
+    t: "Open by default",
+    d: "Specifications, tools, and educational material stay openly licensed.",
+  },
+  {
+    n: "02",
+    t: "Credit where it belongs",
+    d: "Research is attributed to the Consortium and the original investigators.",
+  },
+  {
+    n: "03",
+    t: "Privacy-preserving",
+    d: "Support federated approaches in which patient data stays with each institution.",
+  },
+  {
+    n: "04",
+    t: "Practical first",
+    d: "Prioritize what helps a new site go from EHR extract to valid CLIF tables.",
+  },
+] as const;
+
+export const BOARD_SEATS = [
+  "Chair",
+  "Treasurer",
+  "Secretary",
+  "Director",
+  "Director",
+] as const;
+
+export const GOVERNING_DOCS = [
+  { name: "Bylaws", status: "published when adopted" },
+  { name: "Conflict-of-interest policy", status: "published when adopted" },
+  { name: "Organizational status", status: "published when confirmed" },
+] as const;
+
+export const SUPPORT_PATHS = [
+  {
+    n: "01",
+    who: "Donors",
+    body: "Individuals and foundations interested in supporting proposed programs.",
+    cta: "Email a gift inquiry",
+    href: `mailto:${CONTACT_EMAIL}?subject=Gift%20inquiry`,
+    external: false,
+  },
+  {
+    n: "02",
+    who: "Institutional partners",
+    body: "Health systems and organizations exploring CLIF adoption.",
+    cta: "Email a partnership inquiry",
+    href: `mailto:${CONTACT_EMAIL}?subject=Partnership%20inquiry`,
+    external: false,
+  },
+  {
+    n: "03",
+    who: "Clinicians",
+    body: "Learn the format first, then tell us about education needs.",
+    cta: "Start with CLIF 101 ↗",
+    href: "https://clif-icu.com/clif-101",
+    external: true,
+  },
+  {
+    n: "04",
+    who: "Technical contributors",
+    body: "Specifications, ETL pipelines, and tools are open source.",
+    cta: "Contribute on GitHub ↗",
+    href: GITHUB_URL,
+    external: true,
+  },
+] as const;
+
+export const HOME_PATHS = [
+  {
+    n: "01",
+    who: "Donors",
+    arrow: "→",
+    cta: "Email a gift inquiry",
+    href: `mailto:${CONTACT_EMAIL}?subject=Gift%20inquiry`,
+  },
+  {
+    n: "02",
+    who: "Institutional partners",
+    arrow: "→",
+    cta: "Email a partnership inquiry",
+    href: `mailto:${CONTACT_EMAIL}?subject=Partnership%20inquiry`,
+  },
+  {
+    n: "03",
+    who: "Clinicians",
+    arrow: "↗",
+    cta: "Start with CLIF 101 ↗",
+    href: "https://clif-icu.com/clif-101",
+  },
+  {
+    n: "04",
+    who: "Technical contributors",
+    arrow: "↗",
+    cta: "Contribute on GitHub ↗",
+    href: GITHUB_URL,
+  },
+] as const;
+
+export const MAPPINGS = [
+  { local: "Vent - Servo-u", cat: "IMV" },
+  { local: "BiPAP mask", cat: "NIPPV" },
+  { local: "HFNC Optiflow 40L", cat: "High Flow NC" },
+  { local: "NC 2L", cat: "Nasal Cannula" },
+  { local: "RA", cat: "Room Air" },
+] as const;
+
+export const NEEDS = [
+  {
+    n: "01",
+    need: "Minute-level timing",
+    how: "Every row carries a timestamp, so ventilator changes, infusion titrations, and labs line up on one clock.",
+    ex: "recorded_dttm · admin_dttm",
+  },
+  {
+    n: "02",
+    need: "Life support over time",
+    how: "Device, mode, and medication categories describe when each therapy starts, changes, and stops.",
+    ex: 'device_category = "IMV"',
+  },
+  {
+    n: "03",
+    need: "Same meaning at every site",
+    how: "mCIDE maps local terms to shared permissible values.",
+    ex: 'med_category = "norepinephrine"',
+  },
+  {
+    n: "04",
+    need: "Quality you can check",
+    how: "The DQA Framework tests completeness and plausibility before analysis.",
+    ex: "DQA Framework",
+  },
+  {
+    n: "05",
+    need: "Privacy at multicenter scale",
+    how: "Federated analysis: code runs at each site and only aggregate results are shared.",
+    ex: "aggregate results only",
+  },
+  {
+    n: "06",
+    need: "Open and testable",
+    how: "Open-source tools under Apache 2.0, and MIMIC-IV in CLIF format for testing code without institutional access.",
+    ex: "MIMIC-IV-Ext-CLIF",
+  },
+] as const;
+
+export const FOOTER_NOTE =
+  "An Illinois nonprofit corporation supporting adoption of the Common Longitudinal ICU data Format. Application for 501(c)(3) recognition is pending. Research is credited to the CLIF Consortium and its investigators.";
