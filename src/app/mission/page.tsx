@@ -52,7 +52,7 @@ export default function MissionPage() {
             flex: "1 1 560px",
             display: "grid",
             gap: 22,
-            fontSize: "clamp(18px,1.6vw,21px)",
+            fontSize: "var(--type-lead-lg)",
             lineHeight: 1.6,
             maxWidth: 760,
           }}
@@ -84,7 +84,7 @@ export default function MissionPage() {
             style={{
               fontFamily: "var(--font-display)",
               fontWeight: 600,
-              fontSize: "clamp(28px,3.2vw,42px)",
+              fontSize: "var(--type-display-m)",
               letterSpacing: "-0.025em",
               margin: 0,
             }}
@@ -198,7 +198,7 @@ export default function MissionPage() {
             flex: "0 1 360px",
             fontFamily: "var(--font-display)",
             fontWeight: 600,
-            fontSize: "clamp(28px,3.2vw,42px)",
+            fontSize: "var(--type-display-m)",
             lineHeight: 1.08,
             letterSpacing: "-0.025em",
             margin: 0,

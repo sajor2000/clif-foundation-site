@@ -33,29 +33,77 @@ colors:
   status-error: "#B42318"
   crimson-logo: "#841839"
 typography:
-  display:
+  display-xl:
     fontFamily: "Funnel Display, Funnel Sans, system-ui, sans-serif"
     fontSize: "clamp(40px, 6.4vw, 88px)"
     fontWeight: 600
     lineHeight: 0.98
     letterSpacing: "-0.035em"
+  display-l:
+    fontFamily: "Funnel Display, Funnel Sans, system-ui, sans-serif"
+    fontSize: "clamp(38px, 5.6vw, 76px)"
+    fontWeight: 600
+    lineHeight: 1
+    letterSpacing: "-0.035em"
+  display-m:
+    fontFamily: "Funnel Display, Funnel Sans, system-ui, sans-serif"
+    fontSize: "clamp(28px, 3.2vw, 42px)"
+    fontWeight: 600
+    lineHeight: 1.06
+    letterSpacing: "-0.025em"
   headline:
     fontFamily: "Funnel Display, Funnel Sans, system-ui, sans-serif"
     fontSize: "clamp(30px, 3.6vw, 48px)"
     fontWeight: 600
     lineHeight: 1.04
     letterSpacing: "-0.03em"
+  h3:
+    fontFamily: "Funnel Display, Funnel Sans, system-ui, sans-serif"
+    fontSize: "clamp(26px, 2.8vw, 36px)"
+    fontWeight: 600
+    lineHeight: 1.06
+    letterSpacing: "-0.025em"
+  h4:
+    fontFamily: "Funnel Display, Funnel Sans, system-ui, sans-serif"
+    fontSize: "clamp(24px, 2.4vw, 32px)"
+    fontWeight: 600
+    lineHeight: 1.06
+    letterSpacing: "-0.025em"
   title:
     fontFamily: "Funnel Sans, system-ui, sans-serif"
     fontSize: "20px"
     fontWeight: 500
     lineHeight: 1.3
     letterSpacing: "normal"
+  lead:
+    fontFamily: "Funnel Sans, system-ui, sans-serif"
+    fontSize: "clamp(17px, 1.5vw, 20px)"
+    fontWeight: 400
+    lineHeight: 1.55
+    letterSpacing: "normal"
+  lead-lg:
+    fontFamily: "Funnel Sans, system-ui, sans-serif"
+    fontSize: "clamp(18px, 1.6vw, 21px)"
+    fontWeight: 400
+    lineHeight: 1.55
+    letterSpacing: "normal"
   body:
     fontFamily: "Funnel Sans, system-ui, sans-serif"
     fontSize: "17px"
     fontWeight: 400
     lineHeight: 1.6
+    letterSpacing: "normal"
+  small:
+    fontFamily: "Funnel Sans, system-ui, sans-serif"
+    fontSize: "15px"
+    fontWeight: 400
+    lineHeight: 1.55
+    letterSpacing: "normal"
+  ui:
+    fontFamily: "Funnel Sans, system-ui, sans-serif"
+    fontSize: "15px"
+    fontWeight: 500
+    lineHeight: 1.45
     letterSpacing: "normal"
   label:
     fontFamily: "Funnel Sans, system-ui, sans-serif"
@@ -68,6 +116,18 @@ typography:
     fontSize: "13px"
     fontWeight: 400
     lineHeight: 1.45
+    letterSpacing: "0.02em"
+  mono-s:
+    fontFamily: "Spline Sans Mono, ui-monospace, Menlo, monospace"
+    fontSize: "12px"
+    fontWeight: 400
+    lineHeight: 1.45
+    letterSpacing: "0.02em"
+  mono-xs:
+    fontFamily: "Spline Sans Mono, ui-monospace, Menlo, monospace"
+    fontSize: "11px"
+    fontWeight: 400
+    lineHeight: 1.4
     letterSpacing: "0.02em"
 rounded:
   tag: "2px"
@@ -167,11 +227,19 @@ Cool green-gray ink scale with one accent family (jade → petrol). Light mode i
 
 ### Hierarchy
 - **Display XL** (600, `clamp(40px, 6.4vw, 88px)`, lh 0.98, tracking −0.035em): Home hero.
+- **Display L** (600, `clamp(38px, 5.6vw, 76px)`): Inner-page display headlines.
+- **Display M** (600, `clamp(28px, 3.2vw, 42px)`): Band / callout display titles.
 - **Headline / H2** (600, `clamp(30px, 3.6vw, 48px)`): Section titles.
+- **H3** (600, `clamp(26px, 2.8vw, 36px)`): Subsection titles.
+- **H4** (600, `clamp(24px, 2.4vw, 32px)`): Panel / form titles.
 - **Title** (500, 20px): Card/list titles.
+- **Lead** (400, `clamp(17px, 1.5vw, 20px)`): Supporting intro sentences.
+- **Lead LG** (400, `clamp(18px, 1.6vw, 21px)`): Mission / long-form lead.
 - **Body** (400, 17px, measure 680px): Reading text.
+- **Small / UI** (400–500, 15px): Nav, secondary copy, control labels.
 - **Label / Eyebrow** (500, 13px): Petrol eyebrows, section indexes (`NN — Label`, `NN / snake_case`).
-- **Mono** (13–12px): Table/field names, snake_case ids, figure metadata.
+- **Mono** (13px): Table/field names, snake_case ids.
+- **Mono S / XS** (12–11px): Figure ticks and dense schematic metadata (illustrative panels only).
 
 ### Named Rules
 **The Mono Sentence Rule.** If a string is a sentence, it is not mono. Mono is sentence case — never all caps.

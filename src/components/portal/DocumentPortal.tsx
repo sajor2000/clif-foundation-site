@@ -135,7 +135,7 @@ function DocumentWorkspace() {
             margin: 0,
             fontFamily: "var(--font-display)",
             fontWeight: 600,
-            fontSize: "clamp(28px, 4vw, 40px)",
+            fontSize: "var(--type-display-m)",
             letterSpacing: "-0.02em",
           }}
         >
@@ -167,6 +167,8 @@ function DocumentWorkspace() {
             <label style={{ display: "grid", gap: 6, fontSize: 14 }}>
               Title
               <input
+                name="title"
+                autoComplete="off"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 required
@@ -177,6 +179,8 @@ function DocumentWorkspace() {
             <label style={{ display: "grid", gap: 6, fontSize: 14 }}>
               Category
               <select
+                name="category"
+                autoComplete="off"
                 value={category}
                 onChange={(e) =>
                   setCategory(e.target.value as (typeof CATEGORIES)[number])
@@ -193,7 +197,9 @@ function DocumentWorkspace() {
             <label style={{ display: "grid", gap: 6, fontSize: 14 }}>
               File
               <input
+                name="file"
                 type="file"
+                autoComplete="off"
                 onChange={(e) => setFile(e.target.files?.[0] ?? null)}
                 required
               />

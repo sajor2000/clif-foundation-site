@@ -4,10 +4,8 @@ import Link from "next/link";
 import { useEffect, useId, useRef } from "react";
 import { Lockup } from "@/components/brand/Lockup";
 import { NAV_ITEMS } from "@/lib/content";
-import { useTheme } from "@/components/theme/ThemeProvider";
 
 export function SiteHeader({ current }: { current?: string }) {
-  const { theme, toggleTheme } = useTheme();
   const toggleId = useId();
   const toggleRef = useRef<HTMLInputElement>(null);
 
@@ -54,7 +52,7 @@ export function SiteHeader({ current }: { current?: string }) {
           gap: 24,
         }}
       >
-        <Lockup height={34} />
+        <Lockup height={34} priority />
         <nav className="site-nav-desktop" aria-label="Primary">
           {NAV_ITEMS.map((item) => (
             <Link
@@ -104,13 +102,15 @@ export function SiteHeader({ current }: { current?: string }) {
             flex: "none",
           }}
         >
-          <button
-            type="button"
-            onClick={toggleTheme}
-            aria-pressed={theme === "dark"}
-            aria-label={
-              theme === "dark" ? "Switch to light mode" : "Switch to dark mode"
-            }
+          <input
+            id="clif-theme-toggle"
+            type="checkbox"
+            className="clif-theme-toggle"
+            aria-label="Toggle dark mode"
+          />
+          <label
+            htmlFor="clif-theme-toggle"
+            className="clif-theme-btn"
             style={{
               height: "var(--control-md)",
               padding: "0 12px",
@@ -123,10 +123,12 @@ export function SiteHeader({ current }: { current?: string }) {
               display: "inline-flex",
               alignItems: "center",
               gap: 8,
+              boxSizing: "border-box",
             }}
           >
             <span
               aria-hidden="true"
+              className="clif-theme-icon"
               style={{
                 width: 14,
                 height: 14,
@@ -134,10 +136,12 @@ export function SiteHeader({ current }: { current?: string }) {
                 border: "1.5px solid currentColor",
                 background:
                   "linear-gradient(90deg, currentColor 50%, transparent 50%)",
+                flex: "none",
               }}
             />
-            {theme === "dark" ? "Dark" : "Light"}
-          </button>
+            <span className="clif-theme-label-light">Light</span>
+            <span className="clif-theme-label-dark">Dark</span>
+          </label>
           <input
             ref={toggleRef}
             id={toggleId}

@@ -86,6 +86,8 @@ export function InquiryForm() {
         Name
         <input
           required
+          name="name"
+          autoComplete="name"
           value={name}
           onChange={(e) => setName(e.target.value)}
           style={inputStyle}
@@ -94,6 +96,8 @@ export function InquiryForm() {
       <label style={{ display: "grid", gap: 6, fontSize: 14 }}>
         Organization (optional)
         <input
+          name="organization"
+          autoComplete="organization"
           value={organization}
           onChange={(e) => setOrganization(e.target.value)}
           style={inputStyle}
@@ -102,6 +106,8 @@ export function InquiryForm() {
       <label style={{ display: "grid", gap: 6, fontSize: 14 }}>
         Kind
         <select
+          name="kind"
+          autoComplete="off"
           value={kind}
           onChange={(e) => setKind(e.target.value as (typeof KINDS)[number])}
           style={inputStyle}
@@ -116,6 +122,8 @@ export function InquiryForm() {
       <label style={{ display: "grid", gap: 6, fontSize: 14 }}>
         Message (optional)
         <textarea
+          name="message"
+          autoComplete="off"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           rows={4}

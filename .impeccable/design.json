@@ -12,9 +12,20 @@
       "crimson-logo": { "role": "tertiary", "displayName": "Crimson (logo only)", "canonical": "#841839" }
     },
     "typographyMeta": {
-      "display": { "displayName": "Display", "purpose": "Hero and page headlines in Funnel Display 600." },
-      "body": { "displayName": "Body", "purpose": "Funnel Sans reading text; measure 680px." },
-      "mono": { "displayName": "Mono", "purpose": "Spline Sans Mono for CLIF field names and technical ids only." }
+      "display-xl": { "displayName": "Display XL", "purpose": "Home hero; Funnel Display 600; clamp(40px, 6.4vw, 88px)." },
+      "display-l": { "displayName": "Display L", "purpose": "Inner-page display headlines; clamp(38px, 5.6vw, 76px)." },
+      "headline": { "displayName": "Headline / H2", "purpose": "Section titles; clamp(30px, 3.6vw, 48px)." },
+      "h3": { "displayName": "H3", "purpose": "Subsection titles; clamp(26px, 2.8vw, 36px)." },
+      "h4": { "displayName": "H4", "purpose": "Panel and form titles; clamp(24px, 2.4vw, 32px)." },
+      "title": { "displayName": "Title", "purpose": "List/card titles; 20px Funnel Sans 500." },
+      "lead": { "displayName": "Lead", "purpose": "Supporting intro; clamp(17px, 1.5vw, 20px)." },
+      "body": { "displayName": "Body", "purpose": "Funnel Sans reading text 17px; measure 680px." },
+      "small": { "displayName": "Small", "purpose": "Secondary copy; 15px." },
+      "ui": { "displayName": "UI", "purpose": "Nav and controls; 15px medium." },
+      "label": { "displayName": "Label / Eyebrow", "purpose": "Petrol eyebrows and section indexes; 13px." },
+      "mono": { "displayName": "Mono", "purpose": "Spline Sans Mono for CLIF field names and technical ids only." },
+      "mono-s": { "displayName": "Mono S", "purpose": "Figure ticks; 12px." },
+      "mono-xs": { "displayName": "Mono XS", "purpose": "Dense schematic metadata; 11px." }
     },
     "shadows": [],
     "motion": [

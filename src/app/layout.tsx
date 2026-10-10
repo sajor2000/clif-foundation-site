@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { AppProviders } from "@/components/providers/AppProviders";
+import { funnelDisplay, funnelSans, splineMono } from "@/lib/fonts";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -11,25 +12,17 @@ export const metadata: Metadata = {
     "An Illinois nonprofit supporting adoption of the Common Longitudinal ICU data Format. 501(c)(3) application pending.",
 };
 
+const themeBoot = `(function(){function syncToggle(){var el=document.getElementById('clif-theme-toggle');if(el)el.checked=document.documentElement.dataset.theme==='dark';}try{var t=localStorage.getItem('clif-site-theme');if(t==='light'||t==='dark'){document.documentElement.dataset.theme=t;}else if(window.matchMedia('(prefers-color-scheme: dark)').matches){document.documentElement.dataset.theme='dark';}}catch(e){}document.addEventListener('change',function(e){var el=e.target;if(!el||el.id!=='clif-theme-toggle')return;var dark=!!el.checked;document.documentElement.dataset.theme=dark?'dark':'light';try{localStorage.setItem('clif-site-theme',dark?'dark':'light');}catch(err){}});if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',syncToggle);}else{syncToggle();}})();`
+
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`${funnelDisplay.variable} ${funnelSans.variable} ${splineMono.variable}`}
+    >
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossOrigin="anonymous"
-        />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Funnel+Display:wght@400..800&family=Funnel+Sans:ital,wght@0,300..700;1,400&family=Spline+Sans+Mono:wght@400;500&display=swap"
-          rel="stylesheet"
-        />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem('clif-site-theme');if(t==='light'||t==='dark'){document.documentElement.dataset.theme=t;}else if(window.matchMedia('(prefers-color-scheme: dark)').matches){document.documentElement.dataset.theme='dark';}}catch(e){}})();`,
-          }}
-        />
+        <script dangerouslySetInnerHTML={{ __html: themeBoot }} />
       </head>
       <body className="min-h-full antialiased">
         <AppProviders>{children}</AppProviders>

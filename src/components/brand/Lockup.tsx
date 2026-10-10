@@ -1,12 +1,14 @@
+import Image from "next/image";
 import Link from "next/link";
-import type { CSSProperties } from "react";
 
 const SRC = {
-  ink: "https://clif-icu.com/images/logos/clif_logo_transparent_FINAL_cropped.png",
-  inverse: "https://clif-icu.com/images/logos/clif_logo_white_email.png",
-  consortium:
-    "https://clif-icu.com/images/logos/clif_logo_transparent_FINAL_cropped.png",
+  ink: "/brand/clif-logo-ink.png",
+  inverse: "/brand/clif-logo-white.png",
+  consortium: "/brand/clif-logo-ink.png",
 } as const;
+
+/** Intrinsic logo aspect ≈ 2417×729 */
+const LOGO_ASPECT = 2417 / 729;
 
 type Tone = keyof typeof SRC;
 
@@ -15,11 +17,13 @@ export function Lockup({
   height = 34,
   label = "Foundation",
   href = "/",
+  priority = false,
 }: {
   tone?: Tone;
   height?: number;
   label?: string | null;
   href?: string;
+  priority?: boolean;
 }) {
   const fg = tone === "inverse" ? "var(--text-inverse)" : "var(--text-primary)";
   const filter =
@@ -28,6 +32,7 @@ export function Lockup({
       : tone === "inverse"
         ? "var(--logo-inverse-filter)"
         : "none";
+  const width = Math.round(height * LOGO_ASPECT);
 
   const inner = (
     <span
@@ -37,11 +42,13 @@ export function Lockup({
         gap: Math.round(height * 0.4),
       }}
     >
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
+      <Image
         src={SRC[tone]}
         alt="CLIF"
-        style={{ height, display: "block", filter } as CSSProperties}
+        width={width}
+        height={height}
+        priority={priority}
+        style={{ height, width, display: "block", filter }}
       />
       {label ? (
         <span

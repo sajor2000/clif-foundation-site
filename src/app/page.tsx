@@ -505,7 +505,7 @@ export default function HomePage() {
             style={{
               fontFamily: "var(--font-display)",
               fontWeight: 600,
-              fontSize: "clamp(28px,3.2vw,42px)",
+              fontSize: "var(--type-display-m)",
               lineHeight: 1.08,
               letterSpacing: "-0.025em",
               margin: 0,
@@ -631,7 +631,7 @@ export default function HomePage() {
               style={{
                 fontFamily: "var(--font-display)",
                 fontWeight: 600,
-                fontSize: "clamp(28px,3.2vw,42px)",
+                fontSize: "var(--type-display-m)",
                 lineHeight: 1.08,
                 letterSpacing: "-0.025em",
                 margin: 0,
@@ -716,7 +716,7 @@ export default function HomePage() {
             style={{
               fontFamily: "var(--font-display)",
               fontWeight: 600,
-              fontSize: "clamp(28px,3.2vw,42px)",
+              fontSize: "var(--type-display-m)",
               letterSpacing: "-0.025em",
               margin: 0,
             }}

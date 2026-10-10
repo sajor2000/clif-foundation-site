@@ -27,7 +27,7 @@ export default function SupportPage() {
           <span className="eyebrow">05 / support</span>
           <h1
             className="display-xl"
-            style={{ fontSize: "clamp(40px,6vw,84px)" }}
+            style={{ fontSize: "var(--type-display-xl)" }}
           >
             Giving starts with a conversation.
           </h1>
@@ -155,7 +155,7 @@ export default function SupportPage() {
             style={{
               fontFamily: "var(--font-display)",
               fontWeight: 600,
-              fontSize: "clamp(28px,3.2vw,42px)",
+              fontSize: "var(--type-display-m)",
               lineHeight: 1.08,
               letterSpacing: "-0.025em",
               margin: 0,
@@ -272,7 +272,7 @@ export default function SupportPage() {
               style={{
                 fontFamily: "var(--font-display)",
                 fontWeight: 600,
-                fontSize: "clamp(28px,3.2vw,42px)",
+                fontSize: "var(--type-display-m)",
                 lineHeight: 1.08,
                 letterSpacing: "-0.025em",
                 margin: 0,
@@ -380,7 +380,7 @@ export default function SupportPage() {
             style={{
               fontFamily: "var(--font-display)",
               fontWeight: 600,
-              fontSize: "clamp(28px,3.2vw,42px)",
+              fontSize: "var(--type-display-m)",
               lineHeight: 1.08,
               letterSpacing: "-0.025em",
               margin: 0,

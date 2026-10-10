@@ -28,7 +28,8 @@
   font-weight: 500;
 }
 
-.site-menu-toggle {
+.site-menu-toggle,
+.clif-theme-toggle {
   position: absolute;
   width: 1px;
   height: 1px;
@@ -38,6 +39,23 @@
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
+}
+
+.clif-theme-label-dark {
+  display: none;
+}
+
+html[data-theme="dark"] .clif-theme-label-light {
+  display: none;
+}
+
+html[data-theme="dark"] .clif-theme-label-dark {
+  display: inline;
+}
+
+.clif-theme-toggle:focus-visible + .clif-theme-btn {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 3px;
 }
 
 .site-menu-btn {
