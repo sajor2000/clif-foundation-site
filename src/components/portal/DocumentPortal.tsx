@@ -2,14 +2,17 @@
 
 import { useAuth } from "@clerk/nextjs";
 import { useMutation, useQuery } from "convex/react";
-import { Exit } from "effect";
+import { Cause, Effect, Exit } from "effect";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import { api } from "../../../convex/_generated/api";
 import type { Id } from "../../../convex/_generated/dataModel";
 import { Button } from "@/components/core/Button";
-import { validateDocumentMeta } from "@/lib/effect/documents";
-import { Effect } from "effect";
+import {
+  formatUploadError,
+  uploadDocumentProgram,
+  type UploadDocumentError,
+} from "@/lib/effect/upload";
 
 const CATEGORIES = ["governance", "legal", "meeting", "other"] as const;
 
@@ -85,55 +88,43 @@ function DocumentWorkspace() {
   const [error, setError] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
 
-  async function onUpload(e: React.FormEvent) {
+  async function onUpload(e: FormEvent) {
     e.preventDefault();
     setError(null);
-    if (!file) {
-      setError("Choose a file to upload.");
-      return;
-    }
+    setUploading(true);
 
-    const metaExit = await Effect.runPromiseExit(
-      validateDocumentMeta({
-        title,
-        category,
-        contentType: file.type || "application/octet-stream",
-      }),
+    const exit = await Effect.runPromiseExit(
+      uploadDocumentProgram(
+        { title, category, file },
+        {
+          generateUploadUrl,
+          saveDocument: (args) =>
+            saveDocument({
+              ...args,
+              storageId: args.storageId as Id<"_storage">,
+            }),
+        },
+      ),
     );
 
-    if (!Exit.isSuccess(metaExit)) {
-      setError("Invalid document metadata. Check title and category.");
+    setUploading(false);
+
+    if (Exit.isSuccess(exit)) {
+      setTitle("");
+      setFile(null);
       return;
     }
 
-    const meta = metaExit.value;
-    setUploading(true);
-    try {
-      const uploadUrl = await generateUploadUrl();
-      const result = await fetch(uploadUrl, {
-        method: "POST",
-        headers: { "Content-Type": meta.contentType },
-        body: file,
-      });
-      if (!result.ok) {
-        throw new Error("Upload failed");
-      }
-      const { storageId } = (await result.json()) as {
-        storageId: Id<"_storage">;
-      };
-      await saveDocument({
-        storageId,
-        title: meta.title,
-        category: meta.category,
-        contentType: meta.contentType,
-      });
-      setTitle("");
-      setFile(null);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Upload failed");
-    } finally {
-      setUploading(false);
+    const squashed = Cause.squash(exit.cause);
+    if (
+      squashed &&
+      typeof squashed === "object" &&
+      "_tag" in squashed
+    ) {
+      setError(formatUploadError(squashed as UploadDocumentError));
+      return;
     }
+    setError("Upload failed");
   }
 
   return (

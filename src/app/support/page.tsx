@@ -4,6 +4,7 @@ import { Button } from "@/components/core/Button";
 import { SiteShell } from "@/components/layout/SiteShell";
 import { CopyEmailButton } from "@/components/support/CopyEmailButton";
 import { DonateSoon } from "@/components/support/DonateSoon";
+import { InquiryForm } from "@/components/support/InquiryForm";
 import { CONTACT_EMAIL, SUPPORT_PATHS } from "@/lib/content";
 
 export const metadata: Metadata = { title: "Support" };
@@ -120,7 +121,17 @@ export default function SupportPage() {
             </div>
           ))}
         </div>
-        <DonateSoon />
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,280px),1fr))",
+            gap: 24,
+            alignItems: "start",
+          }}
+        >
+          <InquiryForm />
+          <DonateSoon />
+        </div>
       </section>
 
       <section

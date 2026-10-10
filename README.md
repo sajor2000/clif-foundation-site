@@ -49,10 +49,15 @@ Without Clerk/Stripe keys the public site still works; `/portal` shows a configu
 
 ## Effect 4
 
-Server/client workflow helpers use **effect@^4** (`Effect.gen`, `Data.TaggedError`, `Schema` from `effect`):
+Workflow helpers use **effect@4.0.2** (Effect 4 APIs: `Effect.gen`, `Data.TaggedError`, `Schema.decodeUnknownEffect`, `Effect.runPromiseExit`, `Cause.squash`). Kept **out of** Convex UDF bodies.
 
-- `src/lib/effect/documents.ts` — `validateDocumentMeta`
-- `src/lib/effect/donations.ts` — `createDonationSession` → `DonationsNotConfigured`
+| Module | Program | Used by |
+|--------|---------|---------|
+| `src/lib/effect/documents.ts` | `validateDocumentMeta` | Portal upload pipeline |
+| `src/lib/effect/upload.ts` | `uploadDocumentProgram` | `/portal` client upload (validate → URL → POST → save) |
+| `src/lib/effect/donations.ts` | `createDonationSession` | `/api/donate` → `DonationsNotConfigured` / 503 |
+| `src/lib/effect/inquiry.ts` | `validateInquiry` | `/api/inquiry` → mailto draft |
+| `src/lib/effect/http.ts` | `exitToJsonResponse` | Route Handler Exit → HTTP mapping |
 
 ## Deploy on Vercel
 
