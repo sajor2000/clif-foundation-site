@@ -1,0 +1,101 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-10T17:42:00.000Z",
+  "title": "Design System: CLIF Foundation",
+  "extensions": {
+    "colorMeta": {
+      "ink-950": { "role": "primary", "displayName": "Ink 950", "canonical": "#0E1111" },
+      "signal-700": { "role": "primary", "displayName": "Petrol 700", "canonical": "#12495E" },
+      "signal-400": { "role": "primary", "displayName": "Mint 400", "canonical": "#3A9B78" },
+      "ink-50": { "role": "neutral", "displayName": "Page", "canonical": "#F5F6F3" },
+      "ink-100": { "role": "neutral", "displayName": "Panel", "canonical": "#EAECE7" },
+      "crimson-logo": { "role": "tertiary", "displayName": "Crimson (logo only)", "canonical": "#841839" }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Hero and page headlines in Funnel Display 600." },
+      "body": { "displayName": "Body", "purpose": "Funnel Sans reading text; measure 680px." },
+      "mono": { "displayName": "Mono", "purpose": "Spline Sans Mono for CLIF field names and technical ids only." }
+    },
+    "shadows": [],
+    "motion": [
+      { "name": "duration-fast", "value": "120ms", "purpose": "Color-only state transitions." },
+      { "name": "ease-standard", "value": "cubic-bezier(0.2, 0, 0, 1)", "purpose": "Default easing." }
+    ],
+    "breakpoints": [
+      { "name": "nav-collapse", "value": "1000px" },
+      { "name": "min", "value": "320px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Ink fill CTA; hover shifts to petrol.",
+      "html": "<button class=\"ds-btn-primary\" type=\"button\">Support CLIF</button>",
+      "css": ".ds-btn-primary { background: var(--action-primary-bg, #0E1111); color: var(--action-primary-fg, #F5F6F3); padding: 12px 20px; min-height: 48px; border: none; border-radius: 3px; font-family: \"Funnel Sans\", system-ui, sans-serif; font-size: 15px; font-weight: 500; cursor: pointer; transition: background 120ms cubic-bezier(0.2, 0, 0, 1); } .ds-btn-primary:hover { background: var(--signal-700, #12495E); } .ds-btn-primary:focus-visible { outline: 2px solid var(--focus-ring, #0E1111); outline-offset: 3px; }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Outlined control; hover fills panel gray.",
+      "html": "<button class=\"ds-btn-secondary\" type=\"button\">Start with CLIF 101</button>",
+      "css": ".ds-btn-secondary { background: transparent; color: var(--text-primary, #0E1111); padding: 12px 20px; min-height: 48px; border: 1px solid var(--action-secondary-border, #0E1111); border-radius: 3px; font-family: \"Funnel Sans\", system-ui, sans-serif; font-size: 15px; font-weight: 500; cursor: pointer; transition: background 120ms cubic-bezier(0.2, 0, 0, 1); } .ds-btn-secondary:hover { background: var(--action-secondary-hover, #EAECE7); } .ds-btn-secondary:focus-visible { outline: 2px solid var(--focus-ring, #0E1111); outline-offset: 3px; }"
+    },
+    {
+      "name": "Proposed Tag",
+      "kind": "chip",
+      "refersTo": "tag-proposed",
+      "description": "Mint fill status for proposed programs.",
+      "html": "<span class=\"ds-tag-proposed\">proposed</span>",
+      "css": ".ds-tag-proposed { display: inline-block; background: var(--signal-400, #3A9B78); color: var(--ink-950, #0E1111); border-radius: 2px; padding: 2px 8px; font-family: \"Funnel Sans\", system-ui, sans-serif; font-size: 12px; font-weight: 500; line-height: 1.4; }"
+    },
+    {
+      "name": "Data Panel",
+      "kind": "card",
+      "refersTo": "data-panel",
+      "description": "Signature white figure with mono header row.",
+      "html": "<div class=\"ds-data-panel\"><div class=\"ds-data-panel__head\">organization.record</div><div class=\"ds-data-panel__body\">Illustrative schematic · not patient data</div></div>",
+      "css": ".ds-data-panel { background: var(--bg-figure, #FFFFFF); border: 1px solid var(--ink-950, #0E1111); border-radius: 6px; overflow: hidden; font-family: \"Funnel Sans\", system-ui, sans-serif; } .ds-data-panel__head { font-family: \"Spline Sans Mono\", ui-monospace, monospace; font-size: 12px; letter-spacing: 0.02em; padding: 10px 14px; border-bottom: 1px solid var(--ink-200, #CDD1CA); color: var(--text-primary, #0E1111); } .ds-data-panel__body { padding: 16px 14px; color: var(--text-body, #3D423E); font-size: 15px; }"
+    },
+    {
+      "name": "Eyebrow",
+      "kind": "custom",
+      "refersTo": "label",
+      "description": "Petrol section index / page head eyebrow.",
+      "html": "<span class=\"ds-eyebrow\">01 / mission</span>",
+      "css": ".ds-eyebrow { font-family: \"Funnel Sans\", system-ui, sans-serif; font-weight: 500; font-size: 13px; letter-spacing: 0.01em; color: var(--link, #12495E); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Clinical Lab Notebook",
+    "overview": "A cool, clinical public face for open ICU data infrastructure: paper-white grounds, near-black ink type, petrol for links and eyebrows, mint reserved for fills and dark-ground actions. The system feels like a carefully typeset research artifact — hairline rules, numbered sections, and a recurring data-panel motif — not a SaaS marketing kit. Source of truth: design/tokens/* (mirrored in src/styles/*). Agents must preserve this incumbent world; do not replace it with generic Impeccable aesthetics.",
+    "keyCharacteristics": [
+      "Ink + petrol + mint only (crimson is logo/Consortium credit, never Foundation UI chrome)",
+      "Funnel Display headlines, Funnel Sans UI/body, Spline Sans Mono for technical ids",
+      "Hairline lists over cards; square-ish radii; no product shadows; no gradients",
+      "DataPanel as the signature motif; illustrative schematics always labeled"
+    ],
+    "rules": [
+      { "name": "The Petrol-on-Light Rule", "body": "Green (--accent / mint) is never text on light grounds; use petrol (--signal-700) for links and eyebrows.", "section": "colors" },
+      { "name": "The Crimson Ban", "body": "Consortium crimson (#841839) never appears in Foundation UI. Logo stays one-color ink (light) or white (dark).", "section": "colors" },
+      { "name": "The Flat Ground Rule", "body": "No gradients, no photography collages, no decorative glow. Depth comes from panel bands and 1px ink rules.", "section": "colors" },
+      { "name": "The Mono Sentence Rule", "body": "If a string is a sentence, it is not mono. Mono is sentence case — never all caps.", "section": "typography" },
+      { "name": "The No-Shadow Rule", "body": "Never add drop shadows, glow, or layered card elevation to polish the system.", "section": "elevation" }
+    ],
+    "dos": [
+      "Port and extend tokens from design/tokens/ / src/styles/.",
+      "Keep sentence case; label proposed work; credit Consortium research.",
+      "Use hairline lists and DataPanels instead of card grids.",
+      "Respect reduced motion; keep color-only 120ms transitions."
+    ],
+    "donts": [
+      "Replace Funnel/Spline with Inter, Roboto, or decorative serifs.",
+      "Introduce purple gradients, cream AI beige, glassmorphism, glow, or emoji.",
+      "Use mint as body/link text on light grounds.",
+      "Put Consortium crimson in Foundation chrome.",
+      "Add shadcn/card clutter, stat strips, or hero badge overlays."
+    ]
+  }
+}

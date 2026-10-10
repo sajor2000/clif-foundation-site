@@ -79,6 +79,19 @@ This README does not claim a live Vercel URL until you complete the steps above.
 
 `design/` contains the approved design kit (tokens, components, `CLIF Foundation Site.dc.html`). UI primitives are ported into `src/components/` — not shadcn.
 
+Agent design context (Impeccable):
+
+- `PRODUCT.md` — product truth for agents
+- `DESIGN.md` + `.impeccable/design.json` — CLIF visual system (ink / petrol / mint, Funnel fonts); do not replace with generic aesthetics
+- `.cursor/skills/impeccable` — Cursor-scoped skill + `preToolUse` design hook (`.cursor/hooks.json`, enabled in `.impeccable/config.json`)
+
+```bash
+# Optional: refresh skills if the CLI download works in your environment
+npx impeccable install
+# Hooks
+./.cursor/skills/impeccable/scripts/impeccable hook-admin on
+```
+
 ## Legal copy bounds
 
 Say exactly: Illinois nonprofit corporation, EIN issued, 501(c)(3) application pending. Do not claim deductibility until the IRS determination letter is posted. Programs and board seats are labeled **proposed**.
