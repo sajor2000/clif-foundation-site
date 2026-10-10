@@ -130,6 +130,17 @@ function DocumentWorkspace() {
   return (
     <PortalFrame>
       <div style={{ display: "grid", gap: 40 }}>
+        <h1
+          style={{
+            margin: 0,
+            fontFamily: "var(--font-display)",
+            fontWeight: 600,
+            fontSize: "clamp(28px, 4vw, 40px)",
+            letterSpacing: "-0.02em",
+          }}
+        >
+          Board documents
+        </h1>
         <section style={{ display: "grid", gap: 16 }}>
           <h2
             style={{
@@ -303,6 +314,9 @@ function PortalFrame({ children }: { children: React.ReactNode }) {
         fontFamily: "var(--font-sans)",
       }}
     >
+      <a className="skip-link" href="#portal-main">
+        Skip to content
+      </a>
       <header
         style={{
           borderBottom: "1px solid var(--border)",
@@ -314,15 +328,16 @@ function PortalFrame({ children }: { children: React.ReactNode }) {
         }}
       >
         <div style={{ display: "grid", gap: 4 }}>
-          <span
+          <p
             style={{
+              margin: 0,
               fontFamily: "var(--font-display)",
               fontWeight: 600,
               fontSize: 18,
             }}
           >
             CLIF Foundation board portal
-          </span>
+          </p>
           <span
             style={{
               fontFamily: "var(--font-mono)",
@@ -333,11 +348,23 @@ function PortalFrame({ children }: { children: React.ReactNode }) {
             /portal · not linked from public navigation
           </span>
         </div>
-        <Link href="/" className="linkish">
+        <Link
+          href="/"
+          style={{
+            color: "var(--link)",
+            fontWeight: 500,
+            textUnderlineOffset: 3,
+          }}
+        >
           Public site →
         </Link>
       </header>
-      <main className="page-wrap" style={{ paddingTop: 48, paddingBottom: 80 }}>
+      <main
+        id="portal-main"
+        className="page-wrap"
+        tabIndex={-1}
+        style={{ paddingTop: 48, paddingBottom: 80, outline: "none" }}
+      >
         {children}
       </main>
     </div>

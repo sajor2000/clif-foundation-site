@@ -164,11 +164,21 @@ export function IcuStayFigure() {
         </span>
       }
     >
-      <div style={{ padding: "16px 20px 8px", overflow: "hidden" }}>
+      <div
+        style={{
+          padding: "16px 20px 8px",
+          overflowX: "auto",
+          maxWidth: "100%",
+          overscrollBehaviorX: "contain",
+        }}
+        tabIndex={0}
+        role="region"
+        aria-label="ICU stay schematic timeline. Scroll horizontally on small screens."
+      >
+        <div style={{ minWidth: 640, width: "max-content", maxWidth: "none" }}>
         <div
           style={{
             display: "flex",
-            flexWrap: "wrap",
             columnGap: 16,
             paddingBottom: 8,
           }}
@@ -176,11 +186,11 @@ export function IcuStayFigure() {
           <span style={{ flex: "0 0 220px" }} />
           <div
             style={{
-              flex: "1 1 320px",
+              flex: "1 1 auto",
               position: "relative",
               height: 16,
               fontFamily: "var(--font-mono)",
-              fontSize: 11,
+              fontSize: 12,
               color: "var(--text-muted)",
             }}
           >
@@ -204,7 +214,6 @@ export function IcuStayFigure() {
             key={r.table}
             style={{
               display: "flex",
-              flexWrap: "wrap",
               columnGap: 16,
               alignItems: "center",
               borderTop: "1px solid var(--border-subtle)",
@@ -222,7 +231,7 @@ export function IcuStayFigure() {
             </span>
             <div
               style={{
-                flex: "1 1 320px",
+                flex: "1 1 auto",
                 position: "relative",
                 height: 36,
                 backgroundImage:
@@ -233,6 +242,7 @@ export function IcuStayFigure() {
               {r.marks.map((m, i) => (
                 <span
                   key={`${r.table}-${i}`}
+                  title={m.label || undefined}
                   style={{
                     position: "absolute",
                     top: m.top,
@@ -244,7 +254,7 @@ export function IcuStayFigure() {
                     borderRadius: m.radius,
                     color: m.fg,
                     fontFamily: "var(--font-mono)",
-                    fontSize: 11,
+                    fontSize: 12,
                     display: "flex",
                     alignItems: "center",
                     padding: `0 ${m.pad}`,
@@ -258,6 +268,7 @@ export function IcuStayFigure() {
             </div>
           </div>
         ))}
+        </div>
       </div>
     </DataPanel>
   );

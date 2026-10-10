@@ -25,6 +25,8 @@ export function DataPanel({
         background: inverse ? "var(--bg-inverse)" : "var(--bg-figure)",
         color: inverse ? "var(--text-inverse)" : "var(--text-primary)",
         overflow: "hidden",
+        maxWidth: "100%",
+        minWidth: 0,
         ...style,
       }}
     >
@@ -55,7 +57,7 @@ export function DataPanel({
           ) : null}
         </div>
       ) : null}
-      <div>{children}</div>
+      <div style={{ minWidth: 0, maxWidth: "100%" }}>{children}</div>
       {footer ? (
         <figcaption
           style={{

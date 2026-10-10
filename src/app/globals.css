@@ -19,6 +19,74 @@
   left: 8px;
 }
 
+/* Header breakpoints — CSS so mobile never depends on client JS measure */
+.site-nav-desktop {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-size: var(--type-ui);
+  font-weight: 500;
+}
+
+.site-menu-toggle {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.site-menu-btn {
+  display: none;
+  align-items: center;
+}
+
+.site-menu-label-close {
+  display: none;
+}
+
+.site-menu-panel {
+  display: none;
+  padding: 8px var(--gutter) 24px;
+  border-top: 1px solid var(--border);
+}
+
+.site-menu-toggle:focus-visible + .site-menu-btn {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 3px;
+}
+
+.site-menu-toggle:checked + .site-menu-btn {
+  background: var(--action-primary-bg);
+  color: var(--action-primary-fg);
+}
+
+.site-menu-toggle:checked + .site-menu-btn .site-menu-label-open {
+  display: none;
+}
+
+.site-menu-toggle:checked + .site-menu-btn .site-menu-label-close {
+  display: inline;
+}
+
+header:has(.site-menu-toggle:checked) .site-menu-panel {
+  display: grid;
+}
+
+@media (max-width: 999px) {
+  .site-nav-desktop {
+    display: none;
+  }
+
+  .site-menu-btn {
+    display: inline-flex;
+  }
+}
+
 .page-wrap {
   max-width: var(--content-max);
   margin: 0 auto;
