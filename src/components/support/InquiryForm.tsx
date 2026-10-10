@@ -83,11 +83,15 @@ export function InquiryForm() {
         </p>
       </div>
       <label style={{ display: "grid", gap: 6, fontSize: 14 }}>
-        Name
+        Name{" "}
+        <span style={{ color: "var(--text-muted)", fontWeight: 400 }}>
+          (required)
+        </span>
         <input
           required
           name="name"
           autoComplete="name"
+          aria-required="true"
           value={name}
           onChange={(e) => setName(e.target.value)}
           style={inputStyle}

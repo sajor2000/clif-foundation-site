@@ -81,6 +81,7 @@
   --accent-on: var(--ink-950);
   --accent-tint: var(--signal-300);
   --focus-ring: var(--ink-950);
+  --focus-ring-halo: var(--ink-0);
   --status-proposed-bg: var(--signal-400);
   --status-proposed-fg: var(--ink-950);
   --status-existing-bg: var(--ink-950);
@@ -124,6 +125,7 @@
   --grid-dot: var(--ink-800);
   --accent-tint: #1F4A3A;
   --focus-ring: var(--signal-400);
+  --focus-ring-halo: var(--ink-950);
   --status-existing-bg: var(--ink-50);
   --status-existing-fg: var(--ink-950);
   --logo-filter: brightness(0) invert(1);

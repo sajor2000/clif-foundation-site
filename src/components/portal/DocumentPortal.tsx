@@ -165,13 +165,17 @@ function DocumentWorkspace() {
             }}
           >
             <label style={{ display: "grid", gap: 6, fontSize: 14 }}>
-              Title
+              Title{" "}
+              <span style={{ color: "var(--text-muted)", fontWeight: 400 }}>
+                (required)
+              </span>
               <input
                 name="title"
                 autoComplete="off"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 required
+                aria-required="true"
                 maxLength={200}
                 style={inputStyle}
               />

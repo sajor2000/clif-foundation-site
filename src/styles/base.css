@@ -2,7 +2,13 @@
 html, body { margin: 0; background: var(--bg-page); color: var(--text-primary); font-family: var(--font-sans); font-size: var(--type-body); line-height: var(--leading-body); -webkit-font-smoothing: antialiased; }
 a { color: inherit; text-decoration-thickness: 1px; text-underline-offset: 3px; }
 a:hover { text-decoration-thickness: 2px; }
-:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 3px; border-radius: var(--radius-tag); }
+/* Dual-ring focus: outer halo keeps 3:1 contrast on ink-filled controls (WCAG 2.4.7 / 2.4.11) */
+:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 3px;
+  border-radius: var(--radius-tag);
+  box-shadow: 0 0 0 5px var(--focus-ring-halo);
+}
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
