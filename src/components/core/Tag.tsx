@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-type Status = "proposed" | "existing" | "neutral";
+type Status = "existing" | "neutral";
 
 export function Tag({
   status = "neutral",
@@ -10,11 +10,6 @@ export function Tag({
   children?: ReactNode;
 }) {
   const m = {
-    proposed: {
-      background: "var(--status-proposed-bg)",
-      color: "var(--status-proposed-fg)",
-      border: "1px solid var(--border-strong)",
-    },
     existing: {
       background: "var(--status-existing-bg)",
       color: "var(--status-existing-fg)",

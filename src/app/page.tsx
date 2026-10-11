@@ -62,13 +62,7 @@ export default function HomePage() {
           style={{ flex: "0 1 380px", minWidth: 0 }}
         >
           <KeyValueList
-            rows={[
-              ...ORG_RECORD.map((r) => ({ k: r.k, v: r.v })),
-              {
-                k: "status",
-                v: <Tag status="proposed">proposed</Tag>,
-              },
-            ]}
+            rows={ORG_RECORD.map((r) => ({ k: r.k, v: r.v }))}
           />
         </DataPanel>
       </section>
@@ -96,15 +90,15 @@ export default function HomePage() {
             {
               eyebrow: "Why a Foundation",
               title:
-                "The Consortium does research. The Foundation would help hospitals adopt.",
-              body: "The CLIF Consortium is a network of academic centers that built the standard and runs studies with it. Getting a new hospital started takes training, technical help and maintenance that research grants do not cover. The Foundation would fund that work.",
+                "The Consortium does research. The Foundation helps hospitals adopt.",
+              body: "The CLIF Consortium is a network of academic centers that built the standard and runs studies with it. Getting a new hospital started takes training, technical help and maintenance that research grants do not cover. The Foundation funds that work.",
               pad: "28px 24px 32px",
               cta: null,
             },
             {
               eyebrow: "What a gift funds",
               title: "Training, implementation help and upkeep",
-              body: "Gifts would support courses for clinicians and data teams, hands-on help for hospitals converting their records, and maintenance of the open specification and tools. No gift funds research or touches patient data.",
+              body: "Gifts support courses for clinicians and data teams, hands-on help for hospitals converting their records, and maintenance of the open specification and tools. No gift funds research or touches patient data.",
               pad: "28px 0 32px 24px",
               cta: "How to give →",
             },
@@ -197,8 +191,8 @@ export default function HomePage() {
             >
               The CLIF Consortium conducts federated research: each site converts
               its EHR data to CLIF locally, runs shared analysis code, and returns
-              only aggregate results. The Foundation’s proposed work helps more
-              sites reach that first step.
+              only aggregate results. The Foundation’s work helps more sites
+              reach that first step.
             </p>
           </div>
           <div
@@ -385,7 +379,7 @@ export default function HomePage() {
             <span className="eyebrow" style={{ fontSize: 12 }}>
               03 — Our work
             </span>
-            <h2 className="h2">Four proposed programs</h2>
+            <h2 className="h2">Four programs</h2>
           </div>
           <Link href="/our-work" className="linkish">
             Program details
@@ -414,7 +408,6 @@ export default function HomePage() {
           >
             <span style={{ flex: "0 0 150px" }}>program_id</span>
             <span style={{ flex: "1 1 200px" }}>name · scope</span>
-            <span style={{ flex: "0 0 90px" }}>status</span>
           </div>
           {PROGRAMS.map((p) => (
             <Link
@@ -472,15 +465,6 @@ export default function HomePage() {
                 >
                   {p.scope}
                 </span>
-              </span>
-              <span
-                style={{
-                  flex: "0 0 90px",
-                  fontFamily: "var(--font-mono)",
-                  fontSize: 12,
-                }}
-              >
-                proposed
               </span>
             </Link>
           ))}

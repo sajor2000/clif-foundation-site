@@ -1,6 +1,6 @@
 # CLIF Foundation Design System
 
-Visual and content system for the proposed **CLIF Foundation** website: a nonprofit that would support wider adoption of the Common Longitudinal ICU data Format (CLIF). The **CLIF Consortium** (clif-icu.com) conducts federated research; the Foundation's proposed work supports adoption. The two share the CLIF symbol but have distinct identities.
+Visual and content system for the **CLIF Foundation** website: a nonprofit that supports wider adoption of the Common Longitudinal ICU data Format (CLIF). The **CLIF Consortium** (clif-icu.com) conducts federated research; the Foundation supports adoption. The two share the CLIF symbol but have distinct identities.
 
 ## Sources
 - CLIF Consortium site: https://clif-icu.com/ (content, publications, resources, logo files)
@@ -10,7 +10,7 @@ Visual and content system for the proposed **CLIF Foundation** website: a nonpro
 - Decision record: palette chosen from four directions (lime, teal, navy, evergreen/amber) and refined to black ink + petrol + jade green; fonts Funnel Display, Funnel Sans, Spline Sans Mono; logo black on light, white on dark. Earlier explorations were removed from this package.
 
 ## Factual boundaries (must hold in every artifact)
-- Programs and board appointments are **proposed**; label them with `<Tag status="proposed" />`. The organization itself is no longer "proposed".
+- Programs, board directors, and officer roles are published as current. Do not label them “proposed”.
 - Credit research to the CLIF Consortium and original investigators; link to the original source.
 - Legal status (confirmed): Illinois nonprofit corporation, EIN issued, 501(c)(3) application pending. Say exactly that. Never claim tax-exempt status or deductibility until the IRS determination letter is posted.
 - Do not invent biographies, partnerships, funding commitments, or impact statistics.
@@ -26,7 +26,7 @@ Visual and content system for the proposed **CLIF Foundation** website: a nonpro
 - External destinations end with ↗. Calls to action name the outcome: "Email a gift inquiry", "Start with CLIF 101".
 
 ## VISUAL FOUNDATIONS
-- **Color:** cool clinical white (`--ink-50`) page, ink (`--ink-950`) type and primary actions, one accent family: petrol (`--signal-700`, #12495E) for links, eyebrows and action hovers on light grounds; mint (`--signal-400`, #3A9B78) as a *fill* (highlighted intervals, proposed tags, current state) and as the action and link color on ink grounds. Green is never text on light grounds. Red of any kind is reserved for errors; the Consortium crimson never appears in Foundation UI. No gradients. No red/blue pairing. Data viz uses its own categorical set (ink, teal, amber, violet, gray).
+- **Color:** cool clinical white (`--ink-50`) page, ink (`--ink-950`) type and primary actions, one accent family: petrol (`--signal-700`, #12495E) for links, eyebrows and action hovers on light grounds; mint (`--signal-400`, #3A9B78) as a *fill* (highlighted intervals, current state) and as the action and link color on ink grounds. Green is never text on light grounds. Red of any kind is reserved for errors; the Consortium crimson never appears in Foundation UI. No gradients. No red/blue pairing. Data viz uses its own categorical set (ink, teal, amber, violet, gray).
 - **Logo:** one-color ink logo on light, white on dark. The crimson original belongs to the Consortium and appears only where the Consortium is credited. Never recolor the logo petrol or mint. Black on white in light mode; white on ink in dark mode.
 - **Type:** Funnel Display 600 for headlines (tight negative tracking); Funnel Sans for everything people read — body, UI, navigation, eyebrows (500 weight), section labels, the context bar. Spline Sans Mono is reserved for technical labels only: CLIF table and field names, snake_case ids, data panel headers, tick labels, figure metadata (“Illustrative schematic”), page numbers. If a string is a sentence, it is not mono. Mono is sentence case — never all caps.
 - **Motif:** the data panel — a white figure framed in 1px ink with a mono header row (`organization.record`, `respiratory_support.device_category`). Schematics are always labeled "Illustrative schematic · not patient data".
@@ -43,7 +43,7 @@ Visual and content system for the proposed **CLIF Foundation** website: a nonpro
 - Type tokens `--slide-*` in `tokens/typography.css`; nothing below 24px.
 - Section dividers use a 220px mint index ("02"). Content slides carry a footer: ink lockup · deck title · page number.
 - Tables and figures reuse the website's DataPanel motif at slide scale; schematics are labeled illustrative.
-- Status tags: `proposed`/`decision` = mint fill; `existing`/`discussion` = ink fill; `info` = outline.
+- Status tags: `existing`/`discussion` = ink fill; `info` = outline.
 - Speaker notes live in `data-speaker-notes` on each section.
 
 ## DARK MODE

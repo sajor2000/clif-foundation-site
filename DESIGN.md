@@ -164,11 +164,6 @@ components:
     rounded: "{rounded.control}"
     padding: "12px 20px"
     height: "48px"
-  tag-proposed:
-    backgroundColor: "{colors.signal-400}"
-    textColor: "{colors.ink-950}"
-    rounded: "{rounded.tag}"
-    padding: "2px 8px"
   tag-existing:
     backgroundColor: "{colors.ink-950}"
     textColor: "{colors.ink-50}"
@@ -204,7 +199,7 @@ Cool green-gray ink scale with one accent family (jade → petrol). Light mode i
 ### Primary
 - **Ink 950** (`#0E1111`): Primary text and primary action fill on light grounds.
 - **Petrol 700** (`#12495E`): Links, eyebrows, action hover on light; accent-text role in light mode.
-- **Mint 400** (`#3A9B78`): Fill-only accent on light (proposed tags, highlights); becomes link/action color on ink grounds / dark mode.
+- **Mint 400** (`#3A9B78`): Fill-only accent on light (highlights, current state); becomes link/action color on ink grounds / dark mode.
 
 ### Neutral
 - **Page** (`#F5F6F3` / `--ink-50`), **Panel** (`#EAECE7` / `--ink-100`), **Figure** (`#FFFFFF`)
@@ -267,7 +262,6 @@ Square-ish geometry: tags 2px, controls 3px, panels 6px. Borders 1px; active nav
 - **Secondary:** Transparent + 1px ink border; hover → panel fill. No press shrink.
 
 ### Tags
-- **Proposed / decision:** Mint fill, ink text.
 - **Existing / discussion:** Ink fill, light text.
 - **Info:** Outline only.
 
@@ -284,7 +278,7 @@ FilterChip for research filters; TextLink with underline-on-hover for list title
 
 **Do**
 - Port and extend tokens from `design/tokens/` / `src/styles/`.
-- Keep sentence case; label proposed work; credit Consortium research.
+- Keep sentence case; credit Consortium research.
 - Use hairline lists and DataPanels instead of card grids.
 - Respect reduced motion; keep color-only 120ms transitions.
 

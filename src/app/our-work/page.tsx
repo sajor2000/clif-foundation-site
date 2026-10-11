@@ -21,7 +21,7 @@ export default function OurWorkPage() {
       >
         <div style={{ flex: "1 1 560px", display: "grid", gap: 24 }}>
           <span className="eyebrow">02 / our_work</span>
-          <h1 className="display-l">Proposed programs</h1>
+          <h1 className="display-l">Programs</h1>
         </div>
         <p
           style={{
@@ -34,8 +34,8 @@ export default function OurWorkPage() {
             paddingLeft: 20,
           }}
         >
-          All four programs are in planning. None are funded or operating. Each
-          builds on resources the CLIF Consortium already publishes.
+          Four programs that help hospitals adopt CLIF. Each builds on resources
+          the CLIF Consortium already publishes.
         </p>
       </section>
 
@@ -70,7 +70,6 @@ export default function OurWorkPage() {
               }}
             >
               <span style={{ color: "var(--link)" }}>{p.id}</span>
-              <span>status: proposed</span>
             </div>
             <div
               style={{

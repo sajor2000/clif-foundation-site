@@ -1,0 +1,498 @@
+[
+  {
+    "id": "j-c-rojas",
+    "display_order": 1,
+    "roster_name": "J.C. Rojas",
+    "name_with_credentials": "J.C. Rojas, MD, MS",
+    "source_url": "https://clif-icu.com/team",
+    "image_source_url": "https://clif-icu.com/images/headshots/jc_rojas.webp",
+    "public_profile_links": [
+      "https://scholar.google.com/citations?user=XXHTvWEAAAAJ&hl=en",
+      "https://www.linkedin.com/in/juan-c-rojas-md-ms-3a7345190/"
+    ],
+    "affiliations": [
+      "Rush University"
+    ],
+    "consortium_role": "Founding Vice-Chair",
+    "retrieved_on": "2026-10-11",
+    "image_alt": "Portrait of J.C. Rojas",
+    "images": {
+      "webp": "headshots/j-c-rojas.webp"
+    },
+    "image_details": [
+      {
+        "path": "headshots/j-c-rojas.webp",
+        "source_url": "https://clif-icu.com/images/headshots/jc_rojas.webp",
+        "bytes": 12810,
+        "sha256": "9bee095e804d52ad67891dca2774e7463cced10e73e9ce206c7d8a4962cc4908",
+        "dimensions_px": [
+          400,
+          400
+        ],
+        "format": "WEBP",
+        "retrieved_on": "2026-10-11",
+        "reuse_license": "Not specified on the source team page"
+      }
+    ],
+    "foundation_role": "President",
+    "bio": "J.C. Rojas is a pulmonary and critical care physician, clinical informatician, and Assistant Professor of Internal Medicine at Rush University. He serves as Associate Chief Medical Information Officer and directs the Rush Health Equity Analytics Studio. His research examines clinical data science, artificial intelligence, and health equity in critical care. He is a founding vice-chair of the CLIF Consortium and serves as President of the CLIF Foundation.",
+    "bio_sources": [
+      {
+        "title": "Rush University faculty profile",
+        "url": "https://www.rushu.rush.edu/faculty/juan-rojas-md-ms"
+      },
+      {
+        "title": "RICCC team and research interests",
+        "url": "https://www.riccc-lab.com/team"
+      },
+      {
+        "title": "CLIF Consortium leadership",
+        "url": "https://clif-icu.com/team"
+      }
+    ],
+    "foundation_role_source": "Confirmed by J.C. in this chat on 2026-10-11",
+    "board_member": true,
+    "biography_status": "Original website bio drafted from the listed public sources",
+    "biography_checked_on": "2026-10-11",
+    "bio_word_count": 67
+  },
+  {
+    "id": "pat-lyons",
+    "display_order": 2,
+    "roster_name": "Pat Lyons",
+    "name_with_credentials": "Pat Lyons, MD",
+    "source_url": "https://clif-icu.com/team",
+    "image_source_url": "https://clif-icu.com/images/headshots/pat_lyons.webp",
+    "public_profile_links": [
+      "https://www.linkedin.com/in/patrick-lyons-79183147/"
+    ],
+    "affiliations": [
+      "Oregon Health & Science University"
+    ],
+    "consortium_role": "Founding Vice-Chair",
+    "retrieved_on": "2026-10-11",
+    "image_alt": "Portrait of Pat Lyons",
+    "images": {
+      "webp": "headshots/pat-lyons.webp"
+    },
+    "image_details": [
+      {
+        "path": "headshots/pat-lyons.webp",
+        "source_url": "https://clif-icu.com/images/headshots/pat_lyons.webp",
+        "bytes": 7854,
+        "sha256": "fb942eca34f3e83fcecf9cd5387f1d13760e9043cb5455ac19823c162689848f",
+        "dimensions_px": [
+          400,
+          400
+        ],
+        "format": "WEBP",
+        "retrieved_on": "2026-10-11",
+        "reuse_license": "Not specified on the source team page"
+      }
+    ],
+    "foundation_role": "Secretary",
+    "bio": "Pat Lyons is an intensivist and Associate Professor of Medicine at Oregon Health & Science University. His work combines clinical research informatics with the design and implementation of health information technology. He completed medical school and internal medicine training at the University of Chicago, followed by pulmonary and critical care training at Washington University in St. Louis. A founding vice-chair of the CLIF Consortium, he serves as Secretary of the CLIF Foundation.",
+    "bio_sources": [
+      {
+        "title": "OHSU faculty biography",
+        "url": "https://www.ohsu.edu/people/patrick-lyons-md"
+      },
+      {
+        "title": "CLIF Consortium leadership",
+        "url": "https://clif-icu.com/team"
+      }
+    ],
+    "foundation_role_source": "Confirmed by J.C. in this chat on 2026-10-11",
+    "board_member": true,
+    "biography_status": "Original website bio drafted from the listed public sources",
+    "biography_checked_on": "2026-10-11",
+    "bio_word_count": 72
+  },
+  {
+    "id": "william-parker",
+    "display_order": 3,
+    "roster_name": "Will Parker",
+    "name_with_credentials": "William Parker, MD, PhD",
+    "source_url": "https://clif-icu.com/team",
+    "image_source_url": "https://clif-icu.com/images/headshots/william_parker.webp",
+    "public_profile_links": [
+      "https://scholar.google.com/citations?user=jaBF4DEAAAAJ",
+      "https://www.linkedin.com/in/william-parker-md-phd-3057a9236/"
+    ],
+    "affiliations": [
+      "UChicago Medicine"
+    ],
+    "consortium_role": "Founding Executive Director",
+    "retrieved_on": "2026-10-11",
+    "image_alt": "Portrait of William Parker",
+    "images": {
+      "webp": "headshots/william-parker.webp"
+    },
+    "image_details": [
+      {
+        "path": "headshots/william-parker.webp",
+        "source_url": "https://clif-icu.com/images/headshots/william_parker.webp",
+        "bytes": 7710,
+        "sha256": "c4130a9daa07c293951ac5a9793f02268bd44fbc6cff1b7b5f09f5d99d6f389e",
+        "dimensions_px": [
+          400,
+          400
+        ],
+        "format": "WEBP",
+        "retrieved_on": "2026-10-11",
+        "reuse_license": "Not specified on the source team page"
+      }
+    ],
+    "foundation_role": "Treasurer",
+    "bio": "William Parker is an intensivist, medical ethicist, and health services researcher at the University of Chicago, where he is Associate Professor of Medicine and Public Health Sciences. His research uses data science to examine how scarce healthcare resources are allocated, including donor organs and life-support treatments. He is the founding executive director of the CLIF Consortium and serves as Treasurer of the CLIF Foundation.",
+    "bio_sources": [
+      {
+        "title": "University of Chicago faculty biography",
+        "url": "https://medicine.uchicago.edu/faculty/william-f-parker-md-phd"
+      },
+      {
+        "title": "CLIF Consortium leadership",
+        "url": "https://clif-icu.com/team"
+      }
+    ],
+    "foundation_role_source": "Confirmed by J.C. in this chat on 2026-10-11",
+    "board_member": true,
+    "biography_status": "Original website bio drafted from the listed public sources",
+    "biography_checked_on": "2026-10-11",
+    "bio_word_count": 64
+  },
+  {
+    "id": "chad-hochberg",
+    "display_order": 4,
+    "roster_name": "Chad Hochberg",
+    "name_with_credentials": "Chad Hochberg, MD, MHS",
+    "source_url": "https://clif-icu.com/team",
+    "image_source_url": "https://clif-icu.com/images/headshots/chad_hochberg.webp",
+    "public_profile_links": [
+      "https://scholar.google.com/citations?hl=en&user=Yc6Zh2kAAAAJ",
+      "https://www.linkedin.com/in/chad-hochberg-md"
+    ],
+    "affiliations": [
+      "The Johns Hopkins Hospital"
+    ],
+    "consortium_role": "Vice-chair for New Member Integration",
+    "retrieved_on": "2026-10-11",
+    "image_alt": "Portrait of Chad Hochberg",
+    "images": {
+      "webp": "headshots/chad-hochberg.webp"
+    },
+    "image_details": [
+      {
+        "path": "headshots/chad-hochberg.webp",
+        "source_url": "https://clif-icu.com/images/headshots/chad_hochberg.webp",
+        "bytes": 9332,
+        "sha256": "2493e0dbef6e9e09b548530b8f19dca41dd10f7f5e99d3010df58ac968340a71",
+        "dimensions_px": [
+          400,
+          400
+        ],
+        "format": "WEBP",
+        "retrieved_on": "2026-10-11",
+        "reuse_license": "Not specified on the source team page"
+      }
+    ],
+    "foundation_role": "Director",
+    "bio": "Chad Hochberg is an intensivist and Assistant Professor of Medicine at Johns Hopkins University. His research brings implementation science and health informatics to the adoption of evidence-based critical care practices. He earned his medical degree at the University of Chicago and completed residency, pulmonary and critical care fellowship, and graduate training in clinical investigation at Johns Hopkins. He leads new member integration as a CLIF Consortium vice-chair and serves on the CLIF Foundation Board of Directors.",
+    "bio_sources": [
+      {
+        "title": "Johns Hopkins professional biography",
+        "url": "https://profiles.hopkinsmedicine.org/provider/chad-harvey-hochberg/2703521"
+      },
+      {
+        "title": "CLIF Consortium leadership",
+        "url": "https://clif-icu.com/team"
+      }
+    ],
+    "foundation_role_source": "Confirmed by J.C. in this chat on 2026-10-11",
+    "board_member": true,
+    "biography_status": "Original website bio drafted from the listed public sources",
+    "biography_checked_on": "2026-10-11",
+    "bio_word_count": 76
+  },
+  {
+    "id": "catherine-gao",
+    "display_order": 5,
+    "roster_name": "Catherine Gao",
+    "name_with_credentials": "Catherine Gao, MD, MS",
+    "source_url": "https://clif-icu.com/team",
+    "image_source_url": "https://clif-icu.com/images/headshots/catherine_gao.webp",
+    "public_profile_links": [
+      "https://www.linkedin.com/in/cathyagao/",
+      "https://scholar.google.com/citations?user=IwClOEIAAAAJ&hl=en"
+    ],
+    "affiliations": [
+      "Northwestern Medicine"
+    ],
+    "consortium_role": "Co-Chair",
+    "retrieved_on": "2026-10-11",
+    "image_alt": "Portrait of Catherine Gao",
+    "images": {
+      "webp": "headshots/catherine-gao.webp"
+    },
+    "image_details": [
+      {
+        "path": "headshots/catherine-gao.webp",
+        "source_url": "https://clif-icu.com/images/headshots/catherine_gao.webp",
+        "bytes": 11832,
+        "sha256": "adaa24f56a57b0d736c6bcf78fc140a8713ea6df944fc6ab273c8922a0a07cb8",
+        "dimensions_px": [
+          400,
+          400
+        ],
+        "format": "WEBP",
+        "retrieved_on": "2026-10-11",
+        "reuse_license": "Not specified on the source team page"
+      }
+    ],
+    "foundation_role": "Director",
+    "bio": "Catherine Gao is a pulmonary and critical care physician and Assistant Professor of Medicine at Northwestern University Feinberg School of Medicine. She serves as Associate Director of the Center for Collaborative AI in Healthcare. Her research includes the use of artificial intelligence in medicine and the evaluation of language models for biomedical writing. She is a co-chair of the CLIF Consortium and serves on the CLIF Foundation Board of Directors.",
+    "bio_sources": [
+      {
+        "title": "Northwestern Institute for Artificial Intelligence in Medicine team",
+        "url": "https://www.feinberg.northwestern.edu/sites/artificial-intelligence/about/team.html"
+      },
+      {
+        "title": "Northwestern research interview",
+        "url": "https://www.feinberg.northwestern.edu/research/podcast/2023/chatgpt-gao-luo.html"
+      },
+      {
+        "title": "CLIF Consortium leadership",
+        "url": "https://clif-icu.com/team"
+      }
+    ],
+    "foundation_role_source": "Confirmed by J.C. in this chat on 2026-10-11",
+    "board_member": true,
+    "biography_status": "Original website bio drafted from the listed public sources",
+    "biography_checked_on": "2026-10-11",
+    "bio_word_count": 70
+  },
+  {
+    "id": "siva-bhavani",
+    "display_order": 6,
+    "roster_name": "Sivasubramanium (Siva) Bhavani",
+    "name_with_credentials": "Siva Bhavani, MD, MS",
+    "source_url": "https://clif-icu.com/team",
+    "image_source_url": "https://clif-icu.com/images/headshots/siva_bhavani.webp",
+    "public_profile_links": [
+      "https://scholar.google.com/citations?user=xSuWGTIAAAAJ&hl=en",
+      "https://www.linkedin.com/in/siva-bhavani-96124848"
+    ],
+    "affiliations": [
+      "Emory Healthcare"
+    ],
+    "consortium_role": "Steering Committee Member",
+    "retrieved_on": "2026-10-11",
+    "image_alt": "Portrait of Siva Bhavani",
+    "images": {
+      "webp": "headshots/siva-bhavani.webp"
+    },
+    "image_details": [
+      {
+        "path": "headshots/siva-bhavani.webp",
+        "source_url": "https://clif-icu.com/images/headshots/siva_bhavani.webp",
+        "bytes": 7902,
+        "sha256": "7e76d1e5de94e0288e7e217cc1e8a4a07e9e2af1a6bbbd645e56abc21961cea3",
+        "dimensions_px": [
+          400,
+          400
+        ],
+        "format": "WEBP",
+        "retrieved_on": "2026-10-11",
+        "reuse_license": "Not specified on the source team page"
+      }
+    ],
+    "foundation_role": "Director",
+    "bio": "Siva Bhavani is a pulmonary and critical care physician-scientist at Emory University. His research develops artificial intelligence methods that use vital signs and other clinical data to study individualized treatment in critical illness. His work also examines how these methods perform in clinical settings and how electronic health records can support more accurate physiologic measurements. He is a CLIF Consortium steering committee member and serves on the CLIF Foundation Board of Directors.",
+    "bio_sources": [
+      {
+        "title": "Emory physician-scientist research spotlight",
+        "url": "https://med.emory.edu/departments/medicine/about-us/news-and-updates/research-siva-bhavani.html"
+      },
+      {
+        "title": "CLIF Consortium leadership",
+        "url": "https://clif-icu.com/team"
+      }
+    ],
+    "editorial_note": "Academic rank omitted because Emory public pages list different ranks.",
+    "foundation_role_source": "Confirmed by J.C. in this chat on 2026-10-11",
+    "board_member": true,
+    "biography_status": "Original website bio drafted from the listed public sources",
+    "biography_checked_on": "2026-10-11",
+    "bio_word_count": 72
+  },
+  {
+    "id": "nicholas-ingraham",
+    "display_order": 7,
+    "roster_name": "Nicholas Ingraham",
+    "name_with_credentials": "Nicholas Ingraham, MD, MS",
+    "source_url": "https://clif-icu.com/team",
+    "image_source_url": "https://clif-icu.com/images/headshots/nicholas_ingraham.webp",
+    "public_profile_links": [
+      "https://www.linkedin.com/in/nicholas-ingraham/",
+      "https://scholar.google.com/citations?user=ZKMVVHkAAAAJ&hl=en",
+      "https://scholar.google.com/citations?hl=en&user=ZKMVVHkAAAAJ"
+    ],
+    "affiliations": [
+      "M Health Fairview University of Minnesota Medical Center"
+    ],
+    "consortium_role": "Co-Chair",
+    "retrieved_on": "2026-10-11",
+    "image_alt": "Portrait of Nicholas Ingraham",
+    "images": {
+      "webp": "headshots/nicholas-ingraham.webp"
+    },
+    "image_details": [
+      {
+        "path": "headshots/nicholas-ingraham.webp",
+        "source_url": "https://clif-icu.com/images/headshots/nicholas_ingraham.webp",
+        "bytes": 7242,
+        "sha256": "2550a158d8dc8d6ee0748cf9cba0a61d4e192de06f985c156b5b00ecee1ddc0b",
+        "dimensions_px": [
+          400,
+          400
+        ],
+        "format": "WEBP",
+        "retrieved_on": "2026-10-11",
+        "reuse_license": "Not specified on the source team page"
+      }
+    ],
+    "foundation_role": "Director",
+    "bio": "Nicholas Ingraham is a critical care physician and Assistant Professor of Medicine at the University of Minnesota. His health services research examines ICU outcomes, variation in evidence-based care, teamwork, and healthcare disparities. He serves as Scientific Co-Director of the Clinical Quality, Outcomes, Discovery and Evaluation Core. He is a co-chair of the CLIF Consortium and serves on the CLIF Foundation Board of Directors.",
+    "bio_sources": [
+      {
+        "title": "University of Minnesota faculty biography",
+        "url": "https://med.umn.edu/bio/nicholas-ingraham"
+      },
+      {
+        "title": "CLIF Consortium leadership",
+        "url": "https://clif-icu.com/team"
+      }
+    ],
+    "editorial_note": "Used the current opened faculty page's CQODE leadership title. An indexed search result instead showed an earlier EHR Data Lead title.",
+    "foundation_role_source": "Confirmed by J.C. in this chat on 2026-10-11",
+    "board_member": true,
+    "biography_status": "Original website bio drafted from the listed public sources",
+    "biography_checked_on": "2026-10-11",
+    "bio_word_count": 63
+  },
+  {
+    "id": "vaishvik-chaudhari",
+    "display_order": 8,
+    "roster_name": "Vaishvik Chaudhari",
+    "name_with_credentials": "Vaishvik Chaudhari, MS",
+    "source_url": "https://clif-icu.com/team",
+    "image_source_url": "https://clif-icu.com/images/headshots/vaishvik_chaudhary.webp",
+    "public_profile_links": [
+      "https://www.linkedin.com/in/vgc25/",
+      "https://www.linkedin.com/in/vgc25"
+    ],
+    "affiliations": [
+      "Rush University"
+    ],
+    "consortium_role": "Vice-chair and Technical Lead",
+    "retrieved_on": "2026-10-11",
+    "image_alt": "Portrait of Vaishvik Chaudhari",
+    "images": {
+      "webp": "headshots/vaishvik-chaudhari.webp"
+    },
+    "image_details": [
+      {
+        "path": "headshots/vaishvik-chaudhari.webp",
+        "source_url": "https://clif-icu.com/images/headshots/vaishvik_chaudhary.webp",
+        "bytes": 11458,
+        "sha256": "e0c256b0a0cad45a7a4533892c784a6a4a88c698f0e0fe75175a080672a0c440",
+        "dimensions_px": [
+          400,
+          400
+        ],
+        "format": "WEBP",
+        "retrieved_on": "2026-10-11",
+        "reuse_license": "Not specified on the source team page"
+      }
+    ],
+    "foundation_role": "Director",
+    "bio": "Vaishvik Chaudhari is a data scientist at Rush University Medical Center and vice-chair and technical lead of the CLIF Consortium. His CLIF work includes developing a shared ICU data structure and common vocabularies for research across institutions. He contributes to the RICCC research team at Rush and serves on the CLIF Foundation Board of Directors.",
+    "bio_sources": [
+      {
+        "title": "RICCC data science team",
+        "url": "https://www.riccc-lab.com/team"
+      },
+      {
+        "title": "CLIF Consortium leadership",
+        "url": "https://clif-icu.com/team"
+      },
+      {
+        "title": "Vaishvik Chaudhari public professional profile",
+        "url": "https://www.linkedin.com/in/vgc25"
+      }
+    ],
+    "editorial_note": "Matched the LinkedIn URL linked from CLIF. Excluded a different person with the same name whose profile lists AMD in India.",
+    "foundation_role_source": "Confirmed by J.C. in this chat on 2026-10-11",
+    "board_member": true,
+    "biography_status": "Original website bio drafted from the listed public sources",
+    "biography_checked_on": "2026-10-11",
+    "bio_word_count": 55
+  },
+  {
+    "id": "kaveri-chhikara",
+    "display_order": 9,
+    "roster_name": "Kaveri Chhikara",
+    "name_with_credentials": "Kaveri Chhikara, MS",
+    "source_url": "https://clif-icu.com/team",
+    "image_source_url": "https://clif-icu.com/images/headshots/kaveri_chhikara.webp",
+    "public_profile_links": [
+      "https://www.linkedin.com/in/kaverichhikara/"
+    ],
+    "affiliations": [
+      "UChicago Medicine"
+    ],
+    "consortium_role": "Vice-chair for Software Development",
+    "retrieved_on": "2026-10-11",
+    "image_alt": "Portrait of Kaveri Chhikara",
+    "images": {
+      "webp": "headshots/kaveri-chhikara.webp"
+    },
+    "image_details": [
+      {
+        "path": "headshots/kaveri-chhikara.webp",
+        "source_url": "https://clif-icu.com/images/headshots/kaveri_chhikara.webp",
+        "bytes": 38616,
+        "sha256": "103b2d4970ce805db5a6a681c2c9ff83acf2f700cbf196843e1b5417a57ad747",
+        "dimensions_px": [
+          400,
+          400
+        ],
+        "format": "WEBP",
+        "retrieved_on": "2026-10-11",
+        "reuse_license": "Not specified on the source team page"
+      }
+    ],
+    "foundation_role": "Director",
+    "bio": "Kaveri Chhikara works with UChicago Medicine and serves as the CLIF Consortium's vice-chair for software development. She has contributed to the development of the CLIF data standard and to education about its open-source tools for multicenter ICU research. Her background includes graduate study in computational analysis and public policy at the University of Chicago. She serves on the CLIF Foundation Board of Directors.",
+    "bio_sources": [
+      {
+        "title": "CLIF Consortium leadership and institutional affiliation",
+        "url": "https://clif-icu.com/team"
+      },
+      {
+        "title": "Kaveri Chhikara public professional profile",
+        "url": "https://www.linkedin.com/in/kaverichhikara"
+      },
+      {
+        "title": "University of Chicago computational analysis and public policy research fellowship",
+        "url": "https://epic.uchicago.edu/news/meet-epics-academic-year-drw-and-bartlett-fellows/"
+      }
+    ],
+    "editorial_note": "Public LinkedIn search content was readable, but a direct page open returned HTTP 999. A seniority-specific job title was not independently established from the primary sources and was omitted.",
+    "foundation_role_source": "Confirmed by J.C. in this chat on 2026-10-11",
+    "board_member": true,
+    "biography_status": "Original website bio drafted from the listed public sources",
+    "biography_checked_on": "2026-10-11",
+    "bio_word_count": 63
+  }
+]

@@ -189,14 +189,6 @@ export const PRINCIPLES = [
   },
 ] as const;
 
-export const BOARD_SEATS = [
-  "Chair",
-  "Treasurer",
-  "Secretary",
-  "Director",
-  "Director",
-] as const;
-
 export const GOVERNING_DOCS = [
   { name: "Bylaws", status: "published when adopted" },
   { name: "Conflict-of-interest policy", status: "published when adopted" },
@@ -207,7 +199,7 @@ export const SUPPORT_PATHS = [
   {
     n: "01",
     who: "Donors",
-    body: "Individuals and foundations interested in supporting proposed programs.",
+    body: "Individuals and foundations interested in supporting Foundation programs.",
     cta: "Email a gift inquiry",
     href: `mailto:${CONTACT_EMAIL}?subject=Gift%20inquiry`,
     external: false,

@@ -63,3 +63,9 @@ next-env.d.ts
 **/.impeccable/live/deferred-svelte-component-accepts.json
 **/.impeccable/live/*.png
 # impeccable-ignore-end
+
+# Local download packaging
+clif-foundation-site.bundle
+.bundle-branch
+.bundle-commit
+DOWNLOAD-README.txt

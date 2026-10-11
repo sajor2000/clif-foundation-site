@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Tag } from "@/components/core/Tag";
 import { SiteShell } from "@/components/layout/SiteShell";
 import { PRINCIPLES } from "@/lib/content";
 
@@ -44,8 +43,7 @@ export default function MissionPage() {
             alignContent: "start",
           }}
         >
-          <span>Draft mission statement</span>
-          <Tag status="proposed">proposed</Tag>
+          <span>Mission statement</span>
         </div>
         <div
           style={{
@@ -63,9 +61,9 @@ export default function MissionPage() {
             open-source standard for organizing critical care EHR data.
           </p>
           <p style={{ margin: 0, color: "var(--text-body)" }}>
-            Its proposed work focuses on what helps a new institution get started
-            and keep going: clear education, practical implementation help, and
-            long-term care of the open specification and tools.
+            Its work focuses on what helps a new institution get started and keep
+            going: clear education, practical implementation help, and long-term
+            care of the open specification and tools.
           </p>
         </div>
       </section>
@@ -160,21 +158,21 @@ export default function MissionPage() {
                 }}
               >
                 <span>CLIF Foundation</span>
-                <span>proposed</span>
+                <span>Illinois nonprofit</span>
               </div>
               <ul style={{ margin: 0, padding: 0, listStyle: "none" }}>
                 <li style={{ padding: "16px 20px", borderBottom: "1px solid var(--border-subtle)" }}>
-                  Would support adoption through education and implementation help
+                  Supports adoption through education and implementation help
                 </li>
                 <li style={{ padding: "16px 20px", borderBottom: "1px solid var(--border-subtle)" }}>
-                  Would sustain maintenance of the open specification and tools
+                  Sustains maintenance of the open specification and tools
                 </li>
                 <li style={{ padding: "16px 20px", borderBottom: "1px solid var(--border-subtle)" }}>
                   Does not conduct research or hold patient data
                 </li>
                 <li style={{ padding: "16px 20px" }}>
                   <Link href="/our-work" style={{ color: "var(--link)" }}>
-                    Proposed programs
+                    Programs
                   </Link>
                 </li>
               </ul>
@@ -204,7 +202,7 @@ export default function MissionPage() {
             margin: 0,
           }}
         >
-          Proposed principles
+          Principles
         </h2>
         <ol
           style={{

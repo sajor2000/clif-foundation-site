@@ -94,4 +94,4 @@ npx impeccable install
 
 ## Legal copy bounds
 
-Say exactly: Illinois nonprofit corporation, EIN issued, 501(c)(3) application pending. Do not claim deductibility until the IRS determination letter is posted. Programs and board seats are labeled **proposed**.
+Say exactly: Illinois nonprofit corporation, EIN issued, 501(c)(3) application pending. Do not claim deductibility until the IRS determination letter is posted.

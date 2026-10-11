@@ -55,14 +55,6 @@
       "css": ".ds-btn-secondary { background: transparent; color: var(--text-primary, #0E1111); padding: 12px 20px; min-height: 48px; border: 1px solid var(--action-secondary-border, #0E1111); border-radius: 3px; font-family: \"Funnel Sans\", system-ui, sans-serif; font-size: 15px; font-weight: 500; cursor: pointer; transition: background 120ms cubic-bezier(0.2, 0, 0, 1); } .ds-btn-secondary:hover { background: var(--action-secondary-hover, #EAECE7); } .ds-btn-secondary:focus-visible { outline: 2px solid var(--focus-ring, #0E1111); outline-offset: 3px; }"
     },
     {
-      "name": "Proposed Tag",
-      "kind": "chip",
-      "refersTo": "tag-proposed",
-      "description": "Mint fill status for proposed programs.",
-      "html": "<span class=\"ds-tag-proposed\">proposed</span>",
-      "css": ".ds-tag-proposed { display: inline-block; background: var(--signal-400, #3A9B78); color: var(--ink-950, #0E1111); border-radius: 2px; padding: 2px 8px; font-family: \"Funnel Sans\", system-ui, sans-serif; font-size: 12px; font-weight: 500; line-height: 1.4; }"
-    },
-    {
       "name": "Data Panel",
       "kind": "card",
       "refersTo": "data-panel",
@@ -97,7 +89,7 @@
     ],
     "dos": [
       "Port and extend tokens from design/tokens/ / src/styles/.",
-      "Keep sentence case; label proposed work; credit Consortium research.",
+      "Keep sentence case; credit Consortium research.",
       "Use hairline lists and DataPanels instead of card grids.",
       "Respect reduced motion; keep color-only 120ms transitions."
     ],

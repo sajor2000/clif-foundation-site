@@ -1,6 +1,12 @@
 import type { Metadata } from "next";
+import { BoardMemberList } from "@/components/board/BoardMemberList";
 import { SiteShell } from "@/components/layout/SiteShell";
-import { BOARD_SEATS, GOVERNING_DOCS } from "@/lib/content";
+import {
+  BOARD_DIRECTORS,
+  BOARD_MEMBERS,
+  BOARD_OFFICERS,
+} from "@/lib/board";
+import { GOVERNING_DOCS } from "@/lib/content";
 
 export const metadata: Metadata = { title: "Board & Governance" };
 
@@ -33,14 +39,14 @@ export default function BoardPage() {
             paddingLeft: 20,
           }}
         >
-          Board appointments are proposed and not yet confirmed. Names and
-          affiliations will be published once appointments are final.
+          The CLIF Foundation Board of Directors has {BOARD_MEMBERS.length}{" "}
+          members. Roles and biographies are listed below.
         </p>
       </section>
 
       <section
         className="page-wrap"
-        style={{ paddingBottom: "clamp(72px,8vw,112px)" }}
+        style={{ paddingBottom: "clamp(48px,6vw,72px)" }}
       >
         <div
           style={{
@@ -63,14 +69,13 @@ export default function BoardPage() {
               color: "var(--text-muted)",
             }}
           >
-            <span style={{ flex: "0 0 160px" }}>seat</span>
-            <span style={{ flex: "1 1 200px" }}>name</span>
-            <span style={{ flex: "1 1 200px" }}>affiliation</span>
-            <span style={{ flex: "0 0 90px" }}>status</span>
+            <span style={{ flex: "0 0 140px" }}>seat</span>
+            <span style={{ flex: "1 1 220px" }}>name</span>
+            <span style={{ flex: "1 1 240px" }}>affiliation</span>
           </div>
-          {BOARD_SEATS.map((role) => (
+          {[...BOARD_OFFICERS, ...BOARD_DIRECTORS].map((member) => (
             <div
-              key={role}
+              key={member.id}
               style={{
                 display: "flex",
                 flexWrap: "wrap",
@@ -80,25 +85,49 @@ export default function BoardPage() {
                 alignItems: "baseline",
               }}
             >
-              <span style={{ flex: "0 0 160px", fontSize: 18, fontWeight: 500 }}>
-                {role}
+              <span style={{ flex: "0 0 140px", fontSize: 18, fontWeight: 500 }}>
+                {member.role}
               </span>
-              <span style={{ flex: "1 1 200px", color: "var(--text-muted)" }}>
-                To be announced
-              </span>
-              <span style={{ flex: "1 1 200px", color: "var(--text-muted)" }}>—</span>
-              <span
-                style={{
-                  flex: "0 0 90px",
-                  fontFamily: "var(--font-mono)",
-                  fontSize: 12,
-                }}
-              >
-                proposed
+              <span style={{ flex: "1 1 220px" }}>{member.name}</span>
+              <span style={{ flex: "1 1 240px", color: "var(--text-muted)" }}>
+                {member.affiliation}
               </span>
             </div>
           ))}
         </div>
+      </section>
+
+      <section
+        className="page-wrap"
+        style={{ paddingBottom: "clamp(72px,8vw,112px)" }}
+      >
+        <div style={{ display: "grid", gap: 20, marginBottom: 8 }}>
+          <h2
+            style={{
+              fontFamily: "var(--font-display)",
+              fontWeight: 600,
+              fontSize: "var(--type-display-m)",
+              lineHeight: 1.08,
+              letterSpacing: "-0.025em",
+              margin: 0,
+            }}
+          >
+            Directors
+          </h2>
+          <p
+            style={{
+              margin: 0,
+              fontSize: 17,
+              lineHeight: 1.6,
+              color: "var(--text-body)",
+              maxWidth: 640,
+            }}
+          >
+            Biographies are paraphrased from public institutional and
+            professional sources.
+          </p>
+        </div>
+        <BoardMemberList members={BOARD_MEMBERS} />
       </section>
 
       <section className="band">
@@ -142,8 +171,8 @@ export default function BoardPage() {
               }}
             >
               The CLIF Consortium maintains its own governance for research, data,
-              and the standard. The Foundation’s proposed role is limited to
-              supporting adoption.
+              and the standard. The Foundation’s role is limited to supporting
+              adoption.
             </p>
             <a
               href="https://clif-icu.com/governance"

@@ -161,7 +161,7 @@ export default function SupportPage() {
               margin: 0,
             }}
           >
-            What a gift would fund
+            What a gift funds
           </h2>
           <p
             style={{
@@ -172,8 +172,8 @@ export default function SupportPage() {
               textWrap: "pretty",
             }}
           >
-            Four proposed programs, all aimed at helping hospitals use CLIF. None
-            are funded or operating yet; gifts would start them.
+            Four programs aimed at helping hospitals use CLIF. Gifts support
+            education, implementation help, open-source upkeep, and convening.
           </p>
           <Link href="/our-work" className="linkish">
             Program details
@@ -311,12 +311,12 @@ export default function SupportPage() {
               [
                 "2",
                 "We talk",
-                "We reply to arrange a call about your interests and the proposed programs.",
+                "We reply to arrange a call about your interests and the programs.",
               ],
               [
                 "3",
                 "Terms in writing",
-                "Gift purpose, timing and acknowledgment would be confirmed in writing before anything is transferred.",
+                "Gift purpose, timing and acknowledgment are confirmed in writing before anything is transferred.",
               ],
               [
                 "4",
@@ -407,8 +407,8 @@ export default function SupportPage() {
             the Consortium’s research mission.
           </p>
           <p style={{ margin: 0 }}>
-            Board seats are proposed and will be named here once confirmed.
-            Governing documents will be published on the same page.
+            The Board of Directors is listed on the board page. Governing
+            documents will be published there when adopted.
           </p>
           <Link href="/board" className="linkish">
             Board and governance →
