@@ -59,21 +59,42 @@ Workflow helpers use **effect@4.0.2** (Effect 4 APIs: `Effect.gen`, `Data.Tagged
 | `src/lib/effect/inquiry.ts` | `validateInquiry` | `/api/inquiry` → mailto draft |
 | `src/lib/effect/http.ts` | `exitToJsonResponse` | Route Handler Exit → HTTP mapping |
 
-## Deploy on Vercel
+## Deploy on Vercel + Convex
 
-Production host is **Vercel** (stock Next.js App Router — no custom `output` mode, no special build command beyond `next build`).
+Repo is wired for the [Convex + Vercel](https://docs.convex.dev/production/hosting/vercel) pattern. `vercel.ts` sets the build command to deploy Convex functions, then run `next build` with `NEXT_PUBLIC_CONVEX_URL` injected.
 
-1. Push this repo to GitHub and **Import** the project in Vercel (Framework Preset: **Next.js**).
-2. Build settings: leave defaults (`next build` / Next.js preset). No `vercel.json` is required.
-3. Set Production environment variables in the Vercel project:
-   - `NEXT_PUBLIC_CONVEX_URL`
-   - `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY`
-   - Later: `STRIPE_SECRET_KEY`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`
-4. In the Convex dashboard, set `CLERK_JWT_ISSUER_DOMAIN` on the **production** deployment, then run `npx convex deploy` only for that production backend (not during local/cloud agent development — use `npx convex dev` / `CONVEX_AGENT_MODE=anonymous` there).
-5. Point Clerk production redirect URLs at the Vercel domain; keep `/portal/sign-in` as the board sign-in path.
-6. Optional: attach a custom domain after the first successful deploy.
+### One-time setup
 
-This README does not claim a live Vercel URL until you complete the steps above.
+1. **GitHub** — this repo: https://github.com/sajor2000/clif-foundation-site
+2. **Convex cloud project** (not anonymous local):
+   ```bash
+   npx convex login
+   npx convex dev   # link/create the cloud project (omit CONVEX_AGENT_MODE)
+   ```
+   Then in the Convex dashboard on the **production** deployment:
+   - Set env `CLERK_JWT_ISSUER_DOMAIN` (Clerk Frontend API URL)
+   - Generate a **Production** deploy key (`deployment:deploy`)
+   - Generate a **Preview** deploy key if you want preview backends
+3. **Vercel** — Import the GitHub repo (Framework: Next.js). Confirm build command matches `vercel.ts`:
+   ```bash
+   npx convex deploy --cmd 'npm run build' --cmd-url-env-var-name NEXT_PUBLIC_CONVEX_URL
+   ```
+4. **Vercel environment variables**
+
+   | Variable | Environments | Notes |
+   |----------|--------------|--------|
+   | `CONVEX_DEPLOY_KEY` | Production | Production deploy key from Convex |
+   | `CONVEX_DEPLOY_KEY` | Preview | Preview deploy key (separate value) |
+   | `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | Production + Preview | Board portal |
+   | `CLERK_SECRET_KEY` | Production + Preview | Board portal |
+   | `NEXT_PUBLIC_CLERK_SIGN_IN_URL` | Production + Preview | `/portal/sign-in` |
+   | `STRIPE_*` | later | Omit until Nonprofit Stripe exists |
+
+   Do **not** set `CONVEX_AGENT_MODE` on Vercel. `NEXT_PUBLIC_CONVEX_URL` is set for the build by `convex deploy --cmd` when `CONVEX_DEPLOY_KEY` is present; you may also pin it in Vercel if you prefer.
+5. **Clerk** — add the Vercel production (and preview) URLs to allowed origins / redirect URLs; sign-in path stays `/portal/sign-in`.
+6. Deploy — push to `main` for production, or open a PR for preview. Optional: custom domain after the first green deploy.
+
+Local development still uses `CONVEX_AGENT_MODE=anonymous npx convex dev` + `npm run dev` (see above). Use `npx convex deploy` only against the cloud production/preview backends.
 
 ## Design
 

@@ -1,5 +1,7 @@
 # Start here
 
+## Local
+
 ```bash
 npm install
 cp .env.example .env.local
@@ -8,3 +10,11 @@ npm run dev                                  # terminal 2 → http://127.0.0.1:4
 ```
 
 Public pages run without Clerk/Stripe. Full notes: `README.md`.
+
+## Vercel + Convex (production)
+
+1. `npx convex login` and link a cloud project (`npx convex dev` without agent mode).
+2. Set `CLERK_JWT_ISSUER_DOMAIN` on the Convex production deployment; create Production (+ Preview) deploy keys.
+3. Import https://github.com/sajor2000/clif-foundation-site in Vercel.
+4. Add `CONVEX_DEPLOY_KEY` and Clerk keys (see README deploy table). Build command is in `vercel.ts`.
+5. Push to `main`.

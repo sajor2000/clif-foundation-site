@@ -2,12 +2,17 @@
   "name": "clif-foundation-site",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": "22.x"
+  },
   "scripts": {
     "dev": "next dev --hostname 0.0.0.0 --port 43127",
     "build": "next build",
     "start": "next start --hostname 0.0.0.0 --port 43127",
     "lint": "eslint",
-    "convex:dev": "CONVEX_AGENT_MODE=anonymous npx convex dev"
+    "convex:dev": "CONVEX_AGENT_MODE=anonymous npx convex dev",
+    "convex:deploy": "npx convex deploy",
+    "build:vercel": "npx convex deploy --cmd 'npm run build' --cmd-url-env-var-name NEXT_PUBLIC_CONVEX_URL"
   },
   "dependencies": {
     "@clerk/nextjs": "7.9.14",
@@ -23,6 +28,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@vercel/config": "^0.12.0",
     "eslint": "^9",
     "eslint-config-next": "16.4.0",
     "tailwindcss": "^4",
