@@ -69,3 +69,5 @@ clif-foundation-site.bundle
 .bundle-branch
 .bundle-commit
 DOWNLOAD-README.txt
+
+.env.convex.vercel

@@ -73,7 +73,7 @@ export function BoardMemberList({ members }: { members: BoardMember[] }) {
                 fontSize: 16,
                 lineHeight: 1.6,
                 color: "var(--text-body)",
-                maxWidth: 720,
+                maxWidth: "65ch",
               }}
             >
               {member.bio}
