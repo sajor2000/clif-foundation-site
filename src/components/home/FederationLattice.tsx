@@ -1,15 +1,20 @@
 const SITES = [
-  { id: "A", t: 0.06 },
-  { id: "B", t: 0.2 },
-  { id: "C", t: 0.34 },
-  { id: "D", t: 0.48 },
-  { id: "E", t: 0.62 },
+  { id: "A", t: 0.14 },
+  { id: "B", t: 0.23 },
+  { id: "C", t: 0.32 },
+  { id: "D", t: 0.41 },
+  { id: "E", t: 0.5 },
 ] as const;
 
 /** Scroll-driven federated-research figure. Progress from parent act `--sc-p`. */
 export function FederationLattice() {
   return (
     <div className="fed" aria-label="Federated research: data stays at each site">
+      <div className="fed__analysis" data-sc-cue="0.06 1 0.22 0">
+        <span className="fed__analysis-label">Shared analysis package</span>
+        <span className="fed__analysis-detail">sent to each site · runs locally</span>
+      </div>
+
       <div className="fed__sites">
         {SITES.map((site) => (
           <div
@@ -27,7 +32,7 @@ export function FederationLattice() {
               <p className="fed__card-body">
                 EHR → CLIF tables
                 <br />
-                run shared code
+                local analysis run
               </p>
             </div>
 
@@ -39,7 +44,7 @@ export function FederationLattice() {
         ))}
       </div>
 
-      <div className="fed__aggregate" data-sc-cue="0.68 0.96">
+      <div className="fed__aggregate" data-sc-cue="0.72 1 0.28 0">
         <span className="fed__aggregate-lead">Aggregate results only</span>
         <span className="fed__aggregate-trail">
           No patient-level data leaves an institution

@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     template: "%s · CLIF Foundation",
   },
   description:
-    "An Illinois nonprofit supporting adoption of the Common Longitudinal ICU data Format. 501(c)(3) application pending.",
+    "An Illinois nonprofit scaling adoption of the Common Longitudinal ICU data Format beyond observational research. 501(c)(3) application pending.",
 };
 
 const themeBoot = `(function(){function syncToggle(){var el=document.getElementById('clif-theme-toggle');if(el)el.checked=document.documentElement.dataset.theme==='dark';}try{var t=localStorage.getItem('clif-site-theme');if(t==='light'||t==='dark'){document.documentElement.dataset.theme=t;}else if(window.matchMedia('(prefers-color-scheme: dark)').matches){document.documentElement.dataset.theme='dark';}}catch(e){}document.addEventListener('change',function(e){var el=e.target;if(!el||el.id!=='clif-theme-toggle')return;var dark=!!el.checked;document.documentElement.dataset.theme=dark?'dark':'light';try{localStorage.setItem('clif-site-theme',dark?'dark':'light');}catch(err){}});if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',syncToggle);}else{syncToggle();}})();`

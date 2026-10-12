@@ -141,7 +141,7 @@
   font-size: 11px;
   letter-spacing: 0.02em;
   color: var(--text-muted);
-  pointer-events: none;
+  pointer-events: auto;
 }
 
 @media (min-width: 1400px) {
@@ -159,6 +159,20 @@
   gap: 2px;
   opacity: 0.55;
   transition: opacity var(--sc-d-base) var(--sc-ease-out);
+  text-decoration: none;
+  color: inherit;
+  min-height: 44px;
+  align-content: center;
+}
+
+.sc-folio__item:hover,
+.sc-folio__item:focus-visible {
+  opacity: 1;
+}
+
+.sc-folio__item:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 3px;
 }
 
 .sc-folio__item[data-current="true"] {
@@ -232,8 +246,30 @@
 
 .fed {
   display: grid;
-  gap: 0;
+  gap: 14px;
   width: 100%;
+}
+
+.fed__analysis {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px 20px;
+  min-height: 34px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border-inverse);
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.fed__analysis-label {
+  color: var(--signal-300);
+  font-weight: 500;
+}
+
+.fed__analysis-detail {
+  color: var(--ink-300);
 }
 
 .fed__sites {
@@ -244,14 +280,51 @@
 }
 
 @media (max-width: 799px) {
+  .fed {
+    gap: 8px;
+  }
+
+  .fed__analysis {
+    min-height: 0;
+    padding-bottom: 6px;
+    font-size: 10px;
+  }
+
   .fed__sites {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 4px;
   }
 
   .fed__site:last-child {
-    grid-column: 1 / -1;
-    max-width: 50%;
-    justify-self: center;
+    grid-column: auto;
+    max-width: none;
+    justify-self: stretch;
+  }
+
+  .fed__card {
+    padding: 7px 6px;
+    gap: 4px;
+    font-size: 9px;
+  }
+
+  .fed__card-body {
+    font-size: 0;
+    line-height: 1;
+  }
+
+  .fed__card-body::after {
+    content: "local run";
+    font-size: 9px;
+  }
+
+  .fed__arrow {
+    height: 22px;
+  }
+
+  .fed__aggregate {
+    padding: 9px 10px;
+    gap: 4px 12px;
+    font-size: 10px;
   }
 }
 
@@ -260,7 +333,7 @@
   /* 0→1: how far this site’s arrow has grown */
   --fed-draw: max(
     0,
-    min(1, calc((var(--fed-p) - var(--site-t)) / 0.2))
+    min(1, calc((var(--fed-p) - var(--site-t)) / 0.22))
   );
   display: grid;
   justify-items: center;

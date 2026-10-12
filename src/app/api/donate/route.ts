@@ -22,7 +22,10 @@ async function handle(request: Request) {
   return exitToJsonResponse(exit, {
     onSuccess: () =>
       NextResponse.json(
-        { error: "DonationsNotConfigured", message: "Online giving — coming soon" },
+        {
+          error: "DonationsNotConfigured",
+          message: "Online giving is not available yet",
+        },
         { status: 503 },
       ),
     onTagged: {

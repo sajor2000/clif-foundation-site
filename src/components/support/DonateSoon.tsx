@@ -32,8 +32,8 @@ export function DonateSoon() {
           Online giving
         </h3>
         <p style={{ margin: 0, fontSize: 16, lineHeight: 1.55, color: "var(--text-body)" }}>
-          Online giving — coming soon. Until Stripe Nonprofit checkout is
-          configured, gifts start with an email inquiry.
+          Online giving is not available yet. Until checkout is set up, gifts
+          begin with an email inquiry.
         </p>
       </div>
       <Button
@@ -44,15 +44,15 @@ export function DonateSoon() {
           try {
             const res = await fetch("/api/donate", { method: "POST" });
             const data = (await res.json()) as { message?: string };
-            setMessage(data.message ?? "Online giving — coming soon");
+            setMessage(data.message ?? "Online giving is not available yet");
           } catch {
-            setMessage("Online giving — coming soon");
+            setMessage("Online giving is not available yet");
           } finally {
             setLoading(false);
           }
         }}
       >
-        {loading ? "Checking…" : "Try online giving"}
+        {loading ? "Checking…" : "Check online giving"}
       </Button>
       {message ? (
         <p

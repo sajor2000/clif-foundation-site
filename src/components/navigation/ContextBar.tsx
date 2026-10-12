@@ -1,5 +1,5 @@
 export function ContextBar({
-  text = "An Illinois nonprofit supporting adoption of the CLIF standard · 501(c)(3) application pending",
+  text = "An Illinois nonprofit scaling CLIF adoption beyond research · 501(c)(3) application pending",
   linkLabel = "Research is conducted by the CLIF Consortium ↗",
   href = "https://clif-icu.com/",
 }: {

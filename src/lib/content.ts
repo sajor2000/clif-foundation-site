@@ -34,7 +34,7 @@ export const PROGRAMS = [
     id: "impl_support",
     name: "Implementation support",
     scope:
-      "Guidance for health systems converting EHR data to CLIF, building on the ETL Guide and DQA Framework.",
+      "Guidance for health systems converting EHR data to CLIF, including ETL workflows, quality checks, and reusable implementation support.",
     serves: "Health system data teams",
     base: "ETL Guide",
     baseUrl: "https://clif-icu.com/etl-guide",
@@ -52,7 +52,7 @@ export const PROGRAMS = [
     id: "oss_stewardship",
     name: "Open-source stewardship",
     scope:
-      "Sustained maintenance of the specification, data dictionary, and tools released under the Apache License 2.0.",
+      "Sustained maintenance of the specification, mapping resources, conversion tools, tests, and documentation released under the Apache License 2.0.",
     serves: "Technical contributors, adopting sites",
     base: "GitHub repository",
     baseUrl: GITHUB_URL,
@@ -111,7 +111,7 @@ export const PUBLICATIONS: Array<{
   {
     year: 2025,
     title:
-      "Correspondence on “A common longitudinal intensive care unit data format (CLIF) for critical illness research” – Author’s reply",
+      'Correspondence on "A common longitudinal intensive care unit data format (CLIF) for critical illness research" - Author\'s reply',
     venue: "Intensive Care Medicine",
     type: "Journal",
     url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC12617075/",
@@ -169,23 +169,52 @@ export const RESOURCES = [
 export const PRINCIPLES = [
   {
     n: "01",
-    t: "Open by default",
-    d: "Specifications, tools, and educational material stay openly licensed.",
+    t: "Open infrastructure",
+    d: "Specifications, tools, mappings, and educational material stay openly available for the people who need to use and improve them.",
   },
   {
     n: "02",
-    t: "Credit where it belongs",
-    d: "Research is attributed to the Consortium and the original investigators.",
+    t: "Adoption beyond research",
+    d: "CLIF is for health systems, research groups, professional societies, and EHR vendors, not only observational research networks.",
   },
   {
     n: "03",
-    t: "Privacy-preserving",
-    d: "Support federated approaches in which patient data stays with each institution.",
+    t: "Local control of data",
+    d: "Shared analysis code runs at each site. Patient-level data stays with each institution.",
   },
   {
     n: "04",
-    t: "Practical first",
-    d: "Prioritize what helps a new site go from EHR extract to valid CLIF tables.",
+    t: "Credit and accountability",
+    d: "Research credit belongs to the Consortium and original investigators. Foundation funds are budgeted and overseen for adoption work.",
+  },
+  {
+    n: "05",
+    t: "Practical pathways",
+    d: "Prioritize the work that takes a site from an EHR extract to usable CLIF data: conversion tools, terminology mapping, quality checks, training, and implementation help.",
+  },
+] as const;
+
+/** Gift-page program summary; order and names match PROGRAMS. */
+export const GIFT_PROGRAMS = [
+  {
+    n: "01",
+    t: "Implementation support",
+    d: "Hands-on help for health systems converting EHR data to CLIF, including ETL workflows and quality checks.",
+  },
+  {
+    n: "02",
+    t: "Education",
+    d: "Courses and workshops so clinicians and data teams can work with CLIF-formatted data.",
+  },
+  {
+    n: "03",
+    t: "Open-source stewardship",
+    d: "Maintenance of the specification, mapping resources, conversion tools, tests, and documentation.",
+  },
+  {
+    n: "04",
+    t: "Convening",
+    d: "Forums where adopting sites and contributors coordinate on future versions of the standard.",
   },
 ] as const;
 
@@ -249,14 +278,14 @@ export const HOME_PATHS = [
     n: "03",
     who: "Clinicians",
     arrow: "↗",
-    cta: "Start with CLIF 101 ↗",
+    cta: "Start with CLIF 101",
     href: "https://clif-icu.com/clif-101",
   },
   {
     n: "04",
     who: "Technical contributors",
     arrow: "↗",
-    cta: "Contribute on GitHub ↗",
+    cta: "Contribute on GitHub",
     href: GITHUB_URL,
   },
 ] as const;
@@ -309,4 +338,4 @@ export const NEEDS = [
 ] as const;
 
 export const FOOTER_NOTE =
-  "An Illinois nonprofit corporation supporting adoption of the Common Longitudinal ICU data Format. Application for 501(c)(3) recognition is pending. Research is credited to the CLIF Consortium and its investigators.";
+  "An Illinois nonprofit corporation scaling adoption of the Common Longitudinal ICU data Format beyond observational research. Application for 501(c)(3) recognition is pending. Research is credited to the CLIF Consortium and its investigators.";
