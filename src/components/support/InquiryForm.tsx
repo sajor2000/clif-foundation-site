@@ -78,8 +78,8 @@ export function InquiryForm() {
             color: "var(--text-body)",
           }}
         >
-          Validated with Effect Schema, then opens your mail client. Nothing is
-          stored on the server.
+          We check the details, then open a draft in your email app. The form
+          does not store your message on the server.
         </p>
       </div>
       <label style={{ display: "grid", gap: 6, fontSize: 14 }}>

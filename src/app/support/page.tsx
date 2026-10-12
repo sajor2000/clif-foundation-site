@@ -5,7 +5,7 @@ import { SiteShell } from "@/components/layout/SiteShell";
 import { CopyEmailButton } from "@/components/support/CopyEmailButton";
 import { DonateSoon } from "@/components/support/DonateSoon";
 import { InquiryForm } from "@/components/support/InquiryForm";
-import { CONTACT_EMAIL, SUPPORT_PATHS } from "@/lib/content";
+import { CONTACT_EMAIL, GIFT_PROGRAMS, SUPPORT_PATHS } from "@/lib/content";
 
 export const metadata: Metadata = { title: "Support" };
 
@@ -172,8 +172,9 @@ export default function SupportPage() {
               textWrap: "pretty",
             }}
           >
-            Four programs aimed at helping hospitals use CLIF. Gifts support
-            education, implementation help, open-source upkeep, and convening.
+            Four programs aimed at scaling CLIF adoption beyond observational
+            research. Gifts support implementation help, education, open-source
+            stewardship, and convening.
           </p>
           <Link href="/our-work" className="linkish">
             Program details
@@ -188,30 +189,9 @@ export default function SupportPage() {
             borderTop: "1px solid var(--border-strong)",
           }}
         >
-          {[
-            [
-              "01",
-              "Education",
-              "Courses and workshops so clinicians and data teams can work with CLIF data.",
-            ],
-            [
-              "02",
-              "Implementation help",
-              "Hands-on guidance for a hospital converting its records to the standard.",
-            ],
-            [
-              "03",
-              "Upkeep of the open standard",
-              "Maintaining the specification, data dictionary and free tools that everyone relies on.",
-            ],
-            [
-              "04",
-              "Convening",
-              "Bringing adopting hospitals together to agree on future versions.",
-            ],
-          ].map(([n, t, d]) => (
+          {GIFT_PROGRAMS.map((p) => (
             <li
-              key={n}
+              key={p.n}
               style={{
                 padding: "20px 0",
                 borderBottom: "1px solid var(--border)",
@@ -230,10 +210,10 @@ export default function SupportPage() {
                   paddingTop: 4,
                 }}
               >
-                {n}
+                {p.n}
               </span>
               <div style={{ flex: "1 1 320px", display: "grid", gap: 6 }}>
-                <span style={{ fontSize: 18, fontWeight: 500 }}>{t}</span>
+                <span style={{ fontSize: 18, fontWeight: 500 }}>{p.t}</span>
                 <span
                   style={{
                     fontSize: 15,
@@ -241,7 +221,7 @@ export default function SupportPage() {
                     color: "var(--text-body)",
                   }}
                 >
-                  {d}
+                  {p.d}
                 </span>
               </div>
             </li>
@@ -403,8 +383,9 @@ export default function SupportPage() {
           <p style={{ margin: 0 }}>
             CLIF was built by the CLIF Consortium, a network of clinician-scientists
             and data scientists at academic medical centers. CLIF Foundation was
-            incorporated in Illinois to carry out adoption work that sits outside
-            the Consortium’s research mission.
+            incorporated in Illinois to scale adoption beyond observational
+            research: tools, mapping, training, and implementation help that
+            research grants do not cover.
           </p>
           <p style={{ margin: 0 }}>
             The Board of Directors is listed on the board page. Governing

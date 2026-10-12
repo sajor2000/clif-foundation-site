@@ -98,6 +98,7 @@ export default function BoardPage() {
       </section>
 
       <section
+        id="directors"
         className="page-wrap"
         style={{ paddingBottom: "clamp(72px,8vw,112px)" }}
       >

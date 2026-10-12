@@ -40,7 +40,7 @@ export const createDonationSession = (input: unknown = {}) =>
 
     if (!process.env.STRIPE_SECRET_KEY) {
       return yield* new DonationsNotConfigured({
-        reason: "Online giving — coming soon",
+        reason: "Online giving is not available yet",
       });
     }
 
@@ -48,7 +48,7 @@ export const createDonationSession = (input: unknown = {}) =>
     // using request.amountCents / request.email when present.
     void request;
     return yield* new DonationsNotConfigured({
-      reason: "Online giving — coming soon",
+      reason: "Online giving is not available yet",
     });
   });
 

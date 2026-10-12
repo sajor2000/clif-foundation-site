@@ -19,7 +19,7 @@ export default function MissionPage() {
       >
         <span className="eyebrow">01 / mission</span>
         <h1 className="display-l" style={{ maxWidth: 1100 }}>
-          Make the CLIF standard practical for any hospital to adopt.
+          Make shared critical care data practical beyond research.
         </h1>
       </section>
 
@@ -56,14 +56,16 @@ export default function MissionPage() {
           }}
         >
           <p style={{ margin: 0 }}>
-            CLIF Foundation is an Illinois nonprofit corporation formed to
-            support wider adoption of the Common Longitudinal ICU data Format, an
-            open-source standard for organizing critical care EHR data.
+            CLIF Foundation exists to scale adoption of the Common Longitudinal
+            ICU data Format, an open standard for organizing critical care EHR
+            data, across health systems, research groups, professional societies,
+            and EHR vendors.
           </p>
           <p style={{ margin: 0, color: "var(--text-body)" }}>
-            Its work focuses on what helps a new institution get started and keep
-            going: clear education, practical implementation help, and long-term
-            care of the open specification and tools.
+            CLIF was built for federated observational research. Wider adoption
+            needs different support: conversion tools, terminology mapping,
+            implementation help, training, and long-term care of the open
+            specification and tools. That is why the Foundation exists.
           </p>
         </div>
       </section>
@@ -120,14 +122,15 @@ export default function MissionPage() {
               </div>
               <ul style={{ margin: 0, padding: 0, listStyle: "none" }}>
                 <li style={{ padding: "16px 20px", borderBottom: "1px solid var(--border-subtle)" }}>
-                  Conducts federated, privacy-preserving multicenter research
+                  Supports investigators through federated, privacy-preserving
+                  multicenter research
                 </li>
                 <li style={{ padding: "16px 20px", borderBottom: "1px solid var(--border-subtle)" }}>
-                  Network of clinician-scientists, data scientists, and academic
-                  medical centers
+                  Guides the CLIF data standard and research methods
                 </li>
                 <li style={{ padding: "16px 20px", borderBottom: "1px solid var(--border-subtle)" }}>
-                  Publishes the data dictionary, ETL guide, and open-source tools
+                  Credits research to the original investigators; patient data
+                  remains at each member site
                 </li>
                 <li style={{ padding: "16px 20px" }}>
                   <a href="https://clif-icu.com/" style={{ color: "var(--link)" }}>
@@ -162,13 +165,16 @@ export default function MissionPage() {
               </div>
               <ul style={{ margin: 0, padding: 0, listStyle: "none" }}>
                 <li style={{ padding: "16px 20px", borderBottom: "1px solid var(--border-subtle)" }}>
-                  Supports adoption through education and implementation help
+                  Scales CLIF adoption across organizations beyond observational
+                  research
                 </li>
                 <li style={{ padding: "16px 20px", borderBottom: "1px solid var(--border-subtle)" }}>
-                  Sustains maintenance of the open specification and tools
+                  Supports shared tools, terminology mapping, ETL help, and
+                  training
                 </li>
                 <li style={{ padding: "16px 20px", borderBottom: "1px solid var(--border-subtle)" }}>
-                  Does not conduct research or hold patient data
+                  Does not conduct research or hold patient data; sets budgets
+                  for adoption work
                 </li>
                 <li style={{ padding: "16px 20px" }}>
                   <Link href="/our-work" style={{ color: "var(--link)" }}>
@@ -202,7 +208,7 @@ export default function MissionPage() {
             margin: 0,
           }}
         >
-          Principles
+            Values that guide the work
         </h2>
         <ol
           style={{

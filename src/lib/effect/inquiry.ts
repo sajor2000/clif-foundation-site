@@ -26,7 +26,7 @@ export const validateInquiry = (input: unknown) =>
 
 export function inquiryMailto(inquiry: Inquiry): string {
   const subject = encodeURIComponent(
-    `CLIF Foundation inquiry (${inquiry.kind}) — ${inquiry.name}`,
+    `CLIF Foundation inquiry (${inquiry.kind}): ${inquiry.name}`,
   );
   const body = encodeURIComponent(
     [

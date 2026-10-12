@@ -65,14 +65,16 @@ export function ChapterFolio() {
       data-ink={onInk ? "true" : "false"}
     >
       {CHAPTERS.map((c) => (
-        <div
+        <a
           key={c.id}
+          href={`#${c.id}`}
           className="sc-folio__item"
           data-current={current === c.id ? "true" : "false"}
+          aria-current={current === c.id ? "true" : undefined}
         >
           <span className="sc-folio__n">{c.n}</span>
           <span className="sc-folio__t">{c.title}</span>
-        </div>
+        </a>
       ))}
     </nav>
   );

@@ -44,7 +44,7 @@ export function SectionHeader({
             }}
           >
             {index}
-            {index && label ? (size === "page" ? " / " : " — ") : ""}
+            {index && label ? " / " : ""}
             {label}
           </span>
         ) : null}

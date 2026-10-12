@@ -34,8 +34,8 @@ export default function OurWorkPage() {
             paddingLeft: 20,
           }}
         >
-          Four programs that help hospitals adopt CLIF. Each builds on resources
-          the CLIF Consortium already publishes.
+          Four programs that help organizations adopt CLIF. Each builds on
+          resources the CLIF Consortium already publishes.
         </p>
       </section>
 

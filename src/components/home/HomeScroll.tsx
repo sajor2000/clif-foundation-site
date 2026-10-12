@@ -60,10 +60,10 @@ export function HomeScroll() {
                 }}
               >
                 Every hospital records intensive care differently. CLIF is a free,
-                open standard that makes those records comparable, so clinicians at
-                many hospitals can study critical illness together. CLIF Foundation
-                funds the training, hands-on help, and long-term upkeep that let
-                more hospitals use it.
+                open standard that makes those records comparable. The Foundation
+                exists to help CLIF move beyond observational research, supporting
+                the tools, mapping, implementation help, and training that let more
+                organizations use it.
               </p>
               <div
                 style={{
@@ -111,14 +111,14 @@ export function HomeScroll() {
               {
                 key: "why",
                 title:
-                  "The Consortium does research. The Foundation helps hospitals adopt.",
-                body: "The CLIF Consortium is a network of academic centers that built the standard and runs studies with it. Getting a new hospital started takes training, technical help and maintenance that research grants do not cover. The Foundation funds that work.",
+                  "Research built CLIF. Adoption needs its own infrastructure.",
+                body: "The CLIF Consortium develops the standard and supports federated research. Bringing CLIF to health systems, research groups, societies, and EHR vendors requires conversion tools, terminology mapping, implementation support, and training. The Foundation helps organize and fund that work.",
                 pad: "28px 24px 32px",
               },
               {
                 key: "gift",
-                title: "Training, implementation help and upkeep",
-                body: "Gifts support courses for clinicians and data teams, hands-on help for hospitals converting their records, and maintenance of the open specification and tools. No gift funds research or touches patient data.",
+                title: "Tools, mapping, training, and implementation help",
+                body: "Gifts support courses for clinicians and data teams, reusable mappings, hands-on implementation help, and maintenance of the open specification and tools. Foundation support is for adoption work, not research or patient data.",
                 pad: "28px 0 32px 24px",
                 cta: true,
               },
@@ -725,8 +725,9 @@ export function HomeScroll() {
 
           <div className="sc-colophon" data-sc-in>
             <p style={{ margin: 0, fontSize: 15, lineHeight: 1.55, color: "var(--text-muted)" }}>
-              CLIF Foundation · Illinois nonprofit corporation · 501(c)(3)
-              application pending. Research credited to the CLIF Consortium.
+              CLIF Foundation · Illinois nonprofit · scaling CLIF adoption beyond
+              research · 501(c)(3) application pending. Research credited to the
+              CLIF Consortium.
             </p>
             <p style={{ margin: 0, fontSize: 18, lineHeight: 1.5 }}>
               Email a gift inquiry:{" "}

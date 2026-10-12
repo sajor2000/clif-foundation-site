@@ -131,7 +131,7 @@ export function SiteFooter() {
           }}
         >
           <span>CLIF is open source under the Apache License 2.0</span>
-          <span>Design proposal · October 2026</span>
+          <span>Illinois nonprofit · 2026</span>
         </div>
       </div>
     </footer>
