@@ -1,0 +1,486 @@
+/* scroll-craft device floor, scoped to .sc-home so the CLIF design system stays law.
+   Tokens map to existing CSS variables from DESIGN.md. */
+
+.sc-home {
+  --sc-canvas: var(--bg-page);
+  --sc-surface: var(--bg-panel);
+  --sc-ink: var(--text-primary);
+  --sc-ink-soft: var(--text-body);
+  --sc-accent: var(--accent-fill);
+  --sc-accent-ink: var(--action-primary-fg);
+  --sc-font-display: var(--font-display);
+  --sc-font-text: var(--font-sans);
+  --sc-font-mono: var(--font-mono);
+  --sc-hairline: var(--border);
+  --sc-hairline-strong: var(--border-strong);
+  --sc-ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --sc-ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --sc-d-fast: 160ms;
+  --sc-d-base: 240ms;
+  --sc-d-slow: 420ms;
+  --sc-z-stage: 1;
+  --sc-z-copy: 20;
+  --sc-z-chrome: 60;
+  --sc-gutter: var(--gutter);
+  --sc-maxw: var(--content-max);
+  --sc-section: var(--section-y);
+  position: relative;
+}
+
+.sc-home .sc-act--pinned {
+  position: relative;
+}
+
+.sc-home .sc-stage,
+.sc-home [data-sc-stage] {
+  position: sticky;
+  top: var(--header-h, 56px);
+  height: calc(100vh - var(--header-h, 56px));
+  height: calc(100svh - var(--header-h, 56px));
+  overflow: clip;
+  z-index: var(--sc-z-stage);
+}
+
+/* Opaque chapter grounds so later sections cover the pin (hard cut, no
+   petrol intertitles floating on ink). */
+.sc-home #ch-tables,
+.sc-home #ch-close {
+  position: relative;
+  z-index: calc(var(--sc-z-stage) + 1);
+  background: var(--bg-page);
+}
+
+.sc-home #ch-programs {
+  position: relative;
+  z-index: calc(var(--sc-z-stage) + 1);
+}
+
+.sc-home #ch-programs [data-sc-stage] {
+  background: var(--bg-panel);
+}
+
+/* Only hide cue/in targets after the engine mounts. Without .sc-ready,
+   content must stay readable (no-JS / failed script). */
+.sc-home.sc-ready [data-sc-cue] {
+  opacity: 0;
+  will-change: opacity, transform;
+  transition: none;
+}
+
+.sc-home .sc-split {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+}
+
+.sc-home .sc-split--line {
+  display: block;
+  padding-bottom: 0.14em;
+  margin-bottom: -0.14em;
+}
+
+.sc-home .sc-split__i {
+  display: inline-block;
+  will-change: transform, opacity;
+}
+
+.sc-home .sc-is-split {
+  opacity: 1 !important;
+}
+
+.sc-home [data-sc-pan] {
+  display: flex;
+  will-change: transform;
+}
+
+.sc-home [data-sc-reveal] {
+  will-change: clip-path;
+}
+
+.sc-home [data-sc-parallax] {
+  will-change: transform;
+}
+
+.sc-home.sc-ready [data-sc-in],
+.sc-home.sc-ready [data-sc-stagger] > * {
+  opacity: 0;
+  transform: translate3d(0, 14px, 0);
+  transition:
+    opacity 620ms var(--sc-ease-out),
+    transform 620ms var(--sc-ease-out);
+}
+
+.sc-home.sc-ready [data-sc-in].sc-in,
+.sc-home.sc-ready [data-sc-stagger] > .sc-in {
+  opacity: 1;
+  transform: none;
+}
+
+.sc-home.sc-fallback [data-sc-in],
+.sc-home.sc-fallback [data-sc-stagger] > * {
+  opacity: 1;
+  transform: none;
+}
+
+/* Chapter folio — reserved rail + solid plate so contrast is self-contained */
+.sc-folio {
+  position: fixed;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: calc(var(--sc-z-chrome) - 1);
+  display: none;
+  flex-direction: column;
+  gap: 12px;
+  width: 68px;
+  padding: 12px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
+  background: var(--bg-page);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+@media (min-width: 1400px) {
+  .sc-home {
+    padding-left: 96px;
+  }
+
+  .sc-folio {
+    display: flex;
+  }
+}
+
+.sc-folio__item {
+  display: grid;
+  gap: 2px;
+  opacity: 0.55;
+  transition: opacity var(--sc-d-base) var(--sc-ease-out);
+}
+
+.sc-folio__item[data-current="true"] {
+  opacity: 1;
+  color: var(--link);
+}
+
+.sc-folio__t {
+  max-width: 10ch;
+  line-height: 1.25;
+  color: var(--text-body);
+}
+
+.sc-folio__item[data-current="true"] .sc-folio__t {
+  color: var(--text-primary);
+}
+
+.sc-folio[data-ink="true"] {
+  background: var(--ink-950);
+  border-color: var(--ink-700);
+  color: var(--ink-300);
+}
+
+.sc-folio[data-ink="true"] .sc-folio__item[data-current="true"] {
+  color: var(--signal-300);
+}
+
+.sc-folio[data-ink="true"] .sc-folio__t {
+  color: var(--ink-300);
+}
+
+.sc-folio[data-ink="true"] .sc-folio__item[data-current="true"] .sc-folio__t {
+  color: var(--ink-50);
+}
+
+/* Hard chapter cut: true ink ground (light-mode band-inverse is too close to paper) */
+.sc-chapter--ink {
+  --text-inverse: var(--ink-50);
+  --text-inverse-body: var(--ink-200);
+  --text-inverse-muted: var(--ink-300);
+  --border-inverse: var(--ink-700);
+  --accent-text: var(--signal-300);
+  --bg-inverse: var(--ink-950);
+  background: var(--ink-950);
+  color: var(--ink-50);
+}
+
+.sc-intertitle {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: var(--link);
+  margin-bottom: 28px;
+}
+
+.sc-chapter--ink .sc-intertitle {
+  color: var(--signal-300);
+}
+
+.sc-intertitle__n {
+  opacity: 0.7;
+}
+
+/* Signature: federation lattice — arrows draw from --sc-p on the pin act */
+.sc-home #ch-federation {
+  --fed-p: var(--sc-p, 0);
+}
+
+.fed {
+  display: grid;
+  gap: 0;
+  width: 100%;
+}
+
+.fed__sites {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+  align-items: start;
+}
+
+@media (max-width: 799px) {
+  .fed__sites {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .fed__site:last-child {
+    grid-column: 1 / -1;
+    max-width: 50%;
+    justify-self: center;
+  }
+}
+
+.fed__site {
+  --site-t: 0;
+  /* 0→1: how far this site’s arrow has grown */
+  --fed-draw: max(
+    0,
+    min(1, calc((var(--fed-p) - var(--site-t)) / 0.2))
+  );
+  display: grid;
+  justify-items: center;
+  gap: 0;
+}
+
+.fed__card {
+  width: 100%;
+  border: 1px solid
+    color-mix(
+      in oklab,
+      var(--signal-300) calc(var(--fed-draw) * 85%),
+      var(--border-inverse)
+    );
+  border-radius: var(--radius-control);
+  padding: 14px 16px;
+  display: grid;
+  gap: 10px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  background: var(--ink-900);
+  color: var(--ink-200);
+}
+
+.fed__card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--ink-50);
+}
+
+.fed__dot {
+  color: var(--signal-300);
+}
+
+.fed__card-body {
+  margin: 0;
+  color: var(--ink-300);
+  line-height: 1.7;
+}
+
+/* Whole arrow scales from the card; head stays attached (no stroke-draw clip) */
+.fed__arrow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 48px;
+  color: var(--signal-300);
+  transform: scaleY(var(--fed-draw));
+  transform-origin: top center;
+  will-change: transform;
+}
+
+.fed__arrow-line {
+  flex: 1 1 auto;
+  width: 0;
+  border-left: 2px dashed currentColor;
+}
+
+.fed__arrow-head {
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 8px solid currentColor;
+  margin-top: -1px;
+  flex: 0 0 auto;
+}
+
+.fed__aggregate {
+  border: 1px solid
+    color-mix(
+      in oklab,
+      var(--signal-300) calc(var(--fed-p) * 100%),
+      var(--border-inverse)
+    );
+  border-radius: var(--radius-control);
+  padding: 16px 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 28px;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  color: var(--ink-200);
+  background: var(--ink-900);
+  box-shadow: inset 0 0 0 1px
+    color-mix(
+      in oklab,
+      var(--signal-300) calc(var(--fed-p) * 45%),
+      transparent
+    );
+}
+
+.fed__aggregate-lead {
+  color: var(--signal-300);
+  font-weight: 500;
+}
+
+.fed__aggregate-trail {
+  color: var(--ink-200);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fed__site {
+    --fed-draw: 1;
+  }
+
+  .fed__arrow {
+    transform: none;
+  }
+}
+
+/* Crosswalk join bars */
+.sc-crosswalk-row {
+  --join: var(--sc-p, 0);
+  position: relative;
+}
+
+.sc-crosswalk-row::after {
+  content: "";
+  position: absolute;
+  left: 42%;
+  right: 42%;
+  top: 50%;
+  height: 1px;
+  background: var(--link);
+  transform: translateY(-50%) scaleX(var(--join));
+  transform-origin: left center;
+  pointer-events: none;
+}
+
+@media (max-width: 699px) {
+  .sc-crosswalk-row::after {
+    display: none;
+  }
+}
+
+/* Program pan rail */
+.sc-program-rail {
+  gap: 16px;
+  padding-inline: var(--gutter);
+  align-items: stretch;
+}
+
+.sc-program-card {
+  flex: 0 0 min(340px, 78vw);
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  background: var(--bg-figure);
+  padding: 22px 20px;
+  display: grid;
+  gap: 12px;
+  text-decoration: none;
+  color: inherit;
+  min-height: 220px;
+}
+
+.sc-program-rail__lead {
+  flex: 0 0 min(280px, 70vw);
+  display: grid;
+  gap: 14px;
+  align-content: center;
+  padding-right: 24px;
+}
+
+.sc-chapter-cut {
+  border-top: 1px solid var(--border-strong);
+}
+
+.sc-colophon {
+  border-top: 1px solid var(--border-strong);
+  padding-top: 28px;
+  display: grid;
+  gap: 18px;
+  max-width: 62ch;
+}
+
+.sc-colophon a {
+  color: var(--link);
+  text-underline-offset: 0.22em;
+}
+
+@media (max-width: 700px) {
+  .sc-home .display-xl {
+    font-size: clamp(2rem, 9vw, 2.6rem);
+    line-height: 1.05;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sc-home [data-sc-in],
+  .sc-home [data-sc-stagger] > * {
+    transform: none;
+    transition-duration: 220ms;
+  }
+
+  .sc-home [data-sc-parallax],
+  .sc-home [data-sc-pan],
+  .sc-home .sc-split__i {
+    transform: none !important;
+  }
+
+  .sc-home [data-sc-reveal] {
+    clip-path: none !important;
+  }
+
+  .sc-home [data-sc-act="pan"] .sc-stage,
+  .sc-home [data-sc-act="pan"] [data-sc-stage] {
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x proximity;
+  }
+
+  .sc-home [data-sc-pan] > * {
+    scroll-snap-align: center;
+  }
+
+  .sc-crosswalk-row::after {
+    transform: translateY(-50%) scaleX(1);
+  }
+}

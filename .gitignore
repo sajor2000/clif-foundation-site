@@ -71,3 +71,8 @@ clif-foundation-site.bundle
 DOWNLOAD-README.txt
 
 .env.convex.vercel
+
+# scroll-craft local clone / lab artifacts
+.tmp-scroll-craft/
+scrollcraft/builds/*/lab/
+scrollcraft/builds/*/node_modules/

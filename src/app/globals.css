@@ -3,6 +3,7 @@
 @import "../styles/typography.css";
 @import "../styles/spacing.css";
 @import "../styles/base.css";
+@import "../styles/scrollcraft-devices.css";
 
 .skip-link {
   position: absolute;
