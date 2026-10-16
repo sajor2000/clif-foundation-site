@@ -22,23 +22,23 @@ export function ContextBar({
         style={{
           maxWidth: "var(--content-max)",
           margin: "0 auto",
-          padding: "9px var(--gutter)",
+          padding: "0 var(--gutter)",
           display: "flex",
           flexWrap: "wrap",
-          gap: "6px 24px",
+          alignItems: "center",
+          gap: "0 24px",
           justifyContent: "space-between",
         }}
       >
-        <span>{text}</span>
+        <span style={{ padding: "9px 0" }}>{text}</span>
         <a
           href={href}
           style={{
             color: "var(--accent-text)",
-            // 44px hit area without changing the bar's visual height
+            // 44px hit area; no negative margins so it never overlaps wrapped text
             display: "inline-flex",
             alignItems: "center",
             minHeight: "var(--touch-min)",
-            margin: "-13px 0",
           }}
         >
           {linkLabel}
