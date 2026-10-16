@@ -1,9 +1,15 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import { Button } from "@/components/core/Button";
 import { SiteShell } from "@/components/layout/SiteShell";
 import { CONTACT_EMAIL, PROGRAMS } from "@/lib/content";
 
-export const metadata: Metadata = { title: "Our Work" };
+export const metadata: Metadata = pageMetadata({
+  title: "Our Work",
+  description:
+    "Four CLIF Foundation programs: implementation support for EHR-to-CLIF conversion, education, open-source stewardship, and convening on the ICU data standard.",
+  path: "/our-work",
+});
 
 export default function OurWorkPage() {
   return (

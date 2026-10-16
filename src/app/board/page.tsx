@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import { BoardMemberList } from "@/components/board/BoardMemberList";
 import { SiteShell } from "@/components/layout/SiteShell";
 import {
@@ -8,7 +9,12 @@ import {
 } from "@/lib/board";
 import { GOVERNING_DOCS } from "@/lib/content";
 
-export const metadata: Metadata = { title: "Board & Governance" };
+export const metadata: Metadata = pageMetadata({
+  title: "Board & Governance",
+  description:
+    "The CLIF Foundation Board of Directors: members, roles and biographies for the Illinois nonprofit supporting the Common Longitudinal ICU data Format.",
+  path: "/board",
+});
 
 export default function BoardPage() {
   return (

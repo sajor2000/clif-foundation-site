@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import Link from "next/link";
 import { Button } from "@/components/core/Button";
 import { SiteShell } from "@/components/layout/SiteShell";
@@ -12,7 +13,12 @@ import {
   ZELLE_RECIPIENT,
 } from "@/lib/content";
 
-export const metadata: Metadata = { title: "Support" };
+export const metadata: Metadata = pageMetadata({
+  title: "Support",
+  description:
+    "Support CLIF Foundation with a Zelle gift or an email inquiry. Illinois nonprofit corporation; 501(c)(3) application pending with the IRS.",
+  path: "/support",
+});
 
 export default function SupportPage() {
   return (

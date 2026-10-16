@@ -1,9 +1,15 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import { SiteShell } from "@/components/layout/SiteShell";
 import { PublicationFilter } from "@/components/research/PublicationFilter";
 import { RESOURCES } from "@/lib/content";
 
-export const metadata: Metadata = { title: "Research & Resources" };
+export const metadata: Metadata = pageMetadata({
+  title: "Research & Resources",
+  description:
+    "Critical care research built on CLIF, published by the CLIF Consortium and original investigators, with links to CLIF 101, the ETL guide and data dictionary.",
+  path: "/research",
+});
 
 export default function ResearchPage() {
   return (
