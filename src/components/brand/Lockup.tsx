@@ -76,7 +76,12 @@ export function Lockup({
     <Link
       href={href}
       aria-label={`CLIF ${label ?? ""} home`}
-      style={{ textDecoration: "none", display: "inline-flex" }}
+      style={{
+        textDecoration: "none",
+        display: "inline-flex",
+        alignItems: "center",
+        minHeight: "var(--touch-min)",
+      }}
     >
       {inner}
     </Link>

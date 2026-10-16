@@ -8,7 +8,8 @@ export function ContextBar({
   href?: string;
 }) {
   return (
-    <div
+    <aside
+      aria-label="Foundation status"
       style={{
         background: "var(--bg-inverse)",
         color: "var(--text-inverse-body)",
@@ -29,10 +30,20 @@ export function ContextBar({
         }}
       >
         <span>{text}</span>
-        <a href={href} style={{ color: "var(--accent-text)" }}>
+        <a
+          href={href}
+          style={{
+            color: "var(--accent-text)",
+            // 44px hit area without changing the bar's visual height
+            display: "inline-flex",
+            alignItems: "center",
+            minHeight: "var(--touch-min)",
+            margin: "-13px 0",
+          }}
+        >
           {linkLabel}
         </a>
       </div>
-    </div>
+    </aside>
   );
 }
