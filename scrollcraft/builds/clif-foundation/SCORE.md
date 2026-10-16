@@ -10,9 +10,9 @@
 | Beat | Feeling | Device | Span | Why |
 |---|---|---|---|---|
 | Title | Orientation | `flow` + `in` | natural | Title page: type + org record, no media bleed |
-| Federation | Confidence (peak) | `pin` + lattice | 4.2 | Hard ink cut; sites hold; aggregate completes |
+| Federation | Confidence (peak) | `pin` + lattice | 2.4 | Hard ink cut; sites hold; aggregate completes |
 | Tables | Clarity | `flow` + `in` + `reveal` | natural | Hard cut back to paper; figure + needs |
-| Programs | Appetite | `pan` | 3.2 | Lateral choice on panel ground |
+| Programs | Appetite | `pan` | 2.0 | Lateral choice on panel ground |
 | Start | Intent | `flow` + crosswalk + colophon | natural | mCIDE resolve then running-text inquiry |
 
 **Checks:** 4 device families (flow, pin, pan, reveal/in). No consecutive repeats. Zero scrub. No magnet/spotlight. No continuous drift. No progress bar. Peak has largest span. Intertitles at chapter opens. Eyebrows cut to chapter folio only.
