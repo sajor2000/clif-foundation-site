@@ -1,10 +1,5 @@
 import { Data, Effect, Schema } from "effect";
-
-export class DonationsNotConfigured extends Data.TaggedError(
-  "DonationsNotConfigured",
-)<{
-  reason: string;
-}> {}
+import { CONTACT_EMAIL, ZELLE_MEMO, zelleRecipient } from "@/lib/content";
 
 export class InvalidDonationRequest extends Data.TaggedError(
   "InvalidDonationRequest",
@@ -14,18 +9,23 @@ export class InvalidDonationRequest extends Data.TaggedError(
 
 const DonationRequest = Schema.Struct({
   amountCents: Schema.optional(
-    Schema.Number.check(Schema.isGreaterThan(0), Schema.isLessThan(10_000_000)),
+    Schema.Number.check(Schema.isGreaterThan(0), Schema.isLessThan(100_000_000)),
   ),
-  email: Schema.optional(Schema.String),
 });
 
-export type DonationRequest = typeof DonationRequest.Type;
+export type ZelleInstructions = {
+  method: "zelle";
+  recipient: string;
+  memo: string;
+  amountCents?: number;
+  acknowledgmentEmail: string;
+};
 
 /**
- * Future Stripe Checkout entrypoint (Effect 4).
- * Until STRIPE_SECRET_KEY + nonprofit bank setup exist, fails typed.
+ * Giving instructions for a bank Zelle transfer.
+ * Card checkout is not offered: there is no Stripe account connected.
  */
-export const createDonationSession = (input: unknown = {}) =>
+export const createDonationInstructions = (input: unknown = {}) =>
   Effect.gen(function* () {
     const request = yield* Schema.decodeUnknownEffect(DonationRequest)(
       input,
@@ -38,20 +38,35 @@ export const createDonationSession = (input: unknown = {}) =>
       ),
     );
 
-    if (!process.env.STRIPE_SECRET_KEY) {
-      return yield* new DonationsNotConfigured({
-        reason: "Online giving is not available yet",
+    if (
+      request.amountCents !== undefined &&
+      !Number.isInteger(request.amountCents)
+    ) {
+      return yield* new InvalidDonationRequest({
+        reason: "Amount must be a whole number of cents",
       });
     }
 
-    // Later: stripe.checkout.sessions.create with pay-what-you-want Price
-    // using request.amountCents / request.email when present.
-    void request;
-    return yield* new DonationsNotConfigured({
-      reason: "Online giving is not available yet",
-    });
+    if (request.amountCents !== undefined && request.amountCents < 100) {
+      return yield* new InvalidDonationRequest({
+        reason: "Minimum gift is 100 cents ($1.00)",
+      });
+    }
+
+    const instructions: ZelleInstructions = {
+      method: "zelle",
+      recipient: zelleRecipient(),
+      memo: ZELLE_MEMO,
+      acknowledgmentEmail: CONTACT_EMAIL,
+    };
+
+    if (request.amountCents !== undefined) {
+      instructions.amountCents = request.amountCents;
+    }
+
+    return instructions;
   });
 
-export async function runCreateDonationSession(input: unknown = {}) {
-  return Effect.runPromiseExit(createDonationSession(input));
+export async function runCreateDonationInstructions(input: unknown = {}) {
+  return Effect.runPromiseExit(createDonationInstructions(input));
 }

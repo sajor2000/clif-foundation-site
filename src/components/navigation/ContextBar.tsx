@@ -1,5 +1,7 @@
+import { CONTEXT_BAR_TEXT } from "@/lib/content";
+
 export function ContextBar({
-  text = "An Illinois nonprofit scaling CLIF adoption beyond research · 501(c)(3) application pending",
+  text = CONTEXT_BAR_TEXT,
   linkLabel = "Research is conducted by the CLIF Consortium ↗",
   href = "https://clif-icu.com/",
 }: {

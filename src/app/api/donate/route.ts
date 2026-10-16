@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 import { NextResponse } from "next/server";
-import { createDonationSession } from "@/lib/effect/donations";
+import { createDonationInstructions } from "@/lib/effect/donations";
 import { exitToJsonResponse } from "@/lib/effect/http";
 
 async function handle(request: Request) {
@@ -17,26 +17,12 @@ async function handle(request: Request) {
     }
   }
 
-  const exit = await Effect.runPromiseExit(createDonationSession(body));
+  const exit = await Effect.runPromiseExit(createDonationInstructions(body));
 
   return exitToJsonResponse(exit, {
-    onSuccess: () =>
-      NextResponse.json(
-        {
-          error: "DonationsNotConfigured",
-          message: "Online giving is not available yet",
-        },
-        { status: 503 },
-      ),
+    onSuccess: (instructions) =>
+      NextResponse.json({ ok: true as const, ...instructions }),
     onTagged: {
-      DonationsNotConfigured: (error) =>
-        NextResponse.json(
-          {
-            error: "DonationsNotConfigured",
-            message: error.reason,
-          },
-          { status: 503 },
-        ),
       InvalidDonationRequest: (error) =>
         NextResponse.json(
           {

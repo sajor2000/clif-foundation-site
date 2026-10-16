@@ -1,4 +1,22 @@
 export const CONTACT_EMAIL = "info@clificufoundation.org";
+
+/** Zelle email or US mobile. Defaults to the public contact. Set ZELLE_RECIPIENT when the bank uses a different token. */
+export function zelleRecipient(): string {
+  const fromEnv = process.env.ZELLE_RECIPIENT?.trim();
+  return fromEnv ? fromEnv : CONTACT_EMAIL;
+}
+
+export const ZELLE_MEMO = "CLIF Foundation gift";
+
+export const TAX_STATUS_SHORT = "501(c)(3) recognition in preparation";
+
+export const CONTEXT_BAR_TEXT =
+  "An Illinois nonprofit scaling CLIF adoption beyond research · 501(c)(3) recognition in preparation";
+
+/** Support-page statement. Does not claim a current deduction. */
+export const TAX_STATUS_GIVING =
+  "CLIF Foundation is an Illinois nonprofit corporation, and its EIN has been issued. We are preparing the paperwork for recognition as a 501(c)(3) organization. A gift made now is not tax-deductible today. If the IRS grants recognition, that status is often effective as of the date of formation when the application is filed on time, and a gift made while the paperwork is in preparation may then qualify. We acknowledge every gift we can match to a donor, and we will write again when a determination letter is posted. Ask your tax adviser before treating a gift as a deduction.";
+
 export const CONSORTIUM_URL = "https://clif-icu.com/";
 export const GITHUB_URL =
   "https://github.com/Common-Longitudinal-ICU-data-Format/CLIF";
@@ -24,7 +42,7 @@ export const ORG_RECORD = [
   { k: "name", v: "CLIF Foundation" },
   { k: "supports", v: "Common Longitudinal ICU data Format" },
   { k: "entity", v: "Illinois nonprofit corporation" },
-  { k: "tax_status", v: "501(c)(3) application pending" },
+  { k: "tax_status", v: TAX_STATUS_SHORT },
   { k: "research_by", v: "CLIF Consortium" },
   { k: "contact", v: CONTACT_EMAIL },
 ] as const;
@@ -229,8 +247,8 @@ export const SUPPORT_PATHS = [
     n: "01",
     who: "Donors",
     body: "Individuals and foundations interested in supporting Foundation programs.",
-    cta: "Email a gift inquiry",
-    href: `mailto:${CONTACT_EMAIL}?subject=Gift%20inquiry`,
+    cta: "Send a gift by Zelle",
+    href: "#give",
     external: false,
   },
   {
@@ -264,8 +282,8 @@ export const HOME_PATHS = [
     n: "01",
     who: "Donors",
     arrow: "→",
-    cta: "Email a gift inquiry",
-    href: `mailto:${CONTACT_EMAIL}?subject=Gift%20inquiry`,
+    cta: "Send a gift by Zelle",
+    href: "/support#give",
   },
   {
     n: "02",
@@ -338,4 +356,4 @@ export const NEEDS = [
 ] as const;
 
 export const FOOTER_NOTE =
-  "An Illinois nonprofit corporation scaling adoption of the Common Longitudinal ICU data Format beyond observational research. Application for 501(c)(3) recognition is pending. Research is credited to the CLIF Consortium and its investigators.";
+  "An Illinois nonprofit corporation (EIN issued) scaling adoption of the Common Longitudinal ICU data Format beyond observational research. Recognition as a 501(c)(3) organization is in preparation. Research is credited to the CLIF Consortium and its investigators.";

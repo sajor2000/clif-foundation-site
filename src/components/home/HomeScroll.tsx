@@ -9,7 +9,6 @@ import { IcuStayFigure } from "@/components/home/IcuStayFigure";
 import { ScrollCraftMount } from "@/components/home/ScrollCraftMount";
 import { SiteShell } from "@/components/layout/SiteShell";
 import {
-  CONTACT_EMAIL,
   HOME_PATHS,
   HOME_PUBS,
   MAPPINGS,
@@ -726,12 +725,11 @@ export function HomeScroll() {
           <div className="sc-colophon" data-sc-in>
             <p style={{ margin: 0, fontSize: 15, lineHeight: 1.55, color: "var(--text-muted)" }}>
               CLIF Foundation · Illinois nonprofit · scaling CLIF adoption beyond
-              research · 501(c)(3) application pending. Research credited to the
-              CLIF Consortium.
+              research · 501(c)(3) recognition in preparation. Research credited
+              to the CLIF Consortium.
             </p>
             <p style={{ margin: 0, fontSize: 18, lineHeight: 1.5 }}>
-              Email a gift inquiry:{" "}
-              <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
+              Send a gift by Zelle: <a href="/support#give">Support</a>
             </p>
           </div>
           </div>

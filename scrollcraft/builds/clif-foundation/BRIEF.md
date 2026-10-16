@@ -39,4 +39,4 @@ No scroll cue, no section counters as chrome, no invented impact statistics, no 
 
 - CTA label everywhere: **Email a gift inquiry** (and Support CLIF for primary nav action).
 - Belief to install: the Foundation funds hospital adoption of CLIF; research stays with the Consortium; data never leaves sites.
-- Legal: Illinois nonprofit; 501(c)(3) application pending; never claim deductibility.
+- Legal: Illinois nonprofit; EIN issued; 501(c)(3) recognition in preparation; never claim a current deduction.

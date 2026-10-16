@@ -12,10 +12,10 @@ Visual and content system for the **CLIF Foundation** website: a nonprofit that 
 ## Factual boundaries (must hold in every artifact)
 - Programs, board directors, and officer roles are published as current. Do not label them “proposed”.
 - Credit research to the CLIF Consortium and original investigators; link to the original source.
-- Legal status (confirmed): Illinois nonprofit corporation, EIN issued, 501(c)(3) application pending. Say exactly that. Never claim tax-exempt status or deductibility until the IRS determination letter is posted.
+- Legal status (confirmed): Illinois nonprofit corporation, EIN issued. 501(c)(3) recognition is in preparation. Do not say the application is already pending, and do not claim tax-exempt status or a current deduction. If recognition is granted and the application is filed on time, the effective date is often the date of formation, and a gift made in the meantime may then qualify.
 - Do not invent biographies, partnerships, funding commitments, or impact statistics.
 - Data schematics are simplified concepts for donors. For users of CLIF or mCIDE, link to clif-icu.com, which owns the specification and documentation; do not reproduce it.
-- Giving is by inquiry to **info@clificufoundation.org** — no payment checkout.
+- Giving is by Zelle to **info@clificufoundation.org** (or `ZELLE_RECIPIENT`). There is no card checkout. Larger or restricted gifts still start by email.
 
 ## CONTENT FUNDAMENTALS
 - Plain, factual, third person for the organization ("CLIF Foundation proposes to…"); "we/us" only in direct calls to act ("Email us to discuss a gift").

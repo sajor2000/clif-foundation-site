@@ -1,6 +1,6 @@
 # CLIF Foundation website
 
-Public site for the CLIF Foundation (Illinois nonprofit; 501(c)(3) pending) plus a Clerk-gated board portal for documents. Design system lives in `design/` (reference kit). Stack: **Next.js App Router**, **TypeScript**, **Tailwind**, **Effect 4**, **Convex**, **Clerk**. Stripe checkout is stubbed as Coming soon.
+Public site for the CLIF Foundation (Illinois nonprofit; 501(c)(3) recognition in preparation) plus a Clerk-gated board portal for documents. Design system lives in `design/` (reference kit). Stack: **Next.js App Router**, **TypeScript**, **Tailwind**, **Effect 4**, **Convex**, **Clerk**. Gifts are sent by Zelle. Card checkout is not offered.
 
 ## Local development
 
@@ -34,9 +34,10 @@ See `.env.example`. Minimum for a full local stack:
 - `NEXT_PUBLIC_CONVEX_URL` — from Convex CLI
 - `CLERK_JWT_ISSUER_DOMAIN` — Clerk Frontend API URL (Convex dashboard + `convex/auth.config.ts`)
 - `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY` — board portal
-- `STRIPE_SECRET_KEY` — omit until bank + Stripe Nonprofit exist (UI stays Coming soon)
+- `ZELLE_RECIPIENT` — optional email or US mobile enrolled for Zelle. Defaults to `info@clificufoundation.org`
+- `STRIPE_SECRET_KEY` — unused. Card checkout is not the giving path
 
-Without Clerk/Stripe keys the public site still works; `/portal` shows a configure-env message; `/api/donate` returns **503** with “Online giving — coming soon”.
+Without Clerk keys the public site still works; `/portal` shows a configure-env message. `/api/donate` returns Zelle instructions (`200`).
 
 ## Routes
 
@@ -45,7 +46,7 @@ Without Clerk/Stripe keys the public site still works; `/portal` shows a configu
 | `/`, `/mission`, `/our-work`, `/research`, `/board`, `/support` | Public |
 | `/portal` | Clerk-protected board documents |
 | `/portal/sign-in` | Clerk sign-in (not linked from public nav) |
-| `/api/donate` | Public stub → 503 Coming soon |
+| `/api/donate` | Public → Zelle instructions |
 
 ## Effect 4
 
@@ -55,7 +56,7 @@ Workflow helpers use **effect@4.0.2** (Effect 4 APIs: `Effect.gen`, `Data.Tagged
 |--------|---------|---------|
 | `src/lib/effect/documents.ts` | `validateDocumentMeta` | Portal upload pipeline |
 | `src/lib/effect/upload.ts` | `uploadDocumentProgram` | `/portal` client upload (validate → URL → POST → save) |
-| `src/lib/effect/donations.ts` | `createDonationSession` | `/api/donate` → `DonationsNotConfigured` / 503 |
+| `src/lib/effect/donations.ts` | `createDonationInstructions` | `/api/donate` → Zelle recipient, memo, optional amount |
 | `src/lib/effect/inquiry.ts` | `validateInquiry` | `/api/inquiry` → mailto draft |
 | `src/lib/effect/http.ts` | `exitToJsonResponse` | Route Handler Exit → HTTP mapping |
 
@@ -88,7 +89,7 @@ Repo is wired for the [Convex + Vercel](https://docs.convex.dev/production/hosti
    | `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | Production + Preview | Board portal |
    | `CLERK_SECRET_KEY` | Production + Preview | Board portal |
    | `NEXT_PUBLIC_CLERK_SIGN_IN_URL` | Production + Preview | `/portal/sign-in` |
-   | `STRIPE_*` | later | Omit until Nonprofit Stripe exists |
+   | `STRIPE_*` | — | Unused. Giving is Zelle, not card checkout |
 
    Do **not** set `CONVEX_AGENT_MODE` on Vercel. `NEXT_PUBLIC_CONVEX_URL` is set for the build by `convex deploy --cmd` when `CONVEX_DEPLOY_KEY` is present; you may also pin it in Vercel if you prefer.
 5. **Clerk** — add the Vercel production (and preview) URLs to allowed origins / redirect URLs; sign-in path stays `/portal/sign-in`.
@@ -115,4 +116,4 @@ npx impeccable install
 
 ## Legal copy bounds
 
-Say exactly: Illinois nonprofit corporation, EIN issued, 501(c)(3) application pending. Do not claim deductibility until the IRS determination letter is posted.
+Say: Illinois nonprofit corporation, EIN issued, 501(c)(3) recognition in preparation. Do not say the application is already pending. Do not claim tax-exempt status or that a gift is deductible today. On Support, a gift made while recognition is in preparation may qualify later if the IRS grants recognition effective as of formation (typical when the application is filed on time). Donors should ask a tax adviser.

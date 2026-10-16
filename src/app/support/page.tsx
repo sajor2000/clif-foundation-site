@@ -3,9 +3,16 @@ import Link from "next/link";
 import { Button } from "@/components/core/Button";
 import { SiteShell } from "@/components/layout/SiteShell";
 import { CopyEmailButton } from "@/components/support/CopyEmailButton";
-import { DonateSoon } from "@/components/support/DonateSoon";
 import { InquiryForm } from "@/components/support/InquiryForm";
-import { CONTACT_EMAIL, GIFT_PROGRAMS, SUPPORT_PATHS } from "@/lib/content";
+import { ZelleGift } from "@/components/support/ZelleGift";
+import {
+  CONTACT_EMAIL,
+  GIFT_PROGRAMS,
+  SUPPORT_PATHS,
+  TAX_STATUS_GIVING,
+  ZELLE_MEMO,
+  zelleRecipient,
+} from "@/lib/content";
 
 export const metadata: Metadata = { title: "Support" };
 
@@ -29,7 +36,7 @@ export default function SupportPage() {
             className="display-xl"
             style={{ fontSize: "var(--type-display-xl)" }}
           >
-            Giving starts with a conversation.
+            Send a gift from your bank.
           </h1>
         </div>
         <div style={{ flex: "1 1 380px", display: "grid", gap: 20 }}>
@@ -41,8 +48,8 @@ export default function SupportPage() {
               color: "var(--text-body)",
             }}
           >
-            We are not accepting online payments. Email us to discuss a gift, a
-            partnership, or another way to help.
+            Send a gift by Zelle to the Foundation bank account, or email us to
+            discuss a larger gift, a partnership, or another way to help.
           </p>
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
             <Button href={`mailto:${CONTACT_EMAIL}`} size="lg">
@@ -130,7 +137,7 @@ export default function SupportPage() {
           }}
         >
           <InquiryForm />
-          <DonateSoon />
+          <ZelleGift recipient={zelleRecipient()} />
         </div>
       </section>
 
@@ -269,8 +276,8 @@ export default function SupportPage() {
                 textWrap: "pretty",
               }}
             >
-              There is no online donation form. Every gift begins with a short
-              email and a conversation.
+              A gift can be sent now with Zelle. A larger or restricted gift still
+              starts with a short email.
             </p>
           </div>
           <ol
@@ -285,23 +292,23 @@ export default function SupportPage() {
             {[
               [
                 "1",
-                "Email us",
-                `Write to ${CONTACT_EMAIL} with your name and what you are considering.`,
+                "Send with Zelle",
+                `In your bank, send the gift to ${zelleRecipient()} and use the memo “${ZELLE_MEMO}”.`,
               ],
               [
                 "2",
-                "We talk",
-                "We reply to arrange a call about your interests and the programs.",
+                "Tell us who you are",
+                `Email ${CONTACT_EMAIL} with your name, the amount, and the date. We use that to send a written acknowledgment.`,
               ],
               [
                 "3",
-                "Terms in writing",
-                "Gift purpose, timing and acknowledgment are confirmed in writing before anything is transferred.",
+                "Larger or restricted gifts",
+                "For a pledge, a named purpose, or a gift above your bank’s Zelle limit, write first. Purpose and timing are confirmed in writing before you transfer.",
               ],
               [
                 "4",
                 "Tax status, stated plainly",
-                "CLIF Foundation is an Illinois nonprofit corporation with an EIN. Our application for 501(c)(3) recognition is pending with the IRS. Until it is approved, we cannot promise that a gift is tax-deductible; please ask your tax adviser.",
+                TAX_STATUS_GIVING,
               ],
             ].map(([n, t, d]) => (
               <li

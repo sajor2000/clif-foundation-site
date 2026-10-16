@@ -24,13 +24,13 @@ Distinct from the CLIF Consortium (clif-icu.com): the Consortium owns the specif
 
 - Public marketing site: Home, Mission, Our Work, Research & Resources, Board & Governance, Support.
 - Board portal at `/portal/*` (Clerk-gated, bookmark-only; not in public nav).
-- Giving today: email inquiry to `info@clificufoundation.org`. Online checkout is Coming soon until bank + Stripe Nonprofit exist.
+- Giving today: Zelle to `info@clificufoundation.org` (override with `ZELLE_RECIPIENT` if the bank enrolled a different email or US mobile). Card checkout is not offered.
 - Design authority lives in `design/` (tokens + kit) and is ported into `src/styles/` and `src/components/`.
 
 ## Capabilities and Constraints
 
-- Stack: Next.js App Router, TypeScript, Tailwind, Effect 4, Convex, Clerk; Stripe stubbed.
-- Legal status (confirmed): Illinois nonprofit corporation, EIN issued, 501(c)(3) application pending. Never claim tax-exempt status or deductibility until an IRS determination letter is posted.
+- Stack: Next.js App Router, TypeScript, Tailwind, Effect 4, Convex, Clerk. The `stripe` package is installed and unused; giving is Zelle.
+- Legal status (confirmed): Illinois nonprofit corporation, EIN issued. 501(c)(3) recognition is in preparation; do not say the application is already pending. Never claim tax-exempt status or that a gift is deductible today. On Support, say that if the IRS grants recognition, the effective date is often the date of formation when the application is filed on time, and a gift made in the meantime may then qualify. Donors should ask a tax adviser.
 - Programs, board directors, and officer roles are published as current. Do not revive “proposed” labeling for them.
 - Do not invent biographies, partnerships, funding commitments, or impact statistics.
 - Credit research to the CLIF Consortium and original investigators; link out rather than reproducing the CLIF/mCIDE specification.
@@ -56,7 +56,7 @@ Distinct from the CLIF Consortium (clif-icu.com): the Consortium owns the specif
 
 1. **Factual first.** Prefer precise legal and program language over persuasive flourish.
 2. **Consortium credit.** Research and the format belong to the Consortium; the Foundation does not absorb that identity.
-3. **Inquiry over checkout (for now).** Giving starts with a conversation until Stripe is configured.
+3. **Zelle, then a conversation.** Unrestricted gifts go by Zelle. Larger or restricted gifts still start with email. Do not imply a card charge.
 4. **Design kit is law.** New UI extends the ink/petrol/mint system in `design/`; it does not invent a parallel aesthetic.
 
 ## Accessibility & Inclusion
