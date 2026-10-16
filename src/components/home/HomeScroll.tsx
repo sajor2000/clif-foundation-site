@@ -169,7 +169,7 @@ export function HomeScroll() {
         <section
           id="ch-federation"
           data-sc-act="pin"
-          data-sc-span="4.4"
+          data-sc-span="2.4"
           aria-labelledby="fig-fed"
         >
           <div data-sc-stage className="sc-chapter--ink">
@@ -351,7 +351,7 @@ export function HomeScroll() {
         <section
           id="ch-programs"
           data-sc-act="pan"
-          data-sc-span="3.2"
+          data-sc-span="2.0"
           aria-labelledby="programs-heading"
         >
           <div data-sc-stage>
