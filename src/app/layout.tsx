@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import { AppProviders } from "@/components/providers/AppProviders";
 import { funnelDisplay, funnelSans, splineMono } from "@/lib/fonts";
+import { SITE_URL } from "@/lib/site";
 import "./globals.css";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: {
     default: "CLIF Foundation",
     template: "%s · CLIF Foundation",
