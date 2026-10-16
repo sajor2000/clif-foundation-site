@@ -3,9 +3,14 @@ import Link from "next/link";
 import { Button } from "@/components/core/Button";
 import { SiteShell } from "@/components/layout/SiteShell";
 import { CopyEmailButton } from "@/components/support/CopyEmailButton";
-import { DonateSoon } from "@/components/support/DonateSoon";
 import { InquiryForm } from "@/components/support/InquiryForm";
-import { CONTACT_EMAIL, GIFT_PROGRAMS, SUPPORT_PATHS } from "@/lib/content";
+import { ZelleGive } from "@/components/support/ZelleGive";
+import {
+  CONTACT_EMAIL,
+  GIFT_PROGRAMS,
+  SUPPORT_PATHS,
+  ZELLE_RECIPIENT,
+} from "@/lib/content";
 
 export const metadata: Metadata = { title: "Support" };
 
@@ -29,7 +34,7 @@ export default function SupportPage() {
             className="display-xl"
             style={{ fontSize: "var(--type-display-xl)" }}
           >
-            Giving starts with a conversation.
+            Give by Zelle, or start with an email.
           </h1>
         </div>
         <div style={{ flex: "1 1 380px", display: "grid", gap: 20 }}>
@@ -41,8 +46,9 @@ export default function SupportPage() {
               color: "var(--text-body)",
             }}
           >
-            We are not accepting online payments. Email us to discuss a gift, a
-            partnership, or another way to help.
+            Send a gift by Zelle to {ZELLE_RECIPIENT}, or email us to discuss a
+            partnership or another way to help. Card checkout is not available
+            yet.
           </p>
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
             <Button href={`mailto:${CONTACT_EMAIL}`} size="lg">
@@ -130,7 +136,7 @@ export default function SupportPage() {
           }}
         >
           <InquiryForm />
-          <DonateSoon />
+          <ZelleGive />
         </div>
       </section>
 
@@ -269,8 +275,8 @@ export default function SupportPage() {
                 textWrap: "pretty",
               }}
             >
-              There is no online donation form. Every gift begins with a short
-              email and a conversation.
+              Give by Zelle for a direct gift, or email us first if you want to
+              talk through a larger gift or partnership.
             </p>
           </div>
           <ol
@@ -285,18 +291,18 @@ export default function SupportPage() {
             {[
               [
                 "1",
-                "Email us",
-                `Write to ${CONTACT_EMAIL} with your name and what you are considering.`,
+                "Zelle",
+                `Send your gift to ${ZELLE_RECIPIENT} in your bank's Zelle app. Confirm the recipient name is CLIF Foundation before sending.`,
               ],
               [
                 "2",
-                "We talk",
-                "We reply to arrange a call about your interests and the programs.",
+                "Tell us",
+                `Email ${CONTACT_EMAIL} with your name, amount, and date so we can acknowledge the gift.`,
               ],
               [
                 "3",
-                "Terms in writing",
-                "Gift purpose, timing and acknowledgment are confirmed in writing before anything is transferred.",
+                "Larger gifts",
+                "Zelle is final. For partnerships or larger gifts, email us first and we will arrange a call.",
               ],
               [
                 "4",

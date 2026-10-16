@@ -1,4 +1,6 @@
 export const CONTACT_EMAIL = "info@clificufoundation.org";
+/** Zelle recipient ID (email username registered with the bank). */
+export const ZELLE_RECIPIENT = CONTACT_EMAIL;
 export const CONSORTIUM_URL = "https://clif-icu.com/";
 export const GITHUB_URL =
   "https://github.com/Common-Longitudinal-ICU-data-Format/CLIF";
