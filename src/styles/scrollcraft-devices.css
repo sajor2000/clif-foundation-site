@@ -6,7 +6,7 @@
   --sc-surface: var(--bg-panel);
   --sc-ink: var(--text-primary);
   --sc-ink-soft: var(--text-body);
-  --sc-accent: var(--accent-fill);
+  --sc-accent: var(--accent);
   --sc-accent-ink: var(--action-primary-fg);
   --sc-font-display: var(--font-display);
   --sc-font-text: var(--font-sans);
@@ -132,7 +132,7 @@
   display: none;
   flex-direction: column;
   gap: 12px;
-  width: 68px;
+  min-width: 68px;
   padding: 12px 10px;
   border: 1px solid var(--border);
   border-radius: var(--radius-control);
@@ -157,17 +157,14 @@
 .sc-folio__item {
   display: grid;
   gap: 2px;
-  opacity: 0.55;
-  transition: opacity var(--sc-d-base) var(--sc-ease-out);
   text-decoration: none;
   color: inherit;
   min-height: 44px;
   align-content: center;
 }
 
-.sc-folio__item:hover,
-.sc-folio__item:focus-visible {
-  opacity: 1;
+.sc-folio__item:hover .sc-folio__t {
+  text-decoration: underline;
 }
 
 .sc-folio__item:focus-visible {
@@ -176,7 +173,6 @@
 }
 
 .sc-folio__item[data-current="true"] {
-  opacity: 1;
   color: var(--link);
 }
 
@@ -233,10 +229,6 @@
 
 .sc-chapter--ink .sc-intertitle {
   color: var(--signal-300);
-}
-
-.sc-intertitle__n {
-  opacity: 0.7;
 }
 
 /* Signature: federation lattice — arrows draw from --sc-p on the pin act */

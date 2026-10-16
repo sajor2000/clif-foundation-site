@@ -52,13 +52,16 @@ export function SiteHeader({ current }: { current?: string }) {
           gap: 24,
         }}
       >
-        <Lockup height={34} priority />
+        <span className="site-header-brand">
+          <Lockup height={34} priority />
+        </span>
         <nav className="site-nav-desktop" aria-label="Primary">
           {NAV_ITEMS.map((item) => (
             <Link
               key={item.id}
               href={item.href}
               aria-current={current === item.id ? "page" : undefined}
+              className="site-nav-link"
               style={{
                 textDecoration: "none",
                 whiteSpace: "nowrap",
@@ -78,11 +81,11 @@ export function SiteHeader({ current }: { current?: string }) {
           <Link
             href="/support"
             aria-current={current === "support" ? "page" : undefined}
+            className="site-nav-cta"
             style={{
               marginLeft: 14,
               textDecoration: "none",
               whiteSpace: "nowrap",
-              background: "var(--action-primary-bg)",
               color: "var(--action-primary-fg)",
               padding: "0 18px",
               height: "var(--control-md)",
@@ -116,11 +119,9 @@ export function SiteHeader({ current }: { current?: string }) {
               padding: "0 12px",
               border: "1px solid var(--border-strong)",
               borderRadius: "var(--radius-control)",
-              background: "transparent",
               color: "var(--text-primary)",
               font: "500 14px var(--font-sans)",
               cursor: "pointer",
-              display: "inline-flex",
               alignItems: "center",
               gap: 8,
               boxSizing: "border-box",
@@ -157,7 +158,6 @@ export function SiteHeader({ current }: { current?: string }) {
               padding: "0 16px",
               border: "1px solid var(--border-strong)",
               borderRadius: "var(--radius-control)",
-              background: "transparent",
               color: "var(--text-primary)",
               font: "500 15px var(--font-sans)",
               cursor: "pointer",
@@ -202,10 +202,10 @@ export function SiteHeader({ current }: { current?: string }) {
         ))}
         <Link
           href="/support"
+          className="site-nav-cta"
           style={{
             marginTop: 20,
             textDecoration: "none",
-            background: "var(--action-primary-bg)",
             color: "var(--action-primary-fg)",
             height: 52,
             display: "flex",
@@ -217,6 +217,15 @@ export function SiteHeader({ current }: { current?: string }) {
         >
           Support CLIF
         </Link>
+        <button
+          type="button"
+          className="site-menu-theme"
+          onClick={() => document.getElementById("clif-theme-toggle")?.click()}
+        >
+          <span>Theme</span>
+          <span className="clif-theme-label-light">Light</span>
+          <span className="clif-theme-label-dark">Dark</span>
+        </button>
       </nav>
     </header>
   );

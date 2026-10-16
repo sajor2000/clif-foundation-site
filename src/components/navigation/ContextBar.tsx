@@ -8,7 +8,8 @@ export function ContextBar({
   href?: string;
 }) {
   return (
-    <div
+    <aside
+      aria-label="Foundation status"
       style={{
         background: "var(--bg-inverse)",
         color: "var(--text-inverse-body)",
@@ -21,18 +22,28 @@ export function ContextBar({
         style={{
           maxWidth: "var(--content-max)",
           margin: "0 auto",
-          padding: "9px var(--gutter)",
+          padding: "0 var(--gutter)",
           display: "flex",
           flexWrap: "wrap",
-          gap: "6px 24px",
+          alignItems: "center",
+          gap: "0 24px",
           justifyContent: "space-between",
         }}
       >
-        <span>{text}</span>
-        <a href={href} style={{ color: "var(--accent-text)" }}>
+        <span style={{ padding: "9px 0" }}>{text}</span>
+        <a
+          href={href}
+          style={{
+            color: "var(--accent-text)",
+            // 44px hit area; no negative margins so it never overlaps wrapped text
+            display: "inline-flex",
+            alignItems: "center",
+            minHeight: "var(--touch-min)",
+          }}
+        >
           {linkLabel}
         </a>
       </div>
-    </div>
+    </aside>
   );
 }

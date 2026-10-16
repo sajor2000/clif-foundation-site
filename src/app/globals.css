@@ -81,11 +81,6 @@ html[data-theme="dark"] .clif-theme-label-dark {
   box-shadow: 0 0 0 5px var(--focus-ring-halo);
 }
 
-.site-menu-toggle:checked + .site-menu-btn {
-  background: var(--action-primary-bg);
-  color: var(--action-primary-fg);
-}
-
 .site-menu-toggle:checked + .site-menu-btn .site-menu-label-open {
   display: none;
 }
@@ -98,6 +93,67 @@ header:has(.site-menu-toggle:checked) .site-menu-panel {
   display: grid;
 }
 
+.site-nav-link {
+  transition: background-color var(--duration-fast) var(--ease-standard);
+}
+
+.site-nav-link:hover {
+  background: var(--bg-hover);
+}
+
+.site-nav-cta {
+  background: var(--action-primary-bg);
+  transition: background-color var(--duration-fast) var(--ease-standard);
+}
+
+.site-nav-cta:hover {
+  background: var(--action-primary-hover);
+}
+
+.clif-theme-btn {
+  display: inline-flex;
+}
+
+.clif-theme-btn,
+.site-menu-btn {
+  background: transparent;
+  transition: background-color var(--duration-fast) var(--ease-standard);
+}
+
+.clif-theme-btn:hover,
+.site-menu-btn:hover {
+  background: var(--action-secondary-hover);
+}
+
+/* Theme control inside the open menu (below 1000px, per design/readme.md) */
+.site-menu-theme {
+  margin-top: 12px;
+  min-height: var(--control-lg);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 0 16px;
+  border: 1px solid var(--action-secondary-border);
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--text-primary);
+  font: 500 var(--type-ui) var(--font-sans);
+  cursor: pointer;
+  transition: background-color var(--duration-fast) var(--ease-standard);
+}
+
+.site-menu-theme:hover {
+  background: var(--action-secondary-hover);
+}
+
+@media (min-width: 1000px) {
+  /* The menu checkbox has no visible label here; keep it out of the tab order */
+  .site-menu-toggle {
+    display: none;
+  }
+}
+
 @media (max-width: 999px) {
   .site-nav-desktop {
     display: none;
@@ -105,6 +161,23 @@ header:has(.site-menu-toggle:checked) .site-menu-panel {
 
   .site-menu-btn {
     display: inline-flex;
+  }
+
+  /* Theme toggle moves into the open menu so the header row fits narrow screens */
+  .clif-theme-toggle,
+  .clif-theme-btn {
+    display: none;
+  }
+}
+
+.site-header-brand {
+  display: inline-flex;
+  min-width: 0;
+}
+
+@media (max-width: 359px) {
+  .site-header-brand {
+    zoom: 0.8;
   }
 }
 

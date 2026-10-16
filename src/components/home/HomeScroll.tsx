@@ -241,6 +241,7 @@ export function HomeScroll() {
               paddingTop: "var(--section-y)",
               paddingBottom: "var(--section-y)",
               display: "grid",
+              gridTemplateColumns: "minmax(0, 1fr)",
               gap: 40,
             }}
           >
@@ -432,6 +433,7 @@ export function HomeScroll() {
               paddingTop: "var(--section-y)",
               paddingBottom: "clamp(72px,9vw,112px)",
               display: "grid",
+              gridTemplateColumns: "minmax(0, 1fr)",
               gap: 64,
             }}
           >
