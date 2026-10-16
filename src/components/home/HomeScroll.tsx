@@ -169,7 +169,7 @@ export function HomeScroll() {
         <section
           id="ch-federation"
           data-sc-act="pin"
-          data-sc-span="4.4"
+          data-sc-span="2.2"
           aria-labelledby="fig-fed"
         >
           <div data-sc-stage className="sc-chapter--ink">
