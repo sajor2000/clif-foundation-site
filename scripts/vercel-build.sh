@@ -17,4 +17,6 @@ if [ "${VERCEL_ENV:-}" = "production" ]; then
 fi
 
 echo "CONVEX_DEPLOY_KEY not set for ${VERCEL_ENV:-this} build; building without Convex deploy."
+# A pinned Convex URL must not point keyless previews at another deployment.
+unset NEXT_PUBLIC_CONVEX_URL
 exec npm run build
