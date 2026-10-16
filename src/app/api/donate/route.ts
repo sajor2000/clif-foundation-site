@@ -24,7 +24,8 @@ async function handle(request: Request) {
       NextResponse.json(
         {
           error: "DonationsNotConfigured",
-          message: "Online giving is not available yet",
+          message:
+            "Card checkout is not available yet. Give by Zelle to info@clificufoundation.org, then email a gift notice.",
         },
         { status: 503 },
       ),
