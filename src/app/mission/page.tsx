@@ -1,9 +1,15 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import Link from "next/link";
 import { SiteShell } from "@/components/layout/SiteShell";
 import { PRINCIPLES } from "@/lib/content";
 
-export const metadata: Metadata = { title: "Mission" };
+export const metadata: Metadata = pageMetadata({
+  title: "Mission",
+  description:
+    "Why CLIF Foundation exists: to scale adoption of the Common Longitudinal ICU data Format, an open critical care EHR data standard, beyond research.",
+  path: "/mission",
+});
 
 export default function MissionPage() {
   return (
