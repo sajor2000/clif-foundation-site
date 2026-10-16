@@ -1,19 +1,12 @@
 # CLIF Foundation website
 
-Public site for the CLIF Foundation (Illinois nonprofit; 501(c)(3) pending) plus a Clerk-gated board portal for documents. Design system lives in `design/` (reference kit). Stack: **Next.js App Router**, **TypeScript**, **Tailwind**, **Effect 4**, **Convex**, **Clerk**. Stripe checkout is stubbed as Coming soon.
+Public site for the CLIF Foundation (Illinois nonprofit; 501(c)(3) pending). Design system lives in `design/` (reference kit). Stack: **Next.js App Router**, **TypeScript**, **Tailwind**, **Effect 4**. Stripe checkout is stubbed as Coming soon.
 
 ## Local development
 
 ```bash
 npm install
-cp .env.example .env.local
-# Optional: fill Clerk / Convex keys. Public pages run without them.
-
-# Terminal 1 — Convex (agent/cloud: anonymous mode)
-CONVEX_AGENT_MODE=anonymous npx convex dev
-
-# Terminal 2 — Next.js on port 43127
-npm run dev
+npm run dev   # Next.js on port 43127
 ```
 
 Open [http://127.0.0.1:43127](http://127.0.0.1:43127).
@@ -25,76 +18,35 @@ Open [http://127.0.0.1:43127](http://127.0.0.1:43127).
 | `npm run dev` | Next.js dev server on **43127** |
 | `npm run build` | Production build (`next build`) |
 | `npm run start` | Start production server on 43127 |
-| `npm run convex:dev` | `CONVEX_AGENT_MODE=anonymous npx convex dev` |
 
 ### Env checklist
 
-See `.env.example`. Minimum for a full local stack:
+See `.env.example`. The public site needs no variables.
 
-- `NEXT_PUBLIC_CONVEX_URL` — from Convex CLI
-- `CLERK_JWT_ISSUER_DOMAIN` — Clerk Frontend API URL (Convex dashboard + `convex/auth.config.ts`)
-- `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY` — board portal
-- `STRIPE_SECRET_KEY` — omit until bank + Stripe Nonprofit exist (UI stays Coming soon)
-
-Without Clerk/Stripe keys the public site still works; `/portal` shows a configure-env message; `/api/donate` returns **503** with “Online giving — coming soon”.
+- `STRIPE_SECRET_KEY` — omit until bank + Stripe Nonprofit exist (UI stays Coming soon; `/api/donate` returns **503**)
 
 ## Routes
 
 | Route | Auth |
 |-------|------|
 | `/`, `/mission`, `/our-work`, `/research`, `/board`, `/support` | Public |
-| `/portal` | Clerk-protected board documents |
-| `/portal/sign-in` | Clerk sign-in (not linked from public nav) |
 | `/api/donate` | Public stub → 503 Coming soon |
 
 ## Effect 4
 
-Workflow helpers use **effect@4.0.2** (Effect 4 APIs: `Effect.gen`, `Data.TaggedError`, `Schema.decodeUnknownEffect`, `Effect.runPromiseExit`, `Cause.squash`). Kept **out of** Convex UDF bodies.
+Workflow helpers use **effect@4.0.2** (Effect 4 APIs: `Effect.gen`, `Data.TaggedError`, `Schema.decodeUnknownEffect`, `Effect.runPromiseExit`, `Cause.squash`).
 
 | Module | Program | Used by |
 |--------|---------|---------|
-| `src/lib/effect/documents.ts` | `validateDocumentMeta` | Portal upload pipeline |
-| `src/lib/effect/upload.ts` | `uploadDocumentProgram` | `/portal` client upload (validate → URL → POST → save) |
 | `src/lib/effect/donations.ts` | `createDonationSession` | `/api/donate` → `DonationsNotConfigured` / 503 |
 | `src/lib/effect/inquiry.ts` | `validateInquiry` | `/api/inquiry` → mailto draft |
 | `src/lib/effect/http.ts` | `exitToJsonResponse` | Route Handler Exit → HTTP mapping |
 
-## Deploy on Vercel + Convex
+## Deploy on Vercel
 
-Repo is wired for the [Convex + Vercel](https://docs.convex.dev/production/hosting/vercel) pattern. `vercel.ts` sets the build command to deploy Convex functions, then run `next build` with `NEXT_PUBLIC_CONVEX_URL` injected.
+The Vercel project builds with `npm run build` (see `vercel.ts`). Push to `main` for production; pull requests get preview deployments. No environment variables are required.
 
-### One-time setup
-
-1. **GitHub** — this repo: https://github.com/sajor2000/clif-foundation-site
-2. **Convex cloud project** (not anonymous local):
-   ```bash
-   npx convex login
-   npx convex dev   # link/create the cloud project (omit CONVEX_AGENT_MODE)
-   ```
-   Then in the Convex dashboard on the **production** deployment:
-   - Set env `CLERK_JWT_ISSUER_DOMAIN` (Clerk Frontend API URL)
-   - Generate a **Production** deploy key (`deployment:deploy`)
-   - Generate a **Preview** deploy key if you want preview backends
-3. **Vercel** — Import the GitHub repo (Framework: Next.js). Confirm build command matches `vercel.ts`:
-   ```bash
-   npx convex deploy --cmd 'npm run build' --cmd-url-env-var-name NEXT_PUBLIC_CONVEX_URL
-   ```
-4. **Vercel environment variables**
-
-   | Variable | Environments | Notes |
-   |----------|--------------|--------|
-   | `CONVEX_DEPLOY_KEY` | Production | Production deploy key from Convex |
-   | `CONVEX_DEPLOY_KEY` | Preview | Preview deploy key (separate value) |
-   | `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | Production + Preview | Board portal |
-   | `CLERK_SECRET_KEY` | Production + Preview | Board portal |
-   | `NEXT_PUBLIC_CLERK_SIGN_IN_URL` | Production + Preview | `/portal/sign-in` |
-   | `STRIPE_*` | later | Omit until Nonprofit Stripe exists |
-
-   Do **not** set `CONVEX_AGENT_MODE` on Vercel. `NEXT_PUBLIC_CONVEX_URL` is set for the build by `convex deploy --cmd` when `CONVEX_DEPLOY_KEY` is present; you may also pin it in Vercel if you prefer.
-5. **Clerk** — add the Vercel production (and preview) URLs to allowed origins / redirect URLs; sign-in path stays `/portal/sign-in`.
-6. Deploy — push to `main` for production, or open a PR for preview. Optional: custom domain after the first green deploy.
-
-Local development still uses `CONVEX_AGENT_MODE=anonymous npx convex dev` + `npm run dev` (see above). Use `npx convex deploy` only against the cloud production/preview backends.
+A board document portal (Clerk + Convex) was removed in October 2026 to keep the site static; it is recoverable from git history if needed.
 
 ## Design
 

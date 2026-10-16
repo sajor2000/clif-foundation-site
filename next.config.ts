@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
-// Baseline hardening that cannot block Clerk, Convex, or the inline theme
-// script. A full script/connect allowlist CSP should ship report-only first.
+// Baseline hardening that cannot block the inline theme script. A full
+// script/connect allowlist CSP should ship report-only first.
 const securityHeaders = [
   {
     key: "Content-Security-Policy",

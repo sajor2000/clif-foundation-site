@@ -70,7 +70,6 @@ clif-foundation-site.bundle
 .bundle-commit
 DOWNLOAD-README.txt
 
-.env.convex.vercel
 
 # scroll-craft local clone / lab artifacts
 .tmp-scroll-craft/
