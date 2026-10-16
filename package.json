@@ -12,7 +12,7 @@
     "lint": "eslint",
     "convex:dev": "CONVEX_AGENT_MODE=anonymous npx convex dev",
     "convex:deploy": "npx convex deploy",
-    "build:vercel": "npx convex deploy --cmd 'npm run build' --cmd-url-env-var-name NEXT_PUBLIC_CONVEX_URL"
+    "build:vercel": "if [ -n \"$CONVEX_DEPLOY_KEY\" ]; then npx convex deploy --cmd 'npm run build' --cmd-url-env-var-name NEXT_PUBLIC_CONVEX_URL; else npm run build; fi"
   },
   "dependencies": {
     "@clerk/nextjs": "7.9.14",

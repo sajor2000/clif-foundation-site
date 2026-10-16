@@ -76,16 +76,13 @@ Repo is wired for the [Convex + Vercel](https://docs.convex.dev/production/hosti
    - Set env `CLERK_JWT_ISSUER_DOMAIN` (Clerk Frontend API URL)
    - Generate a **Production** deploy key (`deployment:deploy`)
    - Generate a **Preview** deploy key if you want preview backends
-3. **Vercel** — Import the GitHub repo (Framework: Next.js). Confirm build command matches `vercel.ts`:
-   ```bash
-   npx convex deploy --cmd 'npm run build' --cmd-url-env-var-name NEXT_PUBLIC_CONVEX_URL
-   ```
+3. **Vercel** — Import the GitHub repo (Framework: Next.js). Confirm build command matches `vercel.ts` (runs `convex deploy` when `CONVEX_DEPLOY_KEY` is set, otherwise `npm run build`).
 4. **Vercel environment variables**
 
    | Variable | Environments | Notes |
    |----------|--------------|--------|
-   | `CONVEX_DEPLOY_KEY` | Production | Production deploy key from Convex |
-   | `CONVEX_DEPLOY_KEY` | Preview | Preview deploy key (separate value) |
+   | `CONVEX_DEPLOY_KEY` | Production | Production deploy key from Convex. Required for board portal backend. |
+   | `CONVEX_DEPLOY_KEY` | Preview | Preview deploy key (separate value). Optional; without it Preview still builds the public site. |
    | `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | Production + Preview | Board portal |
    | `CLERK_SECRET_KEY` | Production + Preview | Board portal |
    | `NEXT_PUBLIC_CLERK_SIGN_IN_URL` | Production + Preview | `/portal/sign-in` |
