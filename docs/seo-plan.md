@@ -10,9 +10,7 @@ This plan is bound by `PRODUCT.md` and `DESIGN.md`:
 - Never invent partnerships, impact statistics, biographies or funding.
 - The Foundation is distinct from the CLIF Consortium (<https://clif-icu.com/>).
   Research and the specification belong to the Consortium.
-- Describe CLIF's relationship to OMOP and PCORnet only as the sources below
-  support it. Do not state or imply endorsement by, or affiliation with, OHDSI
-  or PCORnet.
+- Out of scope: no OMOP/PCORnet association (owner decision 2026-10-16).
 
 ## What the technical PR ships
 
@@ -101,63 +99,13 @@ appear only where the existing copy already says them naturally.
 | `/research` | federated ICU research; CLIF publications | critical care EHR research; multicenter ICU data | Informational | Credit Consortium and investigators; link out |
 | `/board` | CLIF Foundation board | — | Navigational / trust | E-E-A-T: real people, real roles (already present) |
 | `/support` | donate critical care data science nonprofit; support CLIF | ICU research nonprofit giving | Transactional | Must say "501(c)(3) application pending"; never "tax-deductible" |
-| Proposed `/clif-and-other-data-models` (see c) | CLIF vs OMOP; CLIF OMOP mapping; ICU common data model | EHR common data model critical care; OMOP ICU data; PCORnet CDM ICU | Informational | Highest-upside new page; factual only |
 
 ## (c) Content plan
 
-### C1. Proposed page: "CLIF and other common data models"
+### C1. Improvements to existing pages (proposals)
 
-Path suggestion: `/clif-and-other-data-models` (or a section on `/mission`).
-Every sentence must trace to a source below. Draft outline — **proposal, not
-shipped in this PR**:
-
-1. **What CLIF is.** An open-source data format that harmonizes a minimum set
-   of common ICU data elements (mCIDE) from EHR data for critical illness
-   research, released under Apache 2.0, maintained by the CLIF Consortium.
-   [S1, S3]
-2. **CLIF and OMOP.** The OMOP Common Data Model, stewarded by the OHDSI
-   community, standardizes the structure and content of observational data
-   across the whole EHR [S5]. The CLIF authors describe CLIF as "designed to
-   complement, not compete with, the OMOP Common Data Model" and as "intended
-   to complement existing CDMs" [S2, S1]. They note that OMOP can represent
-   ICU elements such as ventilator settings and infusion titrations, but these
-   are captured inconsistently and often without granularity, and that OMOP
-   lacks standard concepts for many ICU data elements [S1, S2]. Aligning CLIF
-   with OMOP is described as a next step, and the authors "envision a
-   generalizable pipeline from OMOP to CLIF" — **this is a stated direction,
-   not a released tool**; the page must say so [S1, S2].
-3. **Terminologies.** CLIF keeps site source values next to standardized
-   `_category` fields (similar in spirit to OMOP's `source_value` /
-   `concept_id`) and has begun mapping elements to LOINC (labs) and RxNorm
-   (medications) [S1, S2].
-4. **CLIF and PCORnet.** The PCORnet Common Data Model is a separate CDM
-   maintained by PCORnet for its distributed research network [S6].
-   **No CLIF publication, Consortium page or GitHub document reviewed for this
-   plan describes a CLIF–PCORnet mapping or relationship.** The page may
-   explain, factually, that PCORnet and OMOP are broad EHR CDMs while CLIF is
-   ICU-specific, but must not claim a mapping, crosswalk, compatibility or
-   collaboration with PCORnet unless the Consortium publishes one. Ask the
-   Consortium before publishing any PCORnet sentence beyond a neutral
-   definition.
-5. **Other bridges that exist today.** MIMIC-IV in CLIF format on PhysioNet
-   [S4]; Consortium pipelines listed on GitHub include CLIF-MIMIC and
-   CLIF-MEDS [S3]; FHIR integration is described as a direction [S1].
-6. **Where to go next.** Link to clif-icu.com (CLIF 101, data dictionary, ETL
-   guide) with ↗, and to the papers.
-
-Suggested title: "CLIF and other common data models (OMOP, PCORnet)".
-Suggested description: "How the Common Longitudinal ICU data Format relates to
-broader EHR common data models such as OMOP and PCORnet, according to the CLIF
-Consortium's published work."
-
-Review gate: a Consortium investigator should read the page before it ships.
-
-### C2. Smaller improvements to existing pages (proposals)
-
-- `/mission`: the existing sentence on "terminology mapping" could link to the
-  C1 page.
 - `/research`: add a short "Data access" line pointing to MIMIC-IV-Ext-CLIF on
-  PhysioNet [S4] — a real, citable resource that searchers for "ICU dataset"
+  PhysioNet [S1] — a real, citable resource that searchers for "ICU dataset"
   look for.
 - Add `last updated` dates to publication lists to give crawlers freshness
   signals (only real dates).
@@ -166,26 +114,9 @@ Review gate: a Consortium investigator should read the page before it ships.
 
 ### Sources
 
-- [S1] CLIF Consortium investigators. "A common longitudinal intensive care unit data format
-  (CLIF) for critical illness research." *Intensive Care Medicine* 2025.
-  <https://link.springer.com/article/10.1007/s00134-025-07848-7>; open
-  access: <https://pmc.ncbi.nlm.nih.gov/articles/PMC12167506/>
-- [S2] Author's reply to correspondence on the CLIF paper, *Intensive Care
-  Medicine* 2025. <https://pmc.ncbi.nlm.nih.gov/articles/PMC12617075/>
-  ("CLIF is designed to complement, not compete with, the OMOP Common Data
-  Model. We envision a generalizable pipeline from OMOP to CLIF…")
-- [S3] CLIF GitHub organization.
-  <https://github.com/Common-Longitudinal-ICU-data-Format>
-- [S4] MIMIC-IV-Ext-CLIF on PhysioNet.
+- [S1] MIMIC-IV-Ext-CLIF on PhysioNet.
   <https://physionet.org/content/mimic-iv-ext-clif/>
-- [S5] OMOP Common Data Model (OHDSI). <https://ohdsi.github.io/CommonDataModel/>
-- [S6] PCORnet Common Data Model.
-  <https://pcornet.org/data/> (specification v7.0, May 2025:
-  <https://pcornet.org/wp-content/uploads/2025/05/PCORnet_Common_Data_Model_v70_2025_05_01.pdf>)
-- [S7] CLIF Consortium site. <https://clif-icu.com/>
-
-Cite S1 with its full author list from the journal page when quoting it on
-the site.
+- [S2] CLIF Consortium site. <https://clif-icu.com/>
 
 ## (d) Off-site and backlink plan (honest only)
 
@@ -203,7 +134,7 @@ the site.
 | Conference talks / grand rounds that mention the Foundation | Directors | Ongoing | Ask hosts to link to the site on event pages |
 
 Avoid: paid links, link exchanges, directory spam, guest posts written for
-links, and any wording that implies OHDSI or PCORnet endorsement.
+links, and any wording that implies endorsement by other organizations.
 
 ## (e) Measurement
 
@@ -236,8 +167,6 @@ links, and any wording that implies OHDSI or PCORnet endorsement.
 
 **Day 31–60**
 
-- [ ] Draft the "CLIF and other common data models" page from section C1;
-      Consortium review; ship.
 - [ ] Enable Vercel Web Analytics (separate PR).
 - [ ] Create Candid profile.
 - [ ] Review Search Console queries; adjust descriptions (not body copy) if
