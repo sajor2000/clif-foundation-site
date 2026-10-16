@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { AppProviders } from "@/components/providers/AppProviders";
 import { funnelDisplay, funnelSans, splineMono } from "@/lib/fonts";
 import { SITE_URL } from "@/lib/site";
 import "./globals.css";
@@ -27,7 +26,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <script dangerouslySetInnerHTML={{ __html: themeBoot }} />
       </head>
       <body className="min-h-full antialiased">
-        <AppProviders>{children}</AppProviders>
+        {children}
       </body>
     </html>
   );

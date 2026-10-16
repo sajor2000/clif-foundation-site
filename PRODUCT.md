@@ -10,8 +10,6 @@ web
 
 Primary: clinicians, researchers, hospital data teams, and funders evaluating open infrastructure for critical care data — especially people who already know CLIF (Common Longitudinal ICU data Format) or the CLIF Consortium and want a clear, factual home for the Foundation’s programs and giving path.
 
-Secondary: Foundation board members who need a private document portal (not linked from public navigation).
-
 ## Product Purpose
 
 The CLIF Foundation site explains who the Foundation is, what it proposes to fund or support around CLIF adoption, how research is credited to the Consortium, and how to start a gift conversation. Success means visitors leave with accurate legal/status language, a clear distinction from the Consortium, and a low-friction inquiry path — without inventing impact stats, bios, or tax-deductibility claims.
@@ -23,13 +21,12 @@ Distinct from the CLIF Consortium (clif-icu.com): the Consortium owns the specif
 ## Operating Context
 
 - Public marketing site: Home, Mission, Our Work, Research & Resources, Board & Governance, Support.
-- Board portal at `/portal/*` (Clerk-gated, bookmark-only; not in public nav).
 - Giving today: email inquiry to `info@clificufoundation.org`. Online checkout is Coming soon until bank + Stripe Nonprofit exist.
 - Design authority lives in `design/` (tokens + kit) and is ported into `src/styles/` and `src/components/`.
 
 ## Capabilities and Constraints
 
-- Stack: Next.js App Router, TypeScript, Tailwind, Effect 4, Convex, Clerk; Stripe stubbed.
+- Stack: Next.js App Router, TypeScript, Tailwind, Effect 4; Stripe stubbed. No backend database.
 - Legal status (confirmed): Illinois nonprofit corporation, EIN issued, 501(c)(3) application pending. Never claim tax-exempt status or deductibility until an IRS determination letter is posted.
 - Programs, board directors, and officer roles are published as current. Do not revive “proposed” labeling for them.
 - Do not invent biographies, partnerships, funding commitments, or impact statistics.
@@ -47,7 +44,7 @@ Distinct from the CLIF Consortium (clif-icu.com): the Consortium owns the specif
 ## Evidence on Hand
 
 - `design/` — approved design kit, tokens, component prompts, and prototype HTML.
-- `src/app/*` — six public pages + portal implemented from that kit.
+- `src/app/*` — six public pages implemented from that kit.
 - Consortium reference site: https://clif-icu.com/ (content/publications/logos; logos hot-linked, not copied).
 - Contact: `info@clificufoundation.org`.
 - No customer testimonials or quantified impact studies on hand — do not fabricate them.

@@ -9,14 +9,9 @@
     "dev": "next dev --hostname 0.0.0.0 --port 43127",
     "build": "next build",
     "start": "next start --hostname 0.0.0.0 --port 43127",
-    "lint": "eslint",
-    "convex:dev": "CONVEX_AGENT_MODE=anonymous npx convex dev",
-    "convex:deploy": "npx convex deploy",
-    "build:vercel": "npx convex deploy --cmd 'npm run build' --cmd-url-env-var-name NEXT_PUBLIC_CONVEX_URL"
+    "lint": "eslint"
   },
   "dependencies": {
-    "@clerk/nextjs": "7.9.14",
-    "convex": "1.46.0",
     "effect": "4.0.2",
     "next": "16.4.0",
     "react": "19.3.0",
