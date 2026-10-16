@@ -20,7 +20,7 @@ This plan is bound by `PRODUCT.md` and `DESIGN.md`:
 | Canonical URLs | `alternates.canonical` per page, resolved against `metadataBase` |
 | Open Graph + Twitter | `og:title/description/url/type/site_name/image`, `twitter:card=summary_large_image` |
 | Default share image | `src/app/opengraph-image.tsx` (next/og, prerendered at build). Ink ground, Funnel Display + Spline Sans Mono, mint accent, 1px rule, no gradients. Fonts are OFL, vendored in `src/assets/og/` with their licences |
-| Structured data | `NonprofitOrganization` JSON-LD in the root layout: name, url, logo, email, contact point, Illinois address region, `knowsAbout`. No `nonprofitStatus`, no `sameAs` (see below) |
+| Structured data | `Organization` JSON-LD in the root layout: name, url, logo, email, contact point, Illinois address region, `knowsAbout`. No `nonprofitStatus`, no `sameAs` (see below) |
 | Already present | `metadataBase`, `robots.ts`, `sitemap.ts`, security headers, title template |
 
 Why no `sameAs`: clif-icu.com and the GitHub organization
@@ -58,7 +58,11 @@ updates the site copy.
 7. **URL inspection** → inspect each of the six URLs below → **Request
    indexing** (the daily quota is small; do the home page first):
    - `https://www.clificufoundation.org/`
-   - `/mission`, `/our-work`, `/research`, `/board`, `/support`
+   - `https://www.clificufoundation.org/mission`
+   - `https://www.clificufoundation.org/our-work`
+   - `https://www.clificufoundation.org/research`
+   - `https://www.clificufoundation.org/board`
+   - `https://www.clificufoundation.org/support`
 8. In URL inspection, confirm "User-declared canonical" equals "Google-selected
    canonical" and that the page is "URL is on Google" within 1–2 weeks.
 9. Settings → Users and permissions: add a second owner.
@@ -77,7 +81,7 @@ updates the site copy.
 ### Post-deploy checks (after this PR merges)
 
 - <https://search.google.com/test/rich-results> and
-  <https://validator.schema.org/> on the home page: the `NonprofitOrganization`
+  <https://validator.schema.org/> on the home page: the `Organization`
   block should parse with no errors.
 - Share-card preview: paste a URL into LinkedIn Post Inspector
   (<https://www.linkedin.com/post-inspector/>) and confirm the image appears.

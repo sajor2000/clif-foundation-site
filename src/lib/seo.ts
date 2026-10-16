@@ -66,7 +66,7 @@ export function pageMetadata({
  */
 export const ORGANIZATION_JSON_LD = {
   "@context": "https://schema.org",
-  "@type": "NonprofitOrganization",
+  "@type": "Organization",
   "@id": `${SITE_URL}/#organization`,
   name: SITE_NAME,
   url: SITE_URL,
