@@ -1,248 +1,290 @@
 ---
-title: Private board portal
+title: Private board portal (hardened)
 type: feat
 status: active
 date: 2026-10-17
-origin: user-request (Clerk login, minutes, voting, nonprofit compliance)
+deepened: 2026-10-17
+origin: user-request (Clerk login, minutes, voting, nonprofit compliance, reporting UX)
 ---
 
-# Private board portal
+# Private board portal — hardened implementation plan
+
+LLM-executable plan (Matt **make-plan** phases + ce-plan structure). Code for Units 1–6 already landed on branch `cursor/private-board-portal-compliance-plan-ee69`; this document is the **source of truth** for what shipped, what to harden next, and how to verify without inventing APIs.
+
+---
 
 ## Summary
 
-Reintroduce a Clerk-gated **`/portal`** (Clerk + Convex, recoverable from git before [`68dfcbe`](https://github.com/sajor2000/clif-foundation-site/commit/68dfcbe)) and extend it into an **Illinois nonprofit governance workspace**: auditable meeting minutes, motions and votes, and **paperwork-aligned** features that support Form 990 disclosures, Illinois Not-for-Profit Corporation Act recordkeeping, and the five governance policies the [National Council of Nonprofits](https://www.councilofnonprofits.org/running-nonprofit/governance-leadership/good-governance-policies-nonprofits) ties to Form 990 Part VI.
+Ship a Clerk-gated **`/portal`** on Convex for CLIF Foundation board governance: documents, meetings/minutes, motions/votes, Form 990–aligned compliance, and a **Reporting pack** so directors can pull tax/policy/financial files for CPA and filing prep in one place. Public marketing pages stay usable without portal env keys.
 
-The public marketing site stays static when env keys are absent. Portal routes remain **noindex** and unlinked from public nav.
+**Current state (2026-10-17):** Core portal + reporting UI + Convex schema are implemented. Hardening phases (H1–H5) close gaps: allowlist admin UI, ZIP audit export, auth helpers (`useConvexAuth`), detail routes, e2e, deploy wiring.
 
 ---
 
 ## Problem frame
 
-| Need | Why (regulatory / fiduciary) |
+| Pain | Why it matters |
 | --- | --- |
-| **Private access** | Governance materials (bylaws, applications, financials, contracts) are not public website content. |
-| **Clerk login** | Named identity for audit trails (who uploaded, who voted, who certified minutes) without custom auth. |
-| **Meeting minutes** | Illinois requires **correct and complete** minutes of board (and committee) proceedings ([805 ILCS 105/108.20](https://www.ilga.gov/legislation/ILCS/details?ActID=2280)); IRS and reviewers expect **contemporaneous** minutes (typically within 60 days or before the next board meeting). Dissents/abstentions should appear in minutes ([805 ILCS 105/108.20(b)](https://www.ilga.gov/legislation/ILCS/details?ActID=2280)). |
-| **Voting & quorum** | Director assent is presumed unless dissent is recorded; written consent can substitute for a meeting when bylaws allow ([805 ILCS 105/108.45](https://www.venable.com/insights/publications/2009/09/illinois-updates-its-not-for-profit-corporation-ac)). |
-| **Form 990 alignment** | Part VI asks publicly whether the org has COI, whistleblower, and document retention policies—and whether the **full board reviewed the 990 before filing**. Minutes should substantiate “yes” answers ([IRS Form 990 instructions](https://www.irs.gov/pub/irs-pdf/i990.pdf), [Council of Nonprofits governance guide](https://www.councilofnonprofits.org/running-nonprofit/governance-leadership/good-governance-policies-nonprofits)). |
-| **Policy enforcement evidence** | A COI policy on paper is insufficient; **annual disclosures**, recusals, and compensation deliberations must appear in minutes ([Form 990 compliance practice](https://minutesmith.com/blog/nonprofit-board-minutes-990-compliance)). |
-
-**Baseline code:** git parent of removal `68dfcbe^` — `convex/schema.ts` (`documents`, `boardMembers`), `requireBoardIdentity`, `/portal`, document upload via Convex storage + Effect upload program.
+| Governance files live in email/Drive | No audit trail; hard for Form 990 / CPA requests |
+| Minutes and votes informal | Illinois requires minutes; IRS expects contemporaneous records |
+| Policy “yes” on Form 990 without evidence | Donors/regulators expect COI disclosures + adoption votes in minutes |
+| Board members struggle to find the right PDF | Reporting must be **one click**, grouped by purpose |
 
 ---
 
-## Regulatory feature map (what the portal must support)
+## Requirements (traceability)
 
-Features below are **product capabilities**, not legal advice. Counsel and the board should approve policies and retention schedules.
-
-### A. Corporate records (Illinois + general)
-
-| Feature | Portal capability | Primary source |
+| ID | Requirement | Status |
 | --- | --- | --- |
-| Board minutes retention | **Permanent** retention class for approved minutes; no hard-delete | [Council of Nonprofits — document retention](https://www.councilofnonprofits.org/running-nonprofit/governance-leadership/document-retention-policies-nonprofits) |
-| Meeting attendance | Roster per meeting; **quorum met** flag (directors present vs required) | 805 ILCS 105; bylaws quorum |
-| Contemporaneous minutes | `draft` → `published_for_review` → `approved` with timestamps; optional **certification** by secretary | IRS governance expectations; MinuteSmith 990 guide |
-| Dissent / abstention | Per-agenda-item or per-motion: record `assent` / `dissent` / `abstain` / `not_present` in minutes export | 805 ILCS 105/108.20(b) |
-| Action without meeting | **Written consent** workflow: all directors sign (or vote asynchronously) before effective date | 805 ILCS 105/108.45 |
-| Committee minutes | `meetings.committeeId` optional; same minutes pipeline for committees with board-delegated authority | Form 990 Part VI line 8 (minutes of committees acting for the board) |
-| Member register (if applicable) | If org has voting members: store names/addresses per IL recordkeeping (v1: **defer** unless bylaws require) | 805 ILCS 105/108.20(a) |
+| R1 | Unauthenticated users cannot access portal data (middleware + Convex) | Shipped (harden: `useConvexAuth`) |
+| R2 | Email allowlist when `boardMembers` nonempty | Backend shipped; **admin UI missing** |
+| R3 | Document library with tax/policy/financial/legal/meeting categories + retention | Shipped |
+| R4 | Meetings + attendance + quorum | Shipped (list UI; no `[id]` route) |
+| R5 | Minutes draft → review → approved; export | Shipped (markdown; PDF optional later) |
+| R6 | Motions + ballots; server tallies | Shipped |
+| R7 | Written consent motions (all directors must vote yes) | Schema + tally shipped |
+| R8 | Annual COI disclosure | Shipped |
+| R9 | Policy registry | Shipped |
+| R10 | Retention + legal hold (no auto-delete) | Fields + setHold shipped; archive guard incomplete |
+| R11 | Form 990 board-review record | Shipped |
+| R12 | Minutes export suitable for reporting | Partial (markdown; expand fields) |
+| R13 | Portal noindex; public build without keys | Shipped |
+| R14 | PRODUCT.md / README document portal | Shipped |
+| R15 | **Reporting pack** — grouped downloads + manifest | Shipped |
+| R16 | **ZIP/date-range audit export** for CPA | **Not shipped** |
+| R17 | Portal e2e / Convex tests for T1–T6 | **Not shipped** |
+| R18 | Production Convex+Clerk+Vercel deploy path | Partial (docs; no `vercel-build.sh`) |
 
-### B. Form 990 Part VI — policies & practices
+**Actors:** A1 Director (member), A2 Secretary, A3 Chair, A4 Admin, A5 CPA (receives exports only).
 
-| Form 990 topic | Portal feature | Notes |
-| --- | --- | --- |
-| **Line 12 — Conflict of interest** | **Policy registry** + **annual COI disclosure** form (structured questionnaire) + link disclosures to user/year | Recusals on related motions auto-flagged; minutes template section for COI discussions |
-| **Line 13 — Whistleblower** | Policy document type + board **adoption motion** + effective date | Reporting channel text stored in policy metadata (not public) |
-| **Line 14 — Document retention** | **Retention schedule** on every stored document (`permanent`, `7y`, `3y`, etc.) + **legal hold** flag suspending destruction | Matches org’s written retention policy |
-| **Line 11 — 990 review** | **Annual filing checklist**: draft 990 uploaded, board review meeting linked, “reviewed before file” attestation logged | Does not file 990—stores PDF + audit trail |
-| **Line 15 — Executive compensation** | **Compensation review packet** (optional v1): comparability notes attachment + disinterested-director vote | Only if ED/officer comp is set by board |
-| **Gift acceptance** | Document category `gift_acceptance` + policy adoption; log **non-cash / unusual gifts** as structured records | Council of Nonprofits fifth policy |
-| **Public inspection** | Document library folders: **Determination letter**, **Form 1023**, **last 3 Form 990s** (PDF), available to board; public copy workflow **deferred** (may stay on website when 501(c)(3) confirmed) | IRS public inspection rules |
-
-### C. Operational compliance (portal UX)
-
-| Feature | Description |
-| --- | --- |
-| **Compliance dashboard** | `/portal/compliance` — checklist by tax year: COI disclosures % complete, policies adopted?, 990 review status, minutes gaps (scheduled meetings without approved minutes) |
-| **Audit export** | ZIP or PDF bundle: approved minutes + motion results + COI disclosures for a date range (for CPA, legal, or IRS request) |
-| **Immutable approved records** | Approved minutes and closed votes **append-only**; corrections via new version row with reason |
-| **Activity log** | `auditEvents` table: policy published, vote opened/closed, document classified, retention hold set (actor + timestamp) |
-| **Role gates** | `secretary` — minutes draft/publish; `chair` — adjourn meeting, certify quorum; `admin` — retention/legal hold; `member` — vote/disclose |
-
----
-
-## Requirements
-
-- **R1.** Unauthenticated users cannot access `/portal` (Clerk middleware + Convex auth).
-- **R2.** Email allowlist in `boardMembers` when ≥1 row exists; seed from `src/data/board-members.json` where email present.
-- **R3.** Document library with categories: `governance`, `legal`, `meeting`, `policy`, `tax`, `financial`, `other` (extend removed portal).
-- **R4.** Meetings: schedule, hold, cancel; attendance roster; quorum calculation per bylaws config.
-- **R5.** Minutes lifecycle: draft → published_for_review → approved; optional PDF attachment; certification metadata.
-- **R6.** Motions and ballots: yes / no / abstain / recuse; server-side tallies; voting board UI.
-- **R7.** **Written consent** path for motions marked `consent_in_lieu_of_meeting` (all directors must ballot yes).
-- **R8.** **Annual COI disclosure** per board member per calendar year; store answers + timestamp; secretary can mark complete.
-- **R9.** **Policy registry**: type (COI, whistleblower, retention, gift acceptance), version, storage link, adoption motion id.
-- **R10.** **Retention metadata** on documents and minutes versions; **legal hold** blocks destructive actions (v1: no auto-delete—hold is preparatory).
-- **R11.** **Form 990 review** record per year: upload draft/final PDF, link board meeting, boolean `boardReviewedBeforeFiled` + who/when.
-- **R12.** Minutes export includes attendance, quorum, motions, vote counts, COI recusals, dissents (template-driven).
-- **R13.** Portal noindex; omitted from sitemap; public site builds without Clerk/Convex keys.
-- **R14.** Update `PRODUCT.md` and `README.md` for portal + compliance scope (501(c)(3) still **pending** in public copy).
+**Key flows:** F1 Sign-in → Reporting pack download; F2 Upload tax PDF → appears in Reporting pack; F3 Meeting → minutes approve → export; F4 Open motion → ballot → close; F5 Annual COI; F6 Mark 990 reviewed.
 
 ---
 
 ## Scope boundaries
 
-- Not legal, tax, or accounting advice; templates are starting points for board/counsel review.
-- No IRS e-file, Illinois AG Charitable Trust Act registration, or state annual report filing inside the portal (track **due dates** only as optional reminders in v2).
-- No DocuSign; written consent uses in-portal ballots + downloadable consent PDF for wet signature if required.
-- No whistleblower **submission intake** (hotline form) in v1—store policy + reporting instructions only.
-- No automated document destruction jobs in v1 (retention labels + holds only).
-
-**Deferred:** email notifications; Clerk Organizations; public 990 web page; integration with Dropbox/Google Drive for counsel (MCP-assisted **manual** upload remains v1).
+- Not legal/tax advice; not IRS e-file or Illinois AG filing.
+- No DocuSign; no whistleblower intake form (policy text only).
+- No auto document destruction.
+- Deferred: email notifications, Clerk Organizations, public 990 webpage.
 
 ---
 
-## Context and research (MCP / external)
+## Phase 0: Documentation discovery (Allowed APIs)
 
-| Source | Use in plan |
+### Sources consulted (MCP + local)
+
+| Source | Finding |
 | --- | --- |
-| [Tavily → Council of Nonprofits — good governance policies](https://www.councilofnonprofits.org/running-nonprofit/governance-leadership/good-governance-policies-nonprofits) | Five policies + board practices checklist |
-| [Tavily → Council of Nonprofits — document retention](https://www.councilofnonprofits.org/running-nonprofit/governance-leadership/document-retention-policies-nonprofits) | Permanent vs timed retention classes |
-| [Tavily → IRS Form 990 instructions (PDF)](https://www.irs.gov/pub/irs-pdf/i990.pdf) | Lines 11–15, whistleblower/retention definitions |
-| [Tavily → Illinois Not-for-Profit Corporation Act (minutes, consent)](https://www.ilga.gov/legislation/ILCS/details?ActID=2280) | Minutes, dissent, written consent |
-| Git `68dfcbe^` | Clerk + Convex portal patterns |
-| Notion search (2026-10-17) | No CLIF Foundation portal plan found; grant/Foundation notes unrelated to this product |
+| [Convex & Clerk](https://docs.convex.dev/auth/clerk) (Tavily extract) | `auth.config.ts` with `domain: process.env.CLERK_JWT_ISSUER_DOMAIN`, `applicationID: "convex"`; set issuer on **Convex dashboard** (not only `.env`); `ConvexProviderWithClerk` + `useAuth` from `@clerk/nextjs`; prefer **`useConvexAuth()`** over Clerk `useAuth()` for “is authenticated for Convex” |
+| [Clerk × Convex](https://clerk.com/docs/guides/development/integrations/databases/convex) | Activate Convex integration in Clerk Dashboard; ClerkProvider wraps Convex provider; production Frontend API URL on Convex prod deploy |
+| Explore agent (repo) | Key paths listed below; gaps: allowlist UI, ZIP, e2e, `convex.json`, detail routes |
+| Git `68dfcbe^` | Original portal patterns (middleware protect, document upload Effect pipeline) |
+| `AGENTS.md` / Next 16 | Read `node_modules/next/dist/docs/` before middleware/proxy changes; `usePathname` needs Suspense under Cache Components |
+
+### Allowed APIs (copy these; do not invent)
+
+| Domain | Allowed | Copy from |
+| --- | --- | --- |
+| Clerk middleware | `clerkMiddleware`, `createRouteMatcher`, `auth.protect()` | `src/middleware.ts` + [Clerk middleware docs](https://clerk.com/docs/references/nextjs/clerk-middleware) |
+| Clerk UI | `ClerkProvider`, `SignIn`, `UserButton`, `useAuth` | `src/components/providers/AppProviders.tsx`, `src/app/portal/sign-in/...` |
+| Convex + Clerk client | `ConvexProviderWithClerk`, `ConvexReactClient`, **`useConvexAuth`**, `Authenticated` / `Unauthenticated` | [docs.convex.dev/auth/clerk](https://docs.convex.dev/auth/clerk); local `ConvexClientProvider.tsx` |
+| Convex server auth | `ctx.auth.getUserIdentity()`, throw if null | `convex/lib/auth.ts` → `requireBoardIdentity` |
+| Convex data | `query`/`mutation` with `args` + `returns` validators; indexed `.take(n)` | Existing `convex/*.ts` |
+| File storage | `ctx.storage.generateUploadUrl()`, `getUrl()` | `convex/documents.ts` |
+| Upload pipeline | `uploadDocumentProgram` Effect 4 | `src/lib/effect/upload.ts` |
+| Client queries | `useQuery` / `useMutation` from `convex/react` + `api.*` | Portal components |
+
+### Anti-patterns (do NOT)
+
+- Use Clerk `useAuth().isSignedIn` alone to gate Convex queries (token may not be ready) — use `useConvexAuth()`.
+- Unbounded `.collect()` on `ballots` / `auditEvents` / `documents`.
+- Client-side vote tallies as source of truth.
+- Import Node builtins in Convex without `"use node"`.
+- Hard-delete documents under legal hold.
+- Link `/portal` from public `SiteHeader`.
+- Claim 501(c)(3) / deductibility in portal copy while determination pending.
+- Set `export const dynamic` when `cacheComponents` is on (Next 16) — use Suspense instead.
+- Invent ZIP APIs on Convex storage — client-side ZIP from signed URLs or Convex action with documented fetch pattern.
 
 ---
 
-## Architecture
+## Architecture (as shipped)
 
 ```mermaid
-flowchart TB
-  subgraph portal [PortalApp]
-    Docs[DocumentsLibrary]
-    Meet[MeetingsMinutes]
-    Vote[VotingBoard]
-    Comp[ComplianceDashboard]
-    COI[COIDisclosures]
-    Pol[PolicyRegistry]
-  end
-  Clerk[ClerkAuth]
-  Convex[ConvexDB]
-  Files[ConvexStorage]
-
-  portal --> Clerk
-  portal --> Convex
-  Docs --> Files
-  Meet --> Files
-  Pol --> Files
-  Comp --> Convex
+flowchart LR
+  Browser --> PortalGate
+  PortalGate --> Clerk
+  PortalGate --> ConvexClient
+  ConvexClient -->|"JWT convex"| ConvexBackend
+  ConvexBackend --> Storage
+  ReportingHub --> ConvexBackend
 ```
 
-### Convex schema (extended)
+**Key files (copy targets):**
 
-| Table | Key fields |
+| Concern | Path |
 | --- | --- |
-| `documents` | (restored) + `retentionClass`, `legalHold`, `policyType?`, `taxYear?` |
-| `boardMembers` | (restored) + `role`, `termStart?`, `termEnd?` |
-| `meetings` | `scheduledAt`, `heldAt?`, `status`, `committeeId?`, `quorumRequired`, `attendeeEmails[]` |
-| `minutes` | `meetingId`, `body`, `storageId?`, `status`, `version`, `certifiedBy?`, `certifiedAt?` |
-| `minutesItems` | `minutesId`, `sortOrder`, `title`, `discussion`, `motionId?`, `coiRecusals[]` |
-| `motions` | `meetingId?`, `type` (`standard` / `consent`), `status`, `policyAdoption?` |
-| `ballots` | unique `(motionId, voterSubject)` |
-| `coiDisclosures` | unique `(year, memberEmail)` + JSON answers |
-| `policies` | `type`, `version`, `documentId`, `adoptedAt`, `motionId?` |
-| `form990Reviews` | `taxYear`, `documentId`, `boardReviewedBeforeFiled`, `reviewMeetingId?`, `reviewedAt` |
-| `auditEvents` | append-only log |
-
-### Routes
-
-| Route | Purpose |
-| --- | --- |
-| `/portal` | Hub |
-| `/portal/documents` | Library + retention badges |
-| `/portal/meetings`, `/portal/meetings/[id]` | Meetings + minutes |
-| `/portal/votes`, `/portal/votes/[id]` | Motions |
-| `/portal/compliance` | Form 990 / policy / minutes checklist |
-| `/portal/coi` | Annual disclosure form |
-| `/portal/policies` | Policy registry |
-| `/portal/sign-in` | Clerk |
+| AuthZ | `convex/lib/auth.ts` |
+| Middleware | `src/middleware.ts` |
+| Providers | `src/components/providers/AppProviders.tsx`, `ConvexClientProvider.tsx` |
+| Gate / shell | `src/components/portal/PortalGate.tsx`, `PortalShell.tsx` |
+| Reporting | `convex/reporting.ts`, `src/components/portal/ReportingHub.tsx` |
+| Schema | `convex/schema.ts` |
+| Plan | `docs/plans/private-board-portal.md` |
 
 ---
 
-## Implementation units
+## Implementation phases
 
-### Unit 1 — Restore Clerk + Convex + documents
+### Phase A — Baseline (DONE on branch)
 
-Restore from `68dfcbe^`; add extended document categories and retention fields (nullable defaults).
+**What:** Restore Clerk+Convex shell; documents; meetings/minutes; motions; COI; policies; form990; compliance dashboard; Reporting pack; README/PRODUCT.
 
-**Verify:** build without keys; sign-in + upload with keys.
+**Verify:**
 
-### Unit 2 — Allowlist + roles
+- [x] `npm run build` without Clerk keys
+- [x] Portal routes noindex; Suspense around `usePathname`
+- [x] Convex push with `CLERK_JWT_ISSUER_DOMAIN` set on deployment
+- [x] Configure message when keys missing
 
-Seed `boardMembers`; assign roles for secretary/chair/admin.
-
-**Verify:** unauthorized email rejected.
-
-### Unit 3 — Meetings, minutes, attendance, export
-
-Minutes items, quorum, certification, PDF attachment, minutes PDF/HTML export template.
-
-**Tests:** status transitions; export contains attendance + votes.
-
-### Unit 4 — Motions, ballots, written consent
-
-Voting board UI; consent motions require 100% director participation.
-
-**Tests:** tally, recusal, consent failure when one director has not voted.
-
-### Unit 5 — Compliance pack
-
-COI disclosures, policy registry, Form 990 review records, compliance dashboard, `auditEvents`.
-
-**Tests:** COI uniqueness per year; 990 review requires linked meeting when `boardReviewedBeforeFiled=true`.
-
-### Unit 6 — Docs + product truth
-
-`PRODUCT.md`, `README.md`, `.env.example`, deploy notes.
+**Anti-pattern guard:** Do not re-delete portal to “keep site static.”
 
 ---
 
-## Test scenarios (selected)
+### Phase H1 — Auth hardening (NEXT)
 
-| ID | Scenario |
-| --- | --- |
-| T1 | Non-allowlisted Clerk user → Convex error on all portal queries |
-| T2 | Approve minutes → prior version read-only; new edit creates version 2 |
-| T3 | Director recused on motion → cannot cast ballot; recusal listed on minutes item |
-| T4 | COI disclosure incomplete → compliance dashboard shows blocker for tax year |
-| T5 | Consent motion with 4/5 directors voted → remains open, not effective |
-| T6 | Document with `legalHold=true` → mutation `archiveDocument` fails |
+**What to implement (copy from docs):**
 
----
+1. In portal signed-in UI, gate Convex-dependent children with `Authenticated` / `useConvexAuth` from `convex/react` — pattern from [Convex Clerk Next.js guide step 11](https://docs.convex.dev/auth/clerk#nextjs).
+2. Keep Clerk `auth.protect()` in `src/middleware.ts` for route protection.
+3. Document production setup: Clerk Dashboard → Activate Convex integration → set Frontend API URL as `CLERK_JWT_ISSUER_DOMAIN` on **both** Convex dev and prod deployments ([dev/prod section](https://docs.convex.dev/auth/clerk#configuring-dev-and-prod-instances)).
 
-## Key decisions
+**Verify:**
 
-1. **Compliance-first categories** over generic file dump—maps to auditor requests and Form 990 evidence.
-2. **No auto-delete** until counsel-approved retention automation exists.
-3. **Convex as audit source of truth**; exports are convenience copies.
-4. **501(c)(3) pending** — portal copy never claims deductibility; tax folder holds application/determination when added.
+- [ ] After Clerk sign-in, `useConvexAuth().isAuthenticated === true` before first `useQuery`
+- [ ] Misconfigured issuer → clear error path (document debugging link: Convex Debugging Authentication)
+
+**Anti-pattern:** Nesting ConvexProvider outside ClerkProvider.
 
 ---
 
-## Verification
+### Phase H2 — Allowlist admin + seed
 
-- [ ] Compliance dashboard reflects seeded policies and a full mock meeting cycle.
-- [ ] Minutes export reviewed against Form 990 Part VI evidence checklist (manual QA script in `docs/plans/private-board-portal-checklist.md` optional follow-up).
-- [ ] Public site unchanged; portal noindex.
-- [ ] `npm run build` passes without Clerk/Convex env.
+**What:**
+
+1. UI page `/portal/members` (admin only): form calling `api.board.upsertMember` (already in `convex/board.ts`).
+2. Optional script `scripts/seed-board-members.mjs` or Convex internal mutation: seed emails from a **private** allowlist file (not public `board-members.json` — that file has no emails today). Admin pastes emails for directors.
+3. Role picker: `member` | `secretary` | `chair` | `admin`.
+
+**Verify:**
+
+- [ ] T1: non-allowlisted user gets Convex unauthorized on `listDocuments`
+- [ ] Admin can add second email; that user can sign in and load Reporting pack
+
+**Anti-pattern:** Putting personal emails in public git JSON.
+
+---
+
+### Phase H3 — Reporting UX hardening (board ease)
+
+**What:**
+
+1. **ZIP pack (client):** On Reporting pack, “Download all as ZIP” using browser ZIP (e.g. `fflate` or `jszip`) fetching each `downloadUrl` — keep Convex as URL source (`getReportingPack`).
+2. Date-range filter on reporting query for minutes + docs `createdAt`.
+3. Prominent empty-state CTAs: “Upload a Form 990 draft” → `/portal/documents` with category=tax preselected (query param).
+4. Optional: `?category=tax` support on Documents page.
+
+**Verify:**
+
+- [ ] Board member downloads ZIP with ≥1 tax + 1 policy file after upload
+- [ ] Manifest JSON still works without ZIP dependency failure
+
+**Anti-pattern:** Storing ZIP blobs in Convex as permanent duplicates of each file.
+
+---
+
+### Phase H4 — Governance completeness
+
+**What:**
+
+1. Detail routes `/portal/meetings/[id]`, `/portal/votes/[id]` (plan IA) — move detail panels from list pages.
+2. Minutes version bump: when approved, next edit creates `version+1` draft (today approve locks; create-new-version mutation).
+3. `archiveDocument` mutation that **fails** if `legalHold` (T6).
+4. Expand `getMinutesExport` to include open/closed motion tallies + COI recusal lines (R12).
+5. Consent motion: block `status=closed` as passed unless `yes === eligible` (enforce in `setMotionStatus`).
+
+**Verify:** T2, T3, T5, T6 automated or scripted Convex tests.
+
+**Anti-pattern:** Editing approved minutes in place.
+
+---
+
+### Phase H5 — Deploy, tests, ops
+
+**What:**
+
+1. Add `convex.json` if required by team tooling; restore Convex-aware Vercel build (`npx convex deploy --cmd 'npm run build' --cmd-url-env-var-name NEXT_PUBLIC_CONVEX_URL`) from git history when cloud keys exist — see Convex Vercel hosting docs.
+2. E2E smoke (Playwright in `tests/e2e/`): `/portal` configure message without keys; with keys (env-gated) sign-in redirect.
+3. Convex unit tests for tally + allowlist (if `convex-test` adopted) or Node test harness calling pure helpers in `convex/lib/quorum.ts`.
+4. Ops checklist in README: Clerk Convex integration, Vercel env, first-admin claim, seed members.
+
+**Verify:**
+
+- [ ] Preview/prod deploy with portal env green
+- [ ] Public e2e suite still passes
+- [ ] Portal smoke test skipped cleanly when secrets absent
+
+---
+
+## Phase V — Final verification
+
+1. Grep guards: no `useAuth` alone gating Convex data fetches in portal components; no `.collect()` without `.take` on growing tables.
+2. Manual board walkthrough: F1–F6.
+3. Compliance checklist vs Form 990 Part VI (COI, whistleblower, retention, 990 review) using NCNA / IRS sources in References.
+4. Confirm sitemap/nav exclude portal.
+
+---
+
+## Test scenarios (full)
+
+| ID | Scenario | Phase |
+| --- | --- | --- |
+| T1 | Non-allowlisted Clerk user → Convex error | H2 |
+| T2 | Approved minutes immutable; new version for edits | H4 |
+| T3 | Recusal recorded; ballot rules as designed | H4 |
+| T4 | Incomplete COI → compliance dashboard incomplete | A (manual) |
+| T5 | Consent incomplete → not passed when closed | H4 |
+| T6 | Legal hold blocks archive | H4 |
+| T7 | Reporting ZIP contains tax + policy files | H3 |
+| T8 | `useConvexAuth` false until token ready; no flash of Convex errors | H1 |
+
+---
+
+## Key technical decisions
+
+1. **Restore-and-extend** Convex+Clerk in this repo (not a separate app).
+2. **Reporting pack is the primary board UX** for paperwork; Documents is for upload/manage.
+3. **ZIP is client-assembled** from short-lived storage URLs (H3).
+4. **Allowlist emails stay out of public JSON**; admin UI / private seed only.
+5. **Auth readiness:** Convex docs mandate `useConvexAuth` for query gating (H1).
+
+---
+
+## Assumptions
+
+- Board will use Clerk-hosted accounts (email OTP or Google) restricted by allowlist.
+- Quorum default remains majority of allowlisted directors until bylaws numbers are entered in `orgSettings`.
+- Production Convex project will be linked (not only anonymous local).
 
 ---
 
 ## References
 
-- [Good Governance Policies for Nonprofits (NCNA)](https://www.councilofnonprofits.org/running-nonprofit/governance-leadership/good-governance-policies-nonprofits)
-- [Document Retention Policies for Nonprofits (NCNA)](https://www.councilofnonprofits.org/running-nonprofit/governance-leadership/document-retention-policies-nonprofits)
-- [2025 Instructions for Form 990 (IRS PDF)](https://www.irs.gov/pub/irs-pdf/i990.pdf)
-- [805 ILCS 105 — General Not For Profit Corporation Act](https://www.ilga.gov/legislation/ILCS/details?ActID=2280)
-- [Nonprofit board minutes & Form 990 compliance (MinuteSmith, 2026)](https://minutesmith.com/blog/nonprofit-board-minutes-990-compliance)
+- [Convex & Clerk](https://docs.convex.dev/auth/clerk)
+- [Clerk integrate Convex](https://clerk.com/docs/guides/development/integrations/databases/convex)
+- [NCNA good governance policies](https://www.councilofnonprofits.org/running-nonprofit/governance-leadership/good-governance-policies-nonprofits)
+- [NCNA document retention](https://www.councilofnonprofits.org/running-nonprofit/governance-leadership/document-retention-policies-nonprofits)
+- [IRS Form 990 instructions](https://www.irs.gov/pub/irs-pdf/i990.pdf)
+- [805 ILCS 105](https://www.ilga.gov/legislation/ILCS/details?ActID=2280)
+- Local: `PRODUCT.md`, `README.md`, `src/middleware.ts`, `convex/lib/auth.ts`
