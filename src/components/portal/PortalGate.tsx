@@ -11,14 +11,7 @@ import { usePathname } from "next/navigation";
 import { Suspense, type ReactNode } from "react";
 import { Button } from "@/components/core/Button";
 import { MemberNav, PortalShell } from "@/components/portal/PortalShell";
-
-function clerkReady() {
-  return Boolean(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY);
-}
-
-function convexReady() {
-  return Boolean(process.env.NEXT_PUBLIC_CONVEX_URL);
-}
+import { isClerkConfigured, isConvexConfigured } from "@/lib/env";
 
 function StatusPanel({
   title,
@@ -67,7 +60,7 @@ const devHint = (hint: string, publicText: string) =>
 const UNAVAILABLE = "The board portal is not available right now. Please try again later.";
 
 export function PortalGate({ children }: { children: ReactNode }) {
-  if (!clerkReady()) {
+  if (!isClerkConfigured) {
     return (
       <PortalShell>
         <StatusPanel
@@ -78,7 +71,7 @@ export function PortalGate({ children }: { children: ReactNode }) {
     );
   }
 
-  if (!convexReady()) {
+  if (!isConvexConfigured) {
     return (
       <PortalShell>
         <StatusPanel

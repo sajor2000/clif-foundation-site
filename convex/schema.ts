@@ -1,69 +1,17 @@
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
-
-const retentionClass = v.union(
-  v.literal("permanent"),
-  v.literal("7y"),
-  v.literal("3y"),
-  v.literal("1y"),
-);
-
-const documentCategory = v.union(
-  v.literal("governance"),
-  v.literal("legal"),
-  v.literal("meeting"),
-  v.literal("policy"),
-  v.literal("tax"),
-  v.literal("financial"),
-  v.literal("other"),
-);
-
-const boardRole = v.union(
-  v.literal("member"),
-  v.literal("secretary"),
-  v.literal("chair"),
-  v.literal("admin"),
-);
-
-const meetingStatus = v.union(
-  v.literal("scheduled"),
-  v.literal("held"),
-  v.literal("cancelled"),
-);
-
-const minutesStatus = v.union(
-  v.literal("draft"),
-  v.literal("published_for_review"),
-  v.literal("approved"),
-);
-
-const motionStatus = v.union(
-  v.literal("draft"),
-  v.literal("open"),
-  v.literal("closed"),
-);
-
-const accessRequestStatus = v.union(
-  v.literal("pending"),
-  v.literal("approved"),
-  v.literal("denied"),
-);
-
-const motionType = v.union(v.literal("standard"), v.literal("consent"));
-
-const ballotChoice = v.union(
-  v.literal("yes"),
-  v.literal("no"),
-  v.literal("abstain"),
-  v.literal("recuse"),
-);
-
-const policyType = v.union(
-  v.literal("conflict_of_interest"),
-  v.literal("whistleblower"),
-  v.literal("document_retention"),
-  v.literal("gift_acceptance"),
-);
+import {
+  accessRequestStatus,
+  ballotChoice,
+  boardRole,
+  documentCategory,
+  meetingStatus,
+  minutesStatus,
+  motionStatus,
+  motionType,
+  policyType,
+  retentionClass,
+} from "./lib/vocab";
 
 export default defineSchema({
   orgSettings: defineTable({

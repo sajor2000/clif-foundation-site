@@ -6,6 +6,7 @@ import { logAudit } from "./lib/audit";
 import { getBoardMember, requireBoardIdentity, requireBoardRole } from "./lib/auth";
 import { isDirector, loadDirectorEmails } from "./lib/directors";
 import { tallyBallots } from "./lib/tally";
+import { ballotChoice, motionStatus, motionType } from "./lib/vocab";
 import schema from "./schema";
 
 // Raw motion rows are returned, so the validator must match the table exactly.
@@ -28,7 +29,7 @@ const tallyReturn = v.object({
 export const listMotions = query({
   args: {
     status: v.optional(
-      v.union(v.literal("draft"), v.literal("open"), v.literal("closed")),
+      motionStatus,
     ),
   },
   returns: v.array(
@@ -120,7 +121,7 @@ export const createMotion = mutation({
   args: {
     title: v.string(),
     description: v.optional(v.string()),
-    motionType: v.union(v.literal("standard"), v.literal("consent")),
+    motionType,
     meetingId: v.optional(v.id("meetings")),
   },
   returns: v.id("motions"),
@@ -152,11 +153,7 @@ export const createMotion = mutation({
 export const setMotionStatus = mutation({
   args: {
     motionId: v.id("motions"),
-    status: v.union(
-      v.literal("draft"),
-      v.literal("open"),
-      v.literal("closed"),
-    ),
+    status: motionStatus,
   },
   returns: v.null(),
   handler: async (ctx, args) => {
@@ -200,12 +197,7 @@ export const setMotionStatus = mutation({
 export const castBallot = mutation({
   args: {
     motionId: v.id("motions"),
-    choice: v.union(
-      v.literal("yes"),
-      v.literal("no"),
-      v.literal("abstain"),
-      v.literal("recuse"),
-    ),
+    choice: ballotChoice,
   },
   returns: v.null(),
   handler: async (ctx, args) => {

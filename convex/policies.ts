@@ -2,20 +2,14 @@ import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { logAudit } from "./lib/audit";
 import { requireBoardIdentity, requireBoardRole } from "./lib/auth";
-
-const policyTypeValidator = v.union(
-  v.literal("conflict_of_interest"),
-  v.literal("whistleblower"),
-  v.literal("document_retention"),
-  v.literal("gift_acceptance"),
-);
+import { policyType } from "./lib/vocab";
 
 export const listPolicies = query({
   args: {},
   returns: v.array(
     v.object({
       _id: v.id("policies"),
-      policyType: v.string(),
+      policyType,
       version: v.number(),
       title: v.string(),
       adoptedAt: v.optional(v.number()),
@@ -40,7 +34,7 @@ export const listPolicies = query({
 
 export const registerPolicy = mutation({
   args: {
-    policyType: policyTypeValidator,
+    policyType: policyType,
     title: v.string(),
     version: v.number(),
     documentId: v.optional(v.id("documents")),

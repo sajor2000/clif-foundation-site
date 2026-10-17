@@ -2,10 +2,9 @@
 
 import { SignIn } from "@clerk/nextjs";
 import Link from "next/link";
+import { isClerkConfigured } from "@/lib/env";
 
 export default function PortalSignInPage() {
-  const clerkReady = Boolean(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY);
-
   return (
     <div
       style={{
@@ -34,7 +33,7 @@ export default function PortalSignInPage() {
             CLIF Foundation portal · not linked from the public site
           </p>
         </div>
-        {clerkReady ? (
+        {isClerkConfigured ? (
           <SignIn />
         ) : (
           <div

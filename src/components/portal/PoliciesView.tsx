@@ -3,20 +3,14 @@
 import { useMutation, useQuery } from "convex/react";
 import { useState } from "react";
 import { api } from "../../../convex/_generated/api";
+import { POLICY_TYPES, type PolicyType } from "../../../convex/lib/vocab";
 import { Button } from "@/components/core/Button";
 import { inputStyle, pageTitle, panelStyle } from "@/components/portal/portal-styles";
-
-const POLICY_TYPES = [
-  { value: "conflict_of_interest" as const, label: "Conflict of interest" },
-  { value: "whistleblower" as const, label: "Whistleblower" },
-  { value: "document_retention" as const, label: "Document retention" },
-  { value: "gift_acceptance" as const, label: "Gift acceptance" },
-];
 
 export function PoliciesView() {
   const policies = useQuery(api.policies.listPolicies);
   const register = useMutation(api.policies.registerPolicy);
-  const [policyType, setPolicyType] = useState(POLICY_TYPES[0].value);
+  const [policyType, setPolicyType] = useState<PolicyType>(POLICY_TYPES[0].value);
   const [title, setTitle] = useState("");
   const [version, setVersion] = useState(1);
   const [instructions, setInstructions] = useState("");
@@ -46,7 +40,7 @@ export function PoliciesView() {
           <select
             value={policyType}
             onChange={(e) =>
-              setPolicyType(e.target.value as (typeof POLICY_TYPES)[number]["value"])
+              setPolicyType(e.target.value as PolicyType)
             }
             style={inputStyle}
           >

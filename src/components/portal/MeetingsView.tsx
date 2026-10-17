@@ -4,14 +4,13 @@ import Link from "next/link";
 import { useMutation, useQuery } from "convex/react";
 import { useState } from "react";
 import { api } from "../../../convex/_generated/api";
-import type { Id } from "../../../convex/_generated/dataModel";
 import { Button } from "@/components/core/Button";
 import { inputStyle, pageTitle, panelStyle, sectionTitle } from "@/components/portal/portal-styles";
 
-export function MeetingsView({ meetingId }: { meetingId?: Id<"meetings"> } = {}) {
+export function MeetingsView({ meetingId }: { meetingId?: string } = {}) {
   const [title, setTitle] = useState("");
   const [scheduledAt, setScheduledAt] = useState("");
-  const [pickedId, setPickedId] = useState<Id<"meetings"> | null>(null);
+  const [pickedId, setPickedId] = useState<string | null>(null);
   const selected = meetingId ?? pickedId;
   const meetings = useQuery(api.meetings.listMeetings);
   const createMeeting = useMutation(api.meetings.createMeeting);
@@ -24,7 +23,7 @@ export function MeetingsView({ meetingId }: { meetingId?: Id<"meetings"> } = {})
   );
   const [draftMinutes, setDraftMinutes] = useState<string | null>(null);
   const [draftAttendees, setDraftAttendees] = useState<string | null>(null);
-  const [draftMeetingId, setDraftMeetingId] = useState<Id<"meetings"> | null>(null);
+  const [draftMeetingId, setDraftMeetingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const detail = useQuery(
@@ -64,11 +63,11 @@ export function MeetingsView({ meetingId }: { meetingId?: Id<"meetings"> } = {})
   }
 
   async function saveMinutes(status?: "draft" | "published_for_review" | "approved") {
-    if (!selected) return;
+    if (!detail) return;
     setError(null);
     try {
       await upsertMinutes({
-        meetingId: selected,
+        meetingId: detail.meeting._id,
         body: minutesBody,
         status,
       });
@@ -79,11 +78,11 @@ export function MeetingsView({ meetingId }: { meetingId?: Id<"meetings"> } = {})
   }
 
   async function onRevise() {
-    if (!selected) return;
+    if (!detail) return;
     setError(null);
     try {
       await reviseMinutes({
-        meetingId: selected,
+        meetingId: detail.meeting._id,
         body: minutesBody,
       });
       setDraftMinutes(null);
@@ -93,13 +92,13 @@ export function MeetingsView({ meetingId }: { meetingId?: Id<"meetings"> } = {})
   }
 
   async function saveAttendance() {
-    if (!selected) return;
+    if (!detail) return;
     const emails = attendees
       .split(/[,;\s]+/)
       .map((e) => e.trim())
       .filter(Boolean);
     await updateAttendance({
-      meetingId: selected,
+      meetingId: detail.meeting._id,
       attendeeEmails: emails,
       status: "held",
       heldAt: Date.now(),
@@ -167,6 +166,11 @@ export function MeetingsView({ meetingId }: { meetingId?: Id<"meetings"> } = {})
         </section>
       ) : null}
 
+      {selected && detail === null ? (
+        <p role="status" style={{ margin: 0, color: "var(--text-muted)" }}>
+          Meeting not found. Choose one from the list.
+        </p>
+      ) : null}
       {selected && detail ? (
         <div style={{ display: "grid", gap: 16 }}>
           <h2 style={sectionTitle}>{detail.meeting.title}</h2>

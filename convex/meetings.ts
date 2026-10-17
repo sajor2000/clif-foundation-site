@@ -5,6 +5,7 @@ import { requireBoardIdentity, requireBoardRole } from "./lib/auth";
 import { isDirector, loadDirectorEmails } from "./lib/directors";
 import { minutesTransitionError } from "./lib/minutes";
 import { tallyBallots } from "./lib/tally";
+import { meetingStatus, minutesStatus } from "./lib/vocab";
 import { quorumMet, quorumRequired } from "./lib/quorum";
 import schema from "./schema";
 
@@ -35,7 +36,8 @@ export const listMeetings = query({
 });
 
 export const getMeeting = query({
-  args: { meetingId: v.id("meetings") },
+  // Accepts any string (it comes from the URL); an unknown ID returns null.
+  args: { meetingId: v.string() },
   returns: v.union(
     v.object({
       meeting: meetingReturn,
@@ -52,11 +54,12 @@ export const getMeeting = query({
   ),
   handler: async (ctx, args) => {
     await requireBoardIdentity(ctx);
-    const meeting = await ctx.db.get(args.meetingId);
+    const meetingId = ctx.db.normalizeId("meetings", args.meetingId);
+    const meeting = meetingId ? await ctx.db.get(meetingId) : null;
     if (!meeting) return null;
     const minutes = await ctx.db
       .query("minutes")
-      .withIndex("by_meeting", (q) => q.eq("meetingId", args.meetingId))
+      .withIndex("by_meeting", (q) => q.eq("meetingId", meeting._id))
       .order("desc")
       .first();
     const items = minutes
@@ -110,9 +113,7 @@ export const updateAttendance = mutation({
   args: {
     meetingId: v.id("meetings"),
     attendeeEmails: v.array(v.string()),
-    status: v.optional(
-      v.union(v.literal("scheduled"), v.literal("held"), v.literal("cancelled")),
-    ),
+    status: v.optional(meetingStatus),
     heldAt: v.optional(v.number()),
   },
   returns: v.null(),
@@ -154,13 +155,7 @@ export const upsertMinutes = mutation({
   args: {
     meetingId: v.id("meetings"),
     body: v.optional(v.string()),
-    status: v.optional(
-      v.union(
-        v.literal("draft"),
-        v.literal("published_for_review"),
-        v.literal("approved"),
-      ),
-    ),
+    status: v.optional(minutesStatus),
   },
   returns: v.id("minutes"),
   handler: async (ctx, args) => {
@@ -300,15 +295,16 @@ export const addMinutesItem = mutation({
 });
 
 export const getMinutesExport = query({
-  args: { meetingId: v.id("meetings") },
+  args: { meetingId: v.string() },
   returns: v.string(),
   handler: async (ctx, args) => {
     await requireBoardIdentity(ctx);
-    const meeting = await ctx.db.get(args.meetingId);
+    const meetingId = ctx.db.normalizeId("meetings", args.meetingId);
+    const meeting = meetingId ? await ctx.db.get(meetingId) : null;
     if (!meeting) return "";
     const minutes = await ctx.db
       .query("minutes")
-      .withIndex("by_meeting", (q) => q.eq("meetingId", args.meetingId))
+      .withIndex("by_meeting", (q) => q.eq("meetingId", meeting._id))
       .order("desc")
       .first();
     const items = minutes
@@ -342,7 +338,7 @@ export const getMinutesExport = query({
 
     const motions = await ctx.db
       .query("motions")
-      .withIndex("by_meeting", (q) => q.eq("meetingId", args.meetingId))
+      .withIndex("by_meeting", (q) => q.eq("meetingId", meeting._id))
       .take(50);
     if (motions.length) {
       const directorEmails = await loadDirectorEmails(ctx);

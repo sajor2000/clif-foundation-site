@@ -26,9 +26,7 @@ export function giftAcknowledgmentLetter(
     "",
     "No goods or services were provided in exchange for this gift.",
     "",
-    "CLIF Foundation is an Illinois nonprofit corporation with an EIN. Our application for 501(c)(3) recognition is pending with the IRS. Until a determination letter is issued, we cannot promise that this gift is tax-deductible. Please consult your tax adviser.",
-    "",
-    "If recognition is granted effective as of our formation date, some gifts made earlier may qualify under IRS rules. We will update donors when status changes.",
+    "CLIF Foundation is an Illinois nonprofit corporation with an EIN. Its application for 501(c)(3) recognition is pending with the IRS. Until a determination letter is issued, the Foundation cannot say that this gift is tax-deductible. Please consult your tax adviser.",
     "",
     "Sincerely,",
     "CLIF Foundation",
@@ -41,6 +39,6 @@ export const GIVEBUTTER_THANK_YOU_MESSAGE = `Thank you for supporting CLIF Found
 
 You will receive an emailed receipt from Givebutter with your gift amount and date. No goods or services were provided in exchange for this gift.
 
-CLIF Foundation is an Illinois nonprofit corporation. Our application for 501(c)(3) recognition is pending with the IRS. Until a determination letter is issued, we cannot promise that your gift is tax-deductible. Please consult your tax adviser.
+CLIF Foundation is an Illinois nonprofit corporation. Its application for 501(c)(3) recognition is pending with the IRS. Until a determination letter is issued, the Foundation cannot say that your gift is tax-deductible. Please consult your tax adviser.
 
 Questions or a written acknowledgment for your files: ${CONTACT_EMAIL}`;

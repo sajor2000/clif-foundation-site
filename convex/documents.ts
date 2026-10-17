@@ -5,23 +5,7 @@ import { logAudit } from "./lib/audit";
 import { uploadRejection } from "./lib/uploads";
 import { requireBoardIdentity, requireBoardRole } from "./lib/auth";
 import schema from "./schema";
-
-const categoryValidator = v.union(
-  v.literal("governance"),
-  v.literal("legal"),
-  v.literal("meeting"),
-  v.literal("policy"),
-  v.literal("tax"),
-  v.literal("financial"),
-  v.literal("other"),
-);
-
-const retentionValidator = v.union(
-  v.literal("permanent"),
-  v.literal("7y"),
-  v.literal("3y"),
-  v.literal("1y"),
-);
+import { documentCategory, retentionClass } from "./lib/vocab";
 
 // Raw rows plus a download URL, so the validator must match the table exactly.
 const documentReturn = v.object({
@@ -44,9 +28,9 @@ export const saveDocument = mutation({
   args: {
     storageId: v.id("_storage"),
     title: v.string(),
-    category: categoryValidator,
+    category: documentCategory,
     contentType: v.string(),
-    retentionClass: v.optional(retentionValidator),
+    retentionClass: v.optional(retentionClass),
     taxYear: v.optional(v.number()),
     reportingTag: v.optional(v.string()),
   },
@@ -63,7 +47,9 @@ export const saveDocument = mutation({
     if (!file) {
       throw new Error("Upload not found; try again");
     }
-    const rejection = uploadRejection(file.size, file.contentType ?? args.contentType);
+    // Trust the type Convex recorded for the stored file over the client's claim.
+    const contentType = file.contentType ?? args.contentType;
+    const rejection = uploadRejection(file.size, contentType);
     if (rejection) {
       // Return instead of throwing: a thrown error would roll back this delete.
       await ctx.storage.delete(args.storageId);
@@ -73,7 +59,7 @@ export const saveDocument = mutation({
       title: args.title.trim(),
       category: args.category,
       storageId: args.storageId,
-      contentType: args.contentType,
+      contentType,
       uploadedBy: identity.subject,
       createdAt: Date.now(),
       retentionClass: args.retentionClass ?? "permanent",
@@ -103,7 +89,7 @@ async function attachUrls(ctx: QueryCtx, docs: Doc<"documents">[]) {
 
 export const listDocuments = query({
   args: {
-    category: v.optional(categoryValidator),
+    category: v.optional(documentCategory),
     search: v.optional(v.string()),
     /** Show only archived documents instead of the active library. */
     archived: v.optional(v.boolean()),

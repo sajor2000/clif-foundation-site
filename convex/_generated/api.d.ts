@@ -22,6 +22,7 @@ import type * as lib_minutes from "../lib/minutes.js";
 import type * as lib_quorum from "../lib/quorum.js";
 import type * as lib_tally from "../lib/tally.js";
 import type * as lib_uploads from "../lib/uploads.js";
+import type * as lib_vocab from "../lib/vocab.js";
 import type * as meetings from "../meetings.js";
 import type * as motions from "../motions.js";
 import type * as policies from "../policies.js";
@@ -48,6 +49,7 @@ declare const fullApi: ApiFromModules<{
   "lib/quorum": typeof lib_quorum;
   "lib/tally": typeof lib_tally;
   "lib/uploads": typeof lib_uploads;
+  "lib/vocab": typeof lib_vocab;
   meetings: typeof meetings;
   motions: typeof motions;
   policies: typeof policies;

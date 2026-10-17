@@ -1,8 +1,22 @@
+import type { UserIdentity } from "convex/server";
 import type { MutationCtx, QueryCtx } from "../_generated/server";
 
 type Ctx = QueryCtx | MutationCtx;
 
-export type BoardRole = "member" | "secretary" | "chair" | "admin";
+/**
+ * The caller's email, lowercased, only if Clerk marked it verified. The
+ * allowlist is keyed by email, so a token without email_verified counts as
+ * unverified and never matches.
+ */
+export function verifiedEmail(identity: UserIdentity): string | undefined {
+  return typeof identity.email === "string" && identity.emailVerified === true
+    ? identity.email.toLowerCase()
+    : undefined;
+}
+
+import type { BoardRole } from "./vocab";
+
+export type { BoardRole };
 
 async function isAllowlisted(ctx: Ctx, email: string | undefined) {
   if (!email) return false;
@@ -29,12 +43,7 @@ export async function requireBoardIdentity(ctx: Ctx) {
     throw new Error("Not authenticated");
   }
 
-  // The allowlist is keyed by email, so only a verified address may match
-  // (a token without the email_verified claim counts as unverified).
-  const email =
-    typeof identity.email === "string" && identity.emailVerified === true
-      ? identity.email.toLowerCase()
-      : undefined;
+  const email = verifiedEmail(identity);
 
   const allowlist = await ctx.db.query("boardMembers").take(1);
   if (allowlist.length === 0) {
@@ -60,12 +69,7 @@ export async function requireClerkIdentity(ctx: Ctx) {
   if (!identity) {
     throw new Error("Not authenticated");
   }
-  // The allowlist is keyed by email, so only a verified address may match
-  // (a token without the email_verified claim counts as unverified).
-  const email =
-    typeof identity.email === "string" && identity.emailVerified === true
-      ? identity.email.toLowerCase()
-      : undefined;
+  const email = verifiedEmail(identity);
   return { ...identity, email };
 }
 

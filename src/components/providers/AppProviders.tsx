@@ -3,19 +3,19 @@
 import { ClerkProvider } from "@clerk/nextjs";
 import type { ReactNode } from "react";
 import { ConvexClientProvider } from "@/components/providers/ConvexClientProvider";
+import { clerkPublishableKey } from "@/lib/env";
 
-const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
 
 export function AppProviders({ children }: { children: ReactNode }) {
   const inner = <ConvexClientProvider>{children}</ConvexClientProvider>;
 
-  if (!publishableKey) {
+  if (!clerkPublishableKey) {
     return inner;
   }
 
   return (
     <ClerkProvider
-      publishableKey={publishableKey}
+      publishableKey={clerkPublishableKey}
       signInUrl="/portal/sign-in"
       afterSignOutUrl="/"
     >

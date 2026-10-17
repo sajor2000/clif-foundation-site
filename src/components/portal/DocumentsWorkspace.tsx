@@ -12,7 +12,7 @@ import {
   DOCUMENT_CATEGORIES,
   RETENTION_CLASSES,
   type DocumentCategory,
-} from "@/lib/portal/categories";
+} from "../../../convex/lib/vocab";
 import {
   formatUploadError,
   uploadDocumentProgram,

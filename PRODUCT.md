@@ -21,7 +21,7 @@ Distinct from the CLIF Consortium (clif-icu.com): the Consortium owns the specif
 ## Operating Context
 
 - Public marketing site: Home, Mission, Our Work, Research & Resources, Board & Governance, Support.
-- Giving today: Givebutter embed on `/support#give` (set `NEXT_PUBLIC_GIVEBUTTER_CAMPAIGN_CODE`). Email `info@clificufoundation.org` for pledges and institutional gifts.
+- Giving today: Givebutter widget on `/support#give` (set `NEXT_PUBLIC_GIVEBUTTER_WIDGET_ID`; see `docs/GIVEBUTTER.md`). Email `info@clificufoundation.org` for pledges and institutional gifts.
 - Design authority lives in `design/` (tokens + kit) and is ported into `src/styles/` and `src/components/`.
 
 ## Capabilities and Constraints

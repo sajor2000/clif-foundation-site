@@ -2,12 +2,14 @@ import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { canBootstrapAdmin, leavesNoAdmin, requestAccessOutcome } from "./lib/access";
 import { logAudit } from "./lib/audit";
+import { accessRequestStatus, boardRole } from "./lib/vocab";
 import { isDirector } from "./lib/directors";
 import {
   getBoardMember,
   requireBoardIdentity,
   requireBoardRole,
   requireClerkIdentity,
+  verifiedEmail,
 } from "./lib/auth";
 
 export const listMembers = query({
@@ -32,33 +34,24 @@ export const listMembers = query({
   },
 });
 
+/**
+ * The caller's portal standing: their board role, "bootstrap_eligible" if they
+ * may claim admin on an empty allowlist, or null (no access yet).
+ */
 export const myRole = query({
   args: {},
-  returns: v.union(v.string(), v.null()),
+  returns: v.union(boardRole, v.literal("bootstrap_eligible"), v.null()),
   handler: async (ctx) => {
-    try {
-      const identity = await requireBoardIdentity(ctx);
-      if (!identity.email) return null;
-      const member = await ctx.db
-        .query("boardMembers")
-        .withIndex("by_email", (q) => q.eq("email", identity.email!))
-        .unique();
-      return member?.role ?? (member ? "member" : null);
-    } catch {
-      // Allowlist empty or not a member — UI shows bootstrap / denied.
-      const identity = await ctx.auth.getUserIdentity();
-      if (!identity) return null;
-      const any = await ctx.db.query("boardMembers").take(1);
-      if (any.length > 0) return null;
-      // Only the designated email is offered Claim admin; everyone else requests access.
-      const email =
-        typeof identity.email === "string" && identity.emailVerified === true
-          ? identity.email
-          : undefined;
-      return canBootstrapAdmin(email, process.env.BOOTSTRAP_ADMIN_EMAIL)
-        ? "bootstrap_eligible"
-        : null;
-    }
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) return null;
+    const email = verifiedEmail(identity);
+    const member = await getBoardMember(ctx, email);
+    if (member) return member.role ?? "member";
+    const anyMember = await ctx.db.query("boardMembers").take(1);
+    if (anyMember.length > 0) return null;
+    return canBootstrapAdmin(email, process.env.BOOTSTRAP_ADMIN_EMAIL)
+      ? "bootstrap_eligible"
+      : null;
   },
 });
 
@@ -75,14 +68,7 @@ export const amIDirector = query({
 export const upsertMember = mutation({
   args: {
     email: v.string(),
-    role: v.optional(
-      v.union(
-        v.literal("member"),
-        v.literal("secretary"),
-        v.literal("chair"),
-        v.literal("admin"),
-      ),
-    ),
+    role: v.optional(boardRole),
     displayName: v.optional(v.string()),
     isDirector: v.optional(v.boolean()),
   },
@@ -203,23 +189,10 @@ export const bootstrapAdmin = mutation({
   },
 });
 
-const boardRoleArg = v.union(
-  v.literal("member"),
-  v.literal("secretary"),
-  v.literal("chair"),
-  v.literal("admin"),
-);
-
-const requestStatus = v.union(
-  v.literal("pending"),
-  v.literal("approved"),
-  v.literal("denied"),
-);
-
 /** Signed-in, not-yet-allowlisted user asks an admin for access. */
 export const requestAccess = mutation({
   args: {},
-  returns: v.union(v.literal("already_member"), requestStatus),
+  returns: v.union(v.literal("already_member"), accessRequestStatus),
   handler: async (ctx) => {
     const identity = await requireClerkIdentity(ctx);
     const email = identity.email;
@@ -271,13 +244,11 @@ export const requestAccess = mutation({
 /** The caller's own access request status, or null if they have not asked. */
 export const myAccessRequest = query({
   args: {},
-  returns: v.union(requestStatus, v.null()),
+  returns: v.union(accessRequestStatus, v.null()),
   handler: async (ctx) => {
     const identity = await ctx.auth.getUserIdentity();
-    if (!identity || typeof identity.email !== "string" || identity.emailVerified !== true) {
-      return null;
-    }
-    const email = identity.email.toLowerCase();
+    const email = identity ? verifiedEmail(identity) : undefined;
+    if (!email) return null;
     const existing = await ctx.db
       .query("accessRequests")
       .withIndex("by_email", (q) => q.eq("email", email))
@@ -316,7 +287,7 @@ export const decideAccessRequest = mutation({
   args: {
     id: v.id("accessRequests"),
     approve: v.boolean(),
-    role: v.optional(boardRoleArg),
+    role: v.optional(boardRole),
     isDirector: v.optional(v.boolean()),
   },
   returns: v.null(),

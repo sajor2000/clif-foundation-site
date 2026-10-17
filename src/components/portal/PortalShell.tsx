@@ -6,8 +6,8 @@ import { Suspense, type ReactNode } from "react";
 import { UserButton } from "@clerk/nextjs";
 import { useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
+import { isClerkConfigured } from "@/lib/env";
 
-const clerkReady = Boolean(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY);
 
 const NAV = [
   { href: "/portal", label: "Overview" },
@@ -144,7 +144,7 @@ export function PortalShell({
           <Link href="/" style={{ color: "var(--link)", fontSize: 14 }}>
             Public site
           </Link>
-          {clerkReady ? <UserButton /> : null}
+          {isClerkConfigured ? <UserButton /> : null}
         </div>
       </header>
       {nav ? <Suspense fallback={null}>{nav}</Suspense> : null}

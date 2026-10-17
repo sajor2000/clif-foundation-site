@@ -1,9 +1,8 @@
 /** Public Givebutter account ID from the widget install snippet. */
 const DEFAULT_ACCOUNT_ID = "htqR98I4GhNJ6AiT";
 
-export function givebutterAccountId(): string | null {
-  const value = process.env.NEXT_PUBLIC_GIVEBUTTER_ACCOUNT_ID?.trim();
-  return value || DEFAULT_ACCOUNT_ID;
+export function givebutterAccountId(): string {
+  return process.env.NEXT_PUBLIC_GIVEBUTTER_ACCOUNT_ID?.trim() || DEFAULT_ACCOUNT_ID;
 }
 
 /** Campaign code from Givebutter → Campaign → Widgets / embed. */
@@ -24,14 +23,9 @@ export type GivebutterEmbed =
 
 /** The embed to render on /support: a widget ID wins over a campaign code. */
 export function givebutterEmbed(): GivebutterEmbed | null {
-  if (!givebutterAccountId()) return null;
   const widgetId = givebutterWidgetId();
   if (widgetId) return { kind: "widget", id: widgetId };
   const campaign = givebutterCampaignCode();
   if (campaign) return { kind: "form", campaign };
   return null;
-}
-
-export function isGivebutterConfigured(): boolean {
-  return givebutterEmbed() !== null;
 }
