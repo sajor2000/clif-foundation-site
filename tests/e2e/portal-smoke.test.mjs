@@ -22,9 +22,15 @@ test("/portal shows configure, sign-in, or workspace without crashing", async ()
   await page.context().close();
 });
 
-test("/portal/reporting is reachable", async () => {
+test("/portal/reporting renders, or sends signed-out visitors to portal sign-in", async () => {
   const page = await open("/portal/reporting", DESKTOP);
-  const status = page.url();
-  assert.ok(status.includes("/portal/reporting"));
+  const url = new URL(page.url());
+  // Without Clerk keys the route renders the configure notice in place; with
+  // Clerk, signed-out visitors land on our sign-in page (not Clerk-hosted).
+  const ok =
+    url.pathname === "/portal/reporting" ||
+    (url.pathname.startsWith("/portal/sign-in") &&
+      url.searchParams.get("redirect_url")?.includes("/portal/reporting"));
+  assert.ok(ok, `unexpected landing URL: ${page.url()}`);
   await page.context().close();
 });
