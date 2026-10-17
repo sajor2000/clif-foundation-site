@@ -8,10 +8,16 @@ type GivebutterGivingFormProps = DetailedHTMLProps<
   HTMLElement
 >;
 
+type GivebutterWidgetProps = DetailedHTMLProps<
+  HTMLAttributes<HTMLElement> & { id: string },
+  HTMLElement
+>;
+
 declare module "react" {
   namespace JSX {
     interface IntrinsicElements {
       "givebutter-giving-form": GivebutterGivingFormProps;
+      "givebutter-widget": GivebutterWidgetProps;
     }
   }
 }

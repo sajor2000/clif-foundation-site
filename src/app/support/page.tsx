@@ -10,10 +10,7 @@ import {
 } from "@/components/support/GivebutterGift";
 import { InquiryForm } from "@/components/support/InquiryForm";
 import { CONTACT_EMAIL, GIFT_PROGRAMS, SUPPORT_PATHS } from "@/lib/content";
-import {
-  givebutterCampaignCode,
-  isGivebutterConfigured,
-} from "@/lib/givebutter";
+import { givebutterEmbed } from "@/lib/givebutter";
 
 export const metadata: Metadata = pageMetadata({
   title: "Support",
@@ -23,8 +20,7 @@ export const metadata: Metadata = pageMetadata({
 });
 
 export default function SupportPage() {
-  const campaignCode = givebutterCampaignCode();
-  const givebutterReady = isGivebutterConfigured() && Boolean(campaignCode);
+  const embed = givebutterEmbed();
 
   return (
     <SiteShell current="support">
@@ -80,8 +76,8 @@ export default function SupportPage() {
           gap: 32,
         }}
       >
-        {givebutterReady && campaignCode ? (
-          <GivebutterGift campaignCode={campaignCode} />
+        {embed ? (
+          <GivebutterGift embed={embed} />
         ) : (
           <GivebutterNotConfigured />
         )}

@@ -6,7 +6,7 @@ Public site for the CLIF Foundation (Illinois nonprofit; 501(c)(3) pending), plu
 
 ```bash
 npm install
-cp .env.example .env.local   # Givebutter campaign code; Clerk + Convex for /portal
+cp .env.example .env.local   # Givebutter widget ID; Clerk + Convex for /portal
 
 # Terminal 1 — Convex dev deployment
 npm run convex:dev
@@ -30,9 +30,9 @@ Open [http://127.0.0.1:43127](http://127.0.0.1:43127).
 
 ### Env checklist
 
-See `.env.example`. The public site runs without variables; the giving form needs a campaign code.
+See `.env.example`. The public site runs without variables; the giving form needs a Givebutter widget ID.
 
-- `NEXT_PUBLIC_GIVEBUTTER_CAMPAIGN_CODE` — required to show the Givebutter form on `/support`
+- `NEXT_PUBLIC_GIVEBUTTER_WIDGET_ID` — required to show the Givebutter form on `/support` (or the older `NEXT_PUBLIC_GIVEBUTTER_CAMPAIGN_CODE`)
 - `NEXT_PUBLIC_GIVEBUTTER_ACCOUNT_ID` — optional override (defaults to the Foundation widget account)
 - Setup details: [`docs/GIVEBUTTER.md`](docs/GIVEBUTTER.md)
 - `NEXT_PUBLIC_CONVEX_URL`, `CLERK_*`, `CLERK_JWT_ISSUER_DOMAIN` (Convex dashboard) — board portal
@@ -60,7 +60,7 @@ Workflow helpers use **effect@4.0.2** (Effect 4 APIs: `Effect.gen`, `Data.Tagged
 
 The Vercel project builds with `npm run build` (see `vercel.json`). Push to `main` for production; pull requests get preview deployments.
 
-Set `NEXT_PUBLIC_GIVEBUTTER_CAMPAIGN_CODE` on Production and Preview so the Support page shows the form.
+Set `NEXT_PUBLIC_GIVEBUTTER_WIDGET_ID` on Production and Preview so the Support page shows the form.
 
 For the **board portal**, `vercel.json` runs `npx convex deploy --cmd 'npm run build'` whenever `CONVEX_DEPLOY_KEY` is set, so Convex functions and the site ship together; without the key (e.g. previews) it builds the public site only.
 

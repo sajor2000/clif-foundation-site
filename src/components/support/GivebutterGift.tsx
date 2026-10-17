@@ -1,8 +1,9 @@
 "use client";
 
 import { CONTACT_EMAIL } from "@/lib/content";
+import type { GivebutterEmbed } from "@/lib/givebutter";
 
-export function GivebutterGift({ campaignCode }: { campaignCode: string }) {
+export function GivebutterGift({ embed }: { embed: GivebutterEmbed }) {
   return (
     <section
       id="give"
@@ -42,7 +43,11 @@ export function GivebutterGift({ campaignCode }: { campaignCode: string }) {
         </p>
       </div>
       <div className="givebutter-panel__form">
-        <givebutter-giving-form campaign={campaignCode} max-width="100%" />
+        {embed.kind === "widget" ? (
+          <givebutter-widget id={embed.id} />
+        ) : (
+          <givebutter-giving-form campaign={embed.campaign} max-width="100%" />
+        )}
       </div>
       <p className="givebutter-panel__footnote">
         For a pledge, named purpose, or institutional gift, email{" "}
@@ -55,7 +60,7 @@ export function GivebutterGift({ campaignCode }: { campaignCode: string }) {
   );
 }
 
-/** Donor-facing placeholder when the campaign code is not set yet. */
+/** Donor-facing placeholder when no widget ID or campaign code is set yet. */
 export function GivebutterNotConfigured() {
   return (
     <section
