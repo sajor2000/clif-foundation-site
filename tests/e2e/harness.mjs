@@ -6,7 +6,9 @@ import { chromium } from "playwright-core";
 
 const CHROME =
   process.env.CHROME_PATH ??
-  "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
+  (process.platform === "darwin"
+    ? "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+    : "/usr/local/bin/google-chrome");
 const PORT = Number(process.env.E2E_PORT ?? 43199);
 
 export const DESKTOP = { width: 1440, height: 900 };
