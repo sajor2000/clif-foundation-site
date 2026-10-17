@@ -163,9 +163,15 @@ export function VotesView({ focusId }: { focusId?: string } = {}) {
                     </Button>
                   </>
                 ) : null}
-                {motion.status === "closed" && tally.passed ? (
-                  <span style={{ fontSize: 14, fontWeight: 600, color: "var(--accent-text)" }}>
-                    Passed
+                {motion.status === "closed" ? (
+                  <span
+                    style={{
+                      fontSize: 14,
+                      fontWeight: 600,
+                      color: tally.passed ? "var(--accent-text)" : "var(--status-error)",
+                    }}
+                  >
+                    {tally.passed ? "Passed" : "Not passed"}
                   </span>
                 ) : null}
               </div>
