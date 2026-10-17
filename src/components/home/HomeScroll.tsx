@@ -183,7 +183,7 @@ export function HomeScroll() {
                 paddingBlock: 36,
               }}
             >
-              <header className="sc-intertitle" data-sc-cue="0 0.9 0 0.2">
+              <header className="sc-intertitle" data-sc-cue="0">
                 <span className="sc-intertitle__n">01</span>
                 <span>Federation</span>
               </header>
@@ -199,14 +199,14 @@ export function HomeScroll() {
                   <h2
                     id="fig-fed"
                     className="h2"
-                    data-sc-cue="0 0.9 0 0.2"
+                    data-sc-cue="0"
                     style={{ color: "var(--text-inverse)", margin: 0 }}
                   >
                     Data stays at each hospital. Code travels.
                   </h2>
                 </div>
                 <p
-                  data-sc-cue="0.08 0.88"
+                  data-sc-cue="0.08"
                   style={{
                     flex: "1 1 400px",
                     margin: 0,

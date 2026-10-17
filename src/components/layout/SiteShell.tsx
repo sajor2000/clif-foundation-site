@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { RouteFocus } from "@/components/layout/RouteFocus";
 import { ContextBar } from "@/components/navigation/ContextBar";
 import { SiteFooter } from "@/components/navigation/SiteFooter";
 import { SiteHeader } from "@/components/navigation/SiteHeader";
@@ -29,6 +30,7 @@ export function SiteShell({
       <ContextBar />
       <SiteHeader current={current} />
       <main id="main" tabIndex={-1} style={{ outline: "none", flex: 1 }}>
+        <RouteFocus />
         {children}
       </main>
       <SiteFooter />

@@ -9,7 +9,8 @@
     "dev": "next dev --hostname 0.0.0.0 --port 43127",
     "build": "next build",
     "start": "next start --hostname 0.0.0.0 --port 43127",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test:e2e": "node --test --test-concurrency=1 tests/e2e/*.test.mjs"
   },
   "dependencies": {
     "effect": "4.0.2",
