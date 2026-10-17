@@ -4,6 +4,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Suspense, type ReactNode } from "react";
 import { UserButton } from "@clerk/nextjs";
+import { useQuery } from "convex/react";
+import { api } from "../../../convex/_generated/api";
 
 const clerkReady = Boolean(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY);
 
@@ -16,10 +18,32 @@ const NAV = [
   { href: "/portal/compliance", label: "Compliance" },
   { href: "/portal/coi", label: "COI" },
   { href: "/portal/policies", label: "Policies" },
-  { href: "/portal/members", label: "Members" },
 ] as const;
 
-function PortalNav() {
+/**
+ * Tabs for approved board members only; people waiting for approval see just
+ * the Overview page. Admins also get Members, with the pending-request count.
+ */
+export function MemberNav() {
+  const role = useQuery(api.board.myRole);
+  const isMember = role !== undefined && role !== null && role !== "bootstrap_eligible";
+  const isAdmin = role === "admin";
+  const pending = useQuery(api.board.listAccessRequests, isAdmin ? {} : "skip");
+  if (!isMember) return null;
+  const count = pending?.length ?? 0;
+  return (
+    <PortalNav
+      items={[
+        ...NAV,
+        ...(isAdmin
+          ? [{ href: "/portal/members", label: count ? `Members (${count} pending)` : "Members" }]
+          : []),
+      ]}
+    />
+  );
+}
+
+function PortalNav({ items }: { items: ReadonlyArray<{ href: string; label: string }> }) {
   const path = usePathname();
   return (
     <nav
@@ -32,7 +56,7 @@ function PortalNav() {
         gap: 4,
       }}
     >
-      {NAV.map((item) => {
+      {items.map((item) => {
         const active =
           item.href === "/portal"
             ? path === "/portal"
@@ -64,7 +88,14 @@ function PortalNav() {
   );
 }
 
-export function PortalShell({ children }: { children: ReactNode }) {
+export function PortalShell({
+  children,
+  nav,
+}: {
+  children: ReactNode;
+  /** Rendered under the header; omitted until the visitor is a signed-in member. */
+  nav?: ReactNode;
+}) {
   return (
     <div
       style={{
@@ -116,9 +147,7 @@ export function PortalShell({ children }: { children: ReactNode }) {
           {clerkReady ? <UserButton /> : null}
         </div>
       </header>
-      <Suspense fallback={null}>
-        <PortalNav />
-      </Suspense>
+      {nav ? <Suspense fallback={null}>{nav}</Suspense> : null}
       <main
         id="portal-main"
         className="page-wrap"

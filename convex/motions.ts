@@ -5,16 +5,13 @@ import { mutation, query } from "./_generated/server";
 import { logAudit } from "./lib/audit";
 import { requireBoardIdentity, requireBoardRole } from "./lib/auth";
 import { isDirector } from "./lib/directors";
+import schema from "./schema";
 
+// Raw motion rows are returned, so the validator must match the table exactly.
 const motionReturn = v.object({
   _id: v.id("motions"),
-  title: v.string(),
-  description: v.optional(v.string()),
-  motionType: v.string(),
-  status: v.string(),
-  meetingId: v.optional(v.id("meetings")),
-  openedAt: v.optional(v.number()),
-  closedAt: v.optional(v.number()),
+  _creationTime: v.number(),
+  ...schema.tables.motions.validator.fields,
 });
 
 const tallyReturn = v.object({

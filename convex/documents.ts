@@ -1,6 +1,7 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { logAudit } from "./lib/audit";
+import { uploadRejection } from "./lib/uploads";
 import { requireBoardIdentity, requireBoardRole } from "./lib/auth";
 
 const categoryValidator = v.union(
@@ -60,6 +61,15 @@ export const saveDocument = mutation({
     const identity = await requireBoardIdentity(ctx);
     if (!args.title.trim()) {
       throw new Error("Title is required");
+    }
+    const file = await ctx.db.system.get(args.storageId);
+    if (!file) {
+      throw new Error("Upload not found; try again");
+    }
+    const rejection = uploadRejection(file.size, file.contentType ?? args.contentType);
+    if (rejection) {
+      await ctx.storage.delete(args.storageId);
+      throw new Error(rejection);
     }
     const id = await ctx.db.insert("documents", {
       title: args.title.trim(),

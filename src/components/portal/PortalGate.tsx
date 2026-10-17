@@ -10,7 +10,7 @@ import {
 import { usePathname } from "next/navigation";
 import { Suspense, type ReactNode } from "react";
 import { Button } from "@/components/core/Button";
-import { PortalShell } from "@/components/portal/PortalShell";
+import { MemberNav, PortalShell } from "@/components/portal/PortalShell";
 
 function clerkReady() {
   return Boolean(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY);
@@ -126,7 +126,13 @@ function SignedInGate({ children }: { children: ReactNode }) {
   }
 
   return (
-    <PortalShell>
+    <PortalShell
+      nav={
+        <Authenticated>
+          <MemberNav />
+        </Authenticated>
+      }
+    >
       <AuthLoading>
         <StatusPanel
           title="Connecting…"

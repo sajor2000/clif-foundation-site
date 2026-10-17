@@ -47,8 +47,15 @@ export const myRole = query({
       const identity = await ctx.auth.getUserIdentity();
       if (!identity) return null;
       const any = await ctx.db.query("boardMembers").take(1);
-      if (any.length === 0) return "bootstrap_eligible";
-      return null;
+      if (any.length > 0) return null;
+      // Only the designated email is offered Claim admin; everyone else requests access.
+      const email =
+        typeof identity.email === "string" && identity.emailVerified === true
+          ? identity.email
+          : undefined;
+      return canBootstrapAdmin(email, process.env.BOOTSTRAP_ADMIN_EMAIL)
+        ? "bootstrap_eligible"
+        : null;
     }
   },
 });

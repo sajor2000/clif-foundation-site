@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { api } from "../../../convex/_generated/api";
 import type { Id } from "../../../convex/_generated/dataModel";
+import { ACCEPTED_UPLOAD_TYPES } from "../../../convex/lib/uploads";
 import { Button } from "@/components/core/Button";
 import {
   DOCUMENT_CATEGORIES,
@@ -195,7 +196,12 @@ export function DocumentsWorkspace() {
           </label>
           <label style={{ display: "grid", gap: 6, fontSize: 14 }}>
             File (required)
-            <input type="file" required onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
+            <input
+              type="file"
+              required
+              accept={ACCEPTED_UPLOAD_TYPES}
+              onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+            />
           </label>
           {error ? (
             <p role="alert" style={{ margin: 0, color: "var(--status-error)", fontSize: 14 }}>
