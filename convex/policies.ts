@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
+import { logAudit } from "./lib/audit";
 import { requireBoardIdentity, requireBoardRole } from "./lib/auth";
 
 const policyTypeValidator = v.union(
@@ -48,8 +49,8 @@ export const registerPolicy = mutation({
   },
   returns: v.id("policies"),
   handler: async (ctx, args) => {
-    await requireBoardRole(ctx, ["secretary", "admin"]);
-    return await ctx.db.insert("policies", {
+    const { identity } = await requireBoardRole(ctx, ["secretary", "admin"]);
+    const id = await ctx.db.insert("policies", {
       policyType: args.policyType,
       title: args.title.trim(),
       version: args.version,
@@ -57,5 +58,12 @@ export const registerPolicy = mutation({
       reportingInstructions: args.reportingInstructions,
       adoptedAt: args.adoptedAt ?? Date.now(),
     });
+    await logAudit(ctx, {
+      kind: "policy.register",
+      summary: `Registered policy: ${args.title.trim()} (v${args.version})`,
+      actorSubject: identity.subject,
+      actorEmail: identity.email,
+    });
+    return id;
   },
 });

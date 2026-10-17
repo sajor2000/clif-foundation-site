@@ -42,10 +42,11 @@ export const listDisclosuresForYear = query({
   ),
   handler: async (ctx, args) => {
     await requireBoardIdentity(ctx);
-    const all = await ctx.db.query("coiDisclosures").take(500);
-    return all
-      .filter((d) => d.year === args.year)
-      .map((d) => ({
+    const rows = await ctx.db
+      .query("coiDisclosures")
+      .withIndex("by_year_member", (q) => q.eq("year", args.year))
+      .take(500);
+    return rows.map((d) => ({
         memberEmail: d.memberEmail,
         hasConflict: d.hasConflict,
         submittedAt: d.submittedAt,

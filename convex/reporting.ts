@@ -53,12 +53,13 @@ export const getReportingPack = query({
       };
     };
 
-    const taxYear = args.taxYear ?? new Date().getFullYear();
+    const taxYear = args.taxYear ?? new Date().getUTCFullYear() - 1;
+    // Tax section: tax documents for the selected year (or undated), not every
+    // document that happens to carry a tax year.
     const taxDocs = allDocs.filter(
       (d) =>
-        d.category === "tax" ||
-        d.reportingTag === "form_990" ||
-        d.taxYear === taxYear,
+        (d.category === "tax" || d.reportingTag === "form_990") &&
+        (d.taxYear === undefined || d.taxYear === taxYear),
     );
     const policyDocs = allDocs.filter(
       (d) => d.category === "policy" || d.category === "governance",

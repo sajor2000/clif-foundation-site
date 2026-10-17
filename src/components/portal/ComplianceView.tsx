@@ -9,11 +9,13 @@ import { inputStyle, pageTitle, panelStyle, sectionTitle } from "@/components/po
 
 export function ComplianceView() {
   const [year, setYear] = useState(new Date().getFullYear());
+  // The 990 reviewed this year covers the prior calendar year.
+  const [taxYear, setTaxYear] = useState(new Date().getFullYear() - 1);
   const [notes, setNotes] = useState("");
   const [meetingId, setMeetingId] = useState<Id<"meetings"> | "">("");
   const [error, setError] = useState<string | null>(null);
   const role = useQuery(api.board.myRole);
-  const dashboard = useQuery(api.compliance.getDashboard, { year });
+  const dashboard = useQuery(api.compliance.getDashboard, { year, taxYear });
   const audit = useQuery(api.compliance.listAuditEvents, {});
   const meetings = useQuery(api.meetings.listMeetings);
   const upsert990 = useMutation(api.form990.upsertReview);
@@ -50,7 +52,7 @@ export function ComplianceView() {
     }
     try {
       await upsert990({
-        taxYear: year,
+        taxYear,
         boardReviewedBeforeFiled: true,
         reviewMeetingId: meetingId || undefined,
         notes: notes.trim() || undefined,
@@ -64,13 +66,13 @@ export function ComplianceView() {
     <div style={{ display: "grid", gap: 28 }}>
       <h1 style={pageTitle}>Stay compliant</h1>
       <label style={{ display: "flex", gap: 12, alignItems: "center" }}>
-        Year
+        COI year
         <input
           type="number"
           value={year}
           onChange={(e) => setYear(Number(e.target.value))}
           style={{ width: 100, height: 44 }}
-          aria-label="Compliance year"
+          aria-label="Conflict of interest year"
         />
       </label>
 
@@ -79,8 +81,13 @@ export function ComplianceView() {
           <div style={panelStyle}>
             <h2 style={{ ...sectionTitle, fontSize: 20 }}>Conflict of interest</h2>
             <p style={{ margin: 0 }}>
-              Disclosures: {dashboard.coi.submitted} / {dashboard.coi.eligible}
+              Directors who filed for {year}: {dashboard.coi.submitted} / {dashboard.coi.eligible}
             </p>
+            {dashboard.coi.missing.length ? (
+              <p style={{ margin: 0, fontSize: 14, color: "var(--text-muted)" }}>
+                Still to file: {dashboard.coi.missing.join(", ")}
+              </p>
+            ) : null}
           </div>
           <div style={panelStyle}>
             <h2 style={{ ...sectionTitle, fontSize: 20 }}>Policies</h2>
@@ -89,6 +96,16 @@ export function ComplianceView() {
           </div>
           <div style={panelStyle}>
             <h2 style={{ ...sectionTitle, fontSize: 20 }}>Form 990 review</h2>
+            <label style={{ display: "flex", gap: 12, alignItems: "center", fontSize: 14 }}>
+              Tax year
+              <input
+                type="number"
+                value={taxYear}
+                onChange={(e) => setTaxYear(Number(e.target.value))}
+                style={{ width: 100, height: 44 }}
+                aria-label="Form 990 tax year"
+              />
+            </label>
             <p style={{ margin: 0 }}>
               Board reviewed before filed:{" "}
               {dashboard.form990.boardReviewedBeforeFiled ? "yes" : "no"}
@@ -128,7 +145,7 @@ export function ComplianceView() {
                   </p>
                 ) : null}
                 <Button type="button" variant="secondary" onClick={mark990Reviewed}>
-                  Mark {year} 990 as board-reviewed
+                  Mark {taxYear} 990 as board-reviewed
                 </Button>
               </>
             ) : (

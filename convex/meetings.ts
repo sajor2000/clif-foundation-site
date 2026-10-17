@@ -3,6 +3,7 @@ import { mutation, query } from "./_generated/server";
 import { logAudit } from "./lib/audit";
 import { requireBoardIdentity, requireBoardRole } from "./lib/auth";
 import { isDirector, loadDirectorEmails } from "./lib/directors";
+import { minutesTransitionError } from "./lib/minutes";
 import { tallyBallots } from "./lib/tally";
 import { quorumMet, quorumRequired } from "./lib/quorum";
 import schema from "./schema";
@@ -62,7 +63,7 @@ export const getMeeting = query({
       ? await ctx.db
           .query("minutesItems")
           .withIndex("by_minutes", (q) => q.eq("minutesId", minutes._id))
-          .collect()
+          .take(200)
       : [];
     return { meeting, minutes, items };
   },
@@ -173,34 +174,46 @@ export const upsertMinutes = mutation({
       .order("desc")
       .first();
 
-    if (existing?.status === "approved") {
-      throw new Error(
-        "Approved minutes are read-only. Use reviseMinutes to start a new version.",
-      );
-    }
+    const meeting = await ctx.db.get(args.meetingId);
+    if (!meeting) throw new Error("Meeting not found");
+    const nextStatus = args.status ?? existing?.status ?? "draft";
+    const blocked = minutesTransitionError(
+      existing?.status ?? null,
+      nextStatus,
+      meeting.status === "held",
+    );
+    if (blocked) throw new Error(blocked);
 
+    let id;
     if (existing) {
       await ctx.db.patch(existing._id, {
         body: args.body ?? existing.body,
-        status: args.status ?? existing.status,
+        status: nextStatus,
         updatedAt: Date.now(),
-        certifiedBy:
-          args.status === "approved" ? identity.subject : existing.certifiedBy,
-        certifiedAt:
-          args.status === "approved" ? Date.now() : existing.certifiedAt,
+        certifiedBy: nextStatus === "approved" ? identity.subject : existing.certifiedBy,
+        certifiedAt: nextStatus === "approved" ? Date.now() : existing.certifiedAt,
       });
-      return existing._id;
+      id = existing._id;
+    } else {
+      id = await ctx.db.insert("minutes", {
+        meetingId: args.meetingId,
+        body: args.body,
+        status: nextStatus,
+        version: 1,
+        createdBy: identity.subject,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      });
     }
-
-    return await ctx.db.insert("minutes", {
-      meetingId: args.meetingId,
-      body: args.body,
-      status: args.status ?? "draft",
-      version: 1,
-      createdBy: identity.subject,
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-    });
+    if (nextStatus !== (existing?.status ?? null)) {
+      await logAudit(ctx, {
+        kind: "minutes.status",
+        summary: `Minutes for ${meeting.title} → ${nextStatus}`,
+        actorSubject: identity.subject,
+        actorEmail: identity.email,
+      });
+    }
+    return id;
   },
 });
 
@@ -263,19 +276,26 @@ export const addMinutesItem = mutation({
   },
   returns: v.id("minutesItems"),
   handler: async (ctx, args) => {
-    await requireBoardRole(ctx, ["secretary", "admin"]);
+    const { identity } = await requireBoardRole(ctx, ["secretary", "admin"]);
     const minutes = await ctx.db.get(args.minutesId);
     if (!minutes) throw new Error("Minutes not found");
     if (minutes.status === "approved") {
       throw new Error("Cannot edit approved minutes");
     }
-    return await ctx.db.insert("minutesItems", {
+    const id = await ctx.db.insert("minutesItems", {
       minutesId: args.minutesId,
       title: args.title.trim(),
       discussion: args.discussion,
       sortOrder: args.sortOrder,
       coiRecusals: [],
     });
+    await logAudit(ctx, {
+      kind: "minutes.item_add",
+      summary: `Added minutes item: ${args.title.trim()}`,
+      actorSubject: identity.subject,
+      actorEmail: identity.email,
+    });
+    return id;
   },
 });
 
@@ -295,7 +315,7 @@ export const getMinutesExport = query({
       ? await ctx.db
           .query("minutesItems")
           .withIndex("by_minutes", (q) => q.eq("minutesId", minutes._id))
-          .collect()
+          .take(200)
       : [];
     const lines = [
       `# ${meeting.title}`,
