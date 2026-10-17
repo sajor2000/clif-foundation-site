@@ -1,12 +1,18 @@
 # CLIF Foundation website
 
-Public site for the CLIF Foundation (Illinois nonprofit; 501(c)(3) pending). Design system lives in `design/` (reference kit). Stack: **Next.js App Router**, **TypeScript**, **Tailwind**, **Effect 4**. Stripe checkout is stubbed as Coming soon.
+Public site for the CLIF Foundation (Illinois nonprofit; 501(c)(3) pending), plus a **private board portal** at `/portal` (Clerk + Convex). Design system lives in `design/` (reference kit). Stack: **Next.js App Router**, **TypeScript**, **Tailwind**, **Effect 4**, **Clerk**, **Convex**. Stripe checkout is stubbed as Coming soon.
 
 ## Local development
 
 ```bash
 npm install
-npm run dev   # Next.js on port 43127
+cp .env.example .env.local   # optional: Clerk + Convex for /portal
+
+# Terminal 1 — Convex (anonymous local dev)
+npm run convex:dev
+
+# Terminal 2 — Next.js on port 43127
+npm run dev
 ```
 
 Open [http://127.0.0.1:43127](http://127.0.0.1:43127).
@@ -24,6 +30,7 @@ Open [http://127.0.0.1:43127](http://127.0.0.1:43127).
 
 See `.env.example`. The public site needs no variables.
 
+- `NEXT_PUBLIC_CONVEX_URL`, `CLERK_*`, `CLERK_JWT_ISSUER_DOMAIN` (Convex dashboard) — board portal
 - `STRIPE_SECRET_KEY` — omit until bank + Stripe Nonprofit exist (UI stays Coming soon; `/api/donate` returns **503**)
 
 ## Routes
@@ -31,6 +38,8 @@ See `.env.example`. The public site needs no variables.
 | Route | Auth |
 |-------|------|
 | `/`, `/mission`, `/our-work`, `/research`, `/board`, `/support` | Public |
+| `/portal`, `/portal/reporting`, `/portal/documents`, … | Clerk-protected board workspace (not in public nav) |
+| `/portal/sign-in` | Board sign-in |
 | `/api/donate` | Public stub → 503 Coming soon |
 
 ## Effect 4
@@ -47,7 +56,7 @@ Workflow helpers use **effect@4.0.2** (Effect 4 APIs: `Effect.gen`, `Data.Tagged
 
 The Vercel project builds with `npm run build` (see `vercel.json`). Push to `main` for production; pull requests get preview deployments. No environment variables are required.
 
-A board document portal (Clerk + Convex) was removed in October 2026 to keep the site static; it is recoverable from git history if needed.
+The board portal includes a **Reporting pack** (grouped downloads for Form 990 / audit prep), document library, meetings/minutes, votes, COI disclosures, policy registry, and a compliance checklist. See [`docs/plans/private-board-portal.md`](docs/plans/private-board-portal.md).
 
 ## Design
 

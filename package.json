@@ -10,9 +10,12 @@
     "build": "next build",
     "start": "next start --hostname 0.0.0.0 --port 43127",
     "lint": "eslint",
-    "test:e2e": "node --test --test-concurrency=1 tests/e2e/*.test.mjs"
+    "test:e2e": "node --test --test-concurrency=1 tests/e2e/*.test.mjs",
+    "convex:dev": "CONVEX_AGENT_MODE=anonymous npx convex dev"
   },
   "dependencies": {
+    "@clerk/nextjs": "7.9.14",
+    "convex": "1.46.0",
     "effect": "4.0.2",
     "next": "16.4.0",
     "react": "19.3.0",
