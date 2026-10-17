@@ -3,20 +3,21 @@
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 
-// Survives client-side navigations, so the first page load keeps the
-// browser's default focus and every later route change is announced.
-let initialLoadDone = false;
+// Last pathname seen across client navigations. Comparing against it (rather
+// than a "first load done" flag) ignores Strict Mode's replayed mount effect,
+// which runs again with the same pathname.
+let lastPathname: string | null = null;
 
 /** Moves keyboard focus to #main after in-site navigation. */
 export function RouteFocus() {
   const pathname = usePathname();
 
   useEffect(() => {
-    if (!initialLoadDone) {
-      initialLoadDone = true;
-      return;
+    const previous = lastPathname;
+    lastPathname = pathname;
+    if (previous !== null && previous !== pathname) {
+      document.getElementById("main")?.focus({ preventScroll: true });
     }
-    document.getElementById("main")?.focus({ preventScroll: true });
   }, [pathname]);
 
   return null;

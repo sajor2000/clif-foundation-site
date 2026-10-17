@@ -22,8 +22,9 @@ export function PublicationRow({
         display: "flex",
         flexWrap: "wrap",
         gap: "8px 24px",
-        // 9px of the row padding moves onto the link so it is a 44px tap target.
-        padding: "13px 0",
+        // Row padding + the link's 9px padding keep the original row height while
+        // making the link a 44px tap target.
+        padding: "17px 0",
         borderBottom: "1px solid var(--border)",
         alignItems: "baseline",
       }}

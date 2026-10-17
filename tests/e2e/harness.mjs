@@ -21,12 +21,24 @@ let server;
 let browser;
 export let baseUrl = process.env.BASE_URL;
 
-async function waitForServer(url, timeoutMs = 30_000) {
+async function responds(url) {
+  try {
+    await fetch(url);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+async function waitForServer(url, child, timeoutMs = 30_000) {
   const deadline = Date.now() + timeoutMs;
   while (Date.now() < deadline) {
-    try {
-      if ((await fetch(url)).ok) return;
-    } catch {}
+    if (child.exitCode !== null || child.signalCode !== null) {
+      throw new Error(
+        `next start exited early (${child.exitCode ?? child.signalCode})`,
+      );
+    }
+    if (await responds(url)) return;
     await new Promise((r) => setTimeout(r, 250));
   }
   throw new Error(`server at ${url} did not start`);
@@ -34,19 +46,29 @@ async function waitForServer(url, timeoutMs = 30_000) {
 
 export async function setup() {
   if (!baseUrl) {
+    const url = `http://127.0.0.1:${PORT}`;
+    // Never test against whatever else happens to hold the port.
+    if (await responds(url)) {
+      throw new Error(
+        `port ${PORT} is already in use; set E2E_PORT or BASE_URL`,
+      );
+    }
     server = spawn("npx", ["next", "start", "--port", String(PORT)], {
       stdio: "ignore",
       detached: true,
     });
-    baseUrl = `http://127.0.0.1:${PORT}`;
-    await waitForServer(baseUrl);
+    await waitForServer(url, server);
+    baseUrl = url;
   }
   browser = await chromium.launch({ executablePath: CHROME, headless: true });
 }
 
 export async function teardown() {
   await browser?.close();
-  if (server) process.kill(-server.pid);
+  if (!server || server.exitCode !== null || server.signalCode !== null) return;
+  const exited = new Promise((r) => server.once("exit", r));
+  process.kill(-server.pid);
+  await exited;
 }
 
 /** Opens a page at `path` and waits for the ScrollCraft engine (home only). */
