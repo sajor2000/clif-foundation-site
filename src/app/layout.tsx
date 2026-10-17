@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { AppProviders } from "@/components/providers/AppProviders";
 import { funnelDisplay, funnelSans, splineMono } from "@/lib/fonts";
 import { GivebutterScript } from "@/components/support/GivebutterScript";
 import { SITE_URL } from "@/lib/site";
@@ -40,7 +41,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           dangerouslySetInnerHTML={{ __html: jsonLdScript(ORGANIZATION_JSON_LD) }}
         />
         <GivebutterScript />
-        {children}
+        <AppProviders>{children}</AppProviders>
       </body>
     </html>
   );
