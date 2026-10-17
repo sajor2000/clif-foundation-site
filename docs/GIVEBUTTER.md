@@ -12,18 +12,21 @@ The site loads:
 
 Override with `NEXT_PUBLIC_GIVEBUTTER_ACCOUNT_ID` only if the account changes.
 
-## 2. Campaign code (required for the form)
+## 2. Widget ID (required for the form)
 
-1. In Givebutter, open the CLIF Foundation campaign.
-2. Create or open a **Giving Form** widget.
-3. Copy the **campaign** code from the embed snippet (for example `campaign="XXXX"`).
-4. Set on Vercel (Production + Preview) and in `.env.local`:
+The live site uses the **CLIF Foundation** campaign's giving widget (`LPkWmy`).
+
+1. In Givebutter, open the campaign → **Sharing / Widgets** → the giving form → **Embed**.
+2. The snippet looks like `<givebutter-widget id="LPkWmy"></givebutter-widget>`. Copy the `id`.
+3. Set on Vercel (Production + Preview) and in `.env.local`, then redeploy (the value is built into the page):
 
 ```bash
-NEXT_PUBLIC_GIVEBUTTER_CAMPAIGN_CODE=XXXX
+NEXT_PUBLIC_GIVEBUTTER_WIDGET_ID=LPkWmy
 ```
 
-Without this variable, `/support` shows a polite “form coming shortly” message and points donors to `info@clificufoundation.org`.
+Older `<givebutter-giving-form campaign="…">` snippets still work through `NEXT_PUBLIC_GIVEBUTTER_CAMPAIGN_CODE`; the widget ID wins if both are set.
+
+Without either variable, `/support` shows a polite “form coming shortly” message and points donors to `info@clificufoundation.org`.
 
 ## 3. Thank-you / receipt copy
 
@@ -44,7 +47,7 @@ Until a 501(c)(3) determination letter is posted, receipts must **not** claim ta
 ## Local check
 
 ```bash
-echo 'NEXT_PUBLIC_GIVEBUTTER_CAMPAIGN_CODE=your-code' >> .env.local
+echo 'NEXT_PUBLIC_GIVEBUTTER_WIDGET_ID=LPkWmy' >> .env.local
 npm run dev
 # open http://127.0.0.1:43127/support#give
 ```
