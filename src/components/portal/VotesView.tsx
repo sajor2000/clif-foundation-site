@@ -18,6 +18,7 @@ export function VotesView({ focusId }: { focusId?: string } = {}) {
   const createMotion = useMutation(api.motions.createMotion);
   const setStatus = useMutation(api.motions.setMotionStatus);
   const castBallot = useMutation(api.motions.castBallot);
+  const canVote = useQuery(api.board.amIDirector) === true;
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -141,16 +142,22 @@ export function VotesView({ focusId }: { focusId?: string } = {}) {
                 ) : null}
                 {motion.status === "open" ? (
                   <>
-                    {(["yes", "no", "abstain", "recuse"] as const).map((choice) => (
-                      <Button
-                        key={choice}
-                        type="button"
-                        variant="secondary"
-                        onClick={() => castBallot({ motionId: motion._id, choice })}
-                      >
-                        Vote {choice}
-                      </Button>
-                    ))}
+                    {canVote
+                      ? (["yes", "no", "abstain", "recuse"] as const).map((choice) => (
+                          <Button
+                            key={choice}
+                            type="button"
+                            variant="secondary"
+                            onClick={() =>
+                              castBallot({ motionId: motion._id, choice }).catch((e: Error) =>
+                                setError(e.message),
+                              )
+                            }
+                          >
+                            Vote {choice}
+                          </Button>
+                        ))
+                      : null}
                     <Button
                       type="button"
                       onClick={() =>

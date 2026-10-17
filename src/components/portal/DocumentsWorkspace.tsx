@@ -33,13 +33,16 @@ export function DocumentsWorkspace() {
   );
   const categoryFilter = filterOverride ?? urlFilter;
   const [search, setSearch] = useState("");
+  const [showArchived, setShowArchived] = useState(false);
   const docs = useQuery(api.documents.listDocuments, {
     category: categoryFilter || undefined,
     search: search.trim() || undefined,
+    archived: showArchived || undefined,
   });
   const generateUploadUrl = useMutation(api.documents.generateUploadUrl);
   const saveDocument = useMutation(api.documents.saveDocument);
   const archiveDocument = useMutation(api.documents.archiveDocument);
+  const restoreDocument = useMutation(api.documents.restoreDocument);
   const setLegalHold = useMutation(api.documents.setLegalHold);
   const role = useQuery(api.board.myRole);
   const canManageDocs = role === "admin" || role === "secretary";
@@ -215,7 +218,17 @@ export function DocumentsWorkspace() {
       </section>
 
       <section style={{ display: "grid", gap: 12 }}>
-        <h2 style={sectionTitle}>Library</h2>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 16, alignItems: "baseline" }}>
+          <h2 style={sectionTitle}>{showArchived ? "Archived" : "Library"}</h2>
+          <label style={{ display: "flex", gap: 8, alignItems: "center", fontSize: 14, minHeight: 44 }}>
+            <input
+              type="checkbox"
+              checked={showArchived}
+              onChange={(e) => setShowArchived(e.target.checked)}
+            />
+            Show archived documents (hidden, never deleted)
+          </label>
+        </div>
         {docs === undefined ? (
           <p style={{ color: "var(--text-muted)" }}>Loading…</p>
         ) : docs.length === 0 ? (
@@ -271,25 +284,32 @@ export function DocumentsWorkspace() {
                     >
                       {doc.legalHold ? "Clear hold" : "Legal hold"}
                     </Button>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      disabled={doc.legalHold}
-                      onClick={() => {
-                        if (
-                          !window.confirm(
-                            `Permanently delete “${doc.title}” from the board library and file storage?`,
+                    {showArchived ? (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        onClick={() =>
+                          restoreDocument({ documentId: doc._id }).catch((e: Error) =>
+                            setError(e.message),
                           )
-                        ) {
-                          return;
                         }
-                        archiveDocument({ documentId: doc._id }).catch((e: Error) =>
-                          setError(e.message),
-                        );
-                      }}
-                    >
-                      Archive
-                    </Button>
+                      >
+                        Restore
+                      </Button>
+                    ) : (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        disabled={doc.legalHold}
+                        onClick={() =>
+                          archiveDocument({ documentId: doc._id }).catch((e: Error) =>
+                            setError(e.message),
+                          )
+                        }
+                      >
+                        Archive
+                      </Button>
+                    )}
                   </>
                 ) : null}
               </li>

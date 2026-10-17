@@ -84,6 +84,9 @@ export default defineSchema({
     taxYear: v.optional(v.number()),
     policyType: v.optional(policyType),
     reportingTag: v.optional(v.string()),
+    /** Archived documents are hidden from lists and the reporting pack, never deleted. */
+    archivedAt: v.optional(v.number()),
+    archivedBy: v.optional(v.string()),
   })
     .index("by_created", ["createdAt"])
     .index("by_category", ["category", "createdAt"])

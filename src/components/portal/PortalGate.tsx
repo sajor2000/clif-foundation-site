@@ -60,13 +60,19 @@ function StatusPanel({
   );
 }
 
+/** Setup details for developers only; production visitors never see config names. */
+const devHint = (hint: string, publicText: string) =>
+  process.env.NODE_ENV === "production" ? publicText : `${publicText} (${hint})`;
+
+const UNAVAILABLE = "The board portal is not available right now. Please try again later.";
+
 export function PortalGate({ children }: { children: ReactNode }) {
   if (!clerkReady()) {
     return (
       <PortalShell>
         <StatusPanel
-          title="Clerk not configured"
-          body="Set NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY and CLERK_SECRET_KEY to enable the board portal. Public pages work without Clerk."
+          title="Board portal unavailable"
+          body={devHint("Clerk keys are not set", UNAVAILABLE)}
         />
       </PortalShell>
     );
@@ -76,8 +82,8 @@ export function PortalGate({ children }: { children: ReactNode }) {
     return (
       <PortalShell>
         <StatusPanel
-          title="Convex not configured"
-          body="Set NEXT_PUBLIC_CONVEX_URL (from npx convex dev) to use the board portal."
+          title="Board portal unavailable"
+          body={devHint("NEXT_PUBLIC_CONVEX_URL is not set", UNAVAILABLE)}
         />
       </PortalShell>
     );
@@ -136,13 +142,16 @@ function SignedInGate({ children }: { children: ReactNode }) {
       <AuthLoading>
         <StatusPanel
           title="Connecting…"
-          body="Confirming your board session with Convex."
+          body="Confirming your board session."
         />
       </AuthLoading>
       <Unauthenticated>
         <StatusPanel
           title="Session not ready"
-          body="Clerk signed you in, but Convex has not validated the token yet. Refresh, or sign out and try again. Confirm CLERK_JWT_ISSUER_DOMAIN on the Convex deployment."
+          body={devHint(
+            "Convex rejected the Clerk token; check CLERK_JWT_ISSUER_DOMAIN",
+            "We could not confirm your session. Refresh the page, or sign out and sign in again.",
+          )}
           action={<Button href="/portal/sign-in">Sign in again</Button>}
         />
       </Unauthenticated>
@@ -160,7 +169,7 @@ function ConvexReady({ children }: { children: ReactNode }) {
     return (
       <StatusPanel
         title="Connecting…"
-        body="Confirming your board session with Convex."
+        body="Confirming your board session."
       />
     );
   }
@@ -168,7 +177,7 @@ function ConvexReady({ children }: { children: ReactNode }) {
     return (
       <StatusPanel
         title="Session not ready"
-        body="Waiting for Convex to accept your Clerk token."
+        body="Confirming your board session."
       />
     );
   }

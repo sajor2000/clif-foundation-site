@@ -13,12 +13,26 @@ export function MembersView() {
   const members = useQuery(api.board.listMembers);
   const role = useQuery(api.board.myRole);
   const upsert = useMutation(api.board.upsertMember);
+  const remove = useMutation(api.board.removeMember);
+  const [confirmRemove, setConfirmRemove] = useState<string | null>(null);
+  const [listError, setListError] = useState<string | null>(null);
   const [email, setEmail] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [memberRole, setMemberRole] = useState<(typeof ROLES)[number]>("member");
   const [isDirector, setIsDirector] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
+
+  async function onRemove(target: string) {
+    setListError(null);
+    try {
+      await remove({ email: target });
+    } catch (e) {
+      setListError(e instanceof Error ? e.message : "Could not remove member");
+    } finally {
+      setConfirmRemove(null);
+    }
+  }
 
   async function onAdd() {
     setError(null);
@@ -129,6 +143,11 @@ export function MembersView() {
         </Button>
       </div>
 
+      {listError ? (
+        <p role="alert" style={{ margin: 0, color: "var(--status-error)", fontSize: 14 }}>
+          {listError}
+        </p>
+      ) : null}
       <ul style={{ margin: 0, padding: 0, listStyle: "none" }}>
         {!members ? (
           <li>Loading…</li>
@@ -150,6 +169,27 @@ export function MembersView() {
               <span style={{ fontFamily: "var(--font-mono)", fontSize: 12, color: "var(--text-muted)" }}>
                 {m.email} · {m.role ?? "member"} ·{" "}
                 {m.isDirector ? "director" : "non-director"}
+              </span>
+              <span style={{ marginLeft: "auto", display: "flex", gap: 8 }}>
+                {confirmRemove === m.email ? (
+                  <>
+                    <Button type="button" variant="secondary" onClick={() => onRemove(m.email)}>
+                      Confirm removal
+                    </Button>
+                    <Button type="button" variant="ghost" onClick={() => setConfirmRemove(null)}>
+                      Cancel
+                    </Button>
+                  </>
+                ) : (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    aria-label={`Remove ${m.email}`}
+                    onClick={() => setConfirmRemove(m.email)}
+                  >
+                    Remove
+                  </Button>
+                )}
               </span>
             </li>
           ))

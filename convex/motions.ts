@@ -1,10 +1,11 @@
 import { v } from "convex/values";
-import type { Id } from "./_generated/dataModel";
+import type { Doc } from "./_generated/dataModel";
 import type { QueryCtx } from "./_generated/server";
 import { mutation, query } from "./_generated/server";
 import { logAudit } from "./lib/audit";
-import { requireBoardIdentity, requireBoardRole } from "./lib/auth";
-import { isDirector } from "./lib/directors";
+import { getBoardMember, requireBoardIdentity, requireBoardRole } from "./lib/auth";
+import { isDirector, loadDirectorEmails } from "./lib/directors";
+import { tallyBallots } from "./lib/tally";
 import schema from "./schema";
 
 // Raw motion rows are returned, so the validator must match the table exactly.
@@ -54,7 +55,7 @@ export const listMotions = query({
     for (const motion of motions) {
       results.push({
         motion,
-        tally: await computeTally(ctx, motion._id, motion.motionType, motion.status),
+        tally: await computeTally(ctx, motion),
       });
     }
     return results;
@@ -63,38 +64,13 @@ export const listMotions = query({
 
 async function computeTally(
   ctx: QueryCtx,
-  motionId: Id<"motions">,
-  motionType: string,
-  status: string,
+  motion: Pick<Doc<"motions">, "_id" | "motionType" | "status">,
 ) {
   const ballots = await ctx.db
     .query("ballots")
-    .withIndex("by_motion", (q) => q.eq("motionId", motionId))
+    .withIndex("by_motion", (q) => q.eq("motionId", motion._id))
     .take(500);
-  const members = await ctx.db.query("boardMembers").take(200);
-  const directors = members.filter(isDirector);
-  const directorCount = directors.length > 0 ? directors.length : 1;
-  const yes = ballots.filter((b) => b.choice === "yes").length;
-  const no = ballots.filter((b) => b.choice === "no").length;
-  const abstain = ballots.filter((b) => b.choice === "abstain").length;
-  const recuse = ballots.filter((b) => b.choice === "recuse").length;
-  const voted = ballots.length;
-  // Recused directors are excluded from the unanimous consent denominator.
-  const eligible =
-    motionType === "consent"
-      ? Math.max(1, directorCount - recuse)
-      : directorCount;
-
-  let passed = false;
-  if (status === "closed") {
-    if (motionType === "consent") {
-      passed = yes === eligible && no === 0 && abstain === 0;
-    } else {
-      passed = yes > no;
-    }
-  }
-
-  return { yes, no, abstain, recuse, eligible, voted, passed };
+  return tallyBallots(ballots, await loadDirectorEmails(ctx), motion.motionType, motion.status);
 }
 
 export const getMotion = query({
@@ -114,12 +90,7 @@ export const getMotion = query({
     const identity = await requireBoardIdentity(ctx);
     const motion = await ctx.db.get(args.motionId);
     if (!motion) return null;
-    const tally = await computeTally(
-      ctx,
-      args.motionId,
-      motion.motionType,
-      motion.status,
-    );
+    const tally = await computeTally(ctx, motion);
     const myBallot = await ctx.db
       .query("ballots")
       .withIndex("by_motion_voter", (q) =>
@@ -225,6 +196,10 @@ export const castBallot = mutation({
   returns: v.null(),
   handler: async (ctx, args) => {
     const identity = await requireBoardIdentity(ctx);
+    // Only directors vote; officers or admins who are not directors cannot.
+    if (!isDirector(await getBoardMember(ctx, identity.email))) {
+      throw new Error("Only directors can vote on motions");
+    }
     const motion = await ctx.db.get(args.motionId);
     if (!motion) throw new Error("Motion not found");
     if (motion.status !== "open") {
