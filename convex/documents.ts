@@ -56,7 +56,10 @@ export const saveDocument = mutation({
     taxYear: v.optional(v.number()),
     reportingTag: v.optional(v.string()),
   },
-  returns: v.id("documents"),
+  returns: v.union(
+    v.object({ ok: v.literal(true), id: v.id("documents") }),
+    v.object({ ok: v.literal(false), error: v.string() }),
+  ),
   handler: async (ctx, args) => {
     const identity = await requireBoardIdentity(ctx);
     if (!args.title.trim()) {
@@ -68,8 +71,9 @@ export const saveDocument = mutation({
     }
     const rejection = uploadRejection(file.size, file.contentType ?? args.contentType);
     if (rejection) {
+      // Return instead of throwing: a thrown error would roll back this delete.
       await ctx.storage.delete(args.storageId);
-      throw new Error(rejection);
+      return { ok: false as const, error: rejection };
     }
     const id = await ctx.db.insert("documents", {
       title: args.title.trim(),
@@ -90,7 +94,7 @@ export const saveDocument = mutation({
       actorEmail: identity.email,
       metadata: { documentId: id, category: args.category },
     });
-    return id;
+    return { ok: true as const, id };
   },
 });
 

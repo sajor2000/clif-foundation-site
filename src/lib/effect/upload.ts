@@ -1,4 +1,5 @@
 import { Data, Effect } from "effect";
+import { uploadRejection } from "../../../convex/lib/uploads";
 import {
   InvalidDocumentMeta,
   validateDocumentMeta,
@@ -33,7 +34,7 @@ export type UploadDocumentDeps = {
     title: string;
     category: DocumentMeta["category"];
     contentType: string;
-  }) => Promise<unknown>;
+  }) => Promise<{ ok: true } | { ok: false; error: string }>;
 };
 
 /**
@@ -57,6 +58,12 @@ export function uploadDocumentProgram(
       category: input.category,
       contentType: file.type || "application/octet-stream",
     });
+
+    // Same rule the server applies; checking first avoids storing a file we would reject.
+    const rejection = uploadRejection(file.size, meta.contentType);
+    if (rejection) {
+      return yield* new SaveDocumentFailed({ reason: rejection });
+    }
 
     const uploadUrl = yield* Effect.tryPromise({
       try: () => deps.generateUploadUrl(),
@@ -99,13 +106,15 @@ export function uploadDocumentProgram(
     });
 
     yield* Effect.tryPromise({
-      try: () =>
-        deps.saveDocument({
+      try: async () => {
+        const saved = await deps.saveDocument({
           storageId,
           title: meta.title,
           category: meta.category,
           contentType: meta.contentType,
-        }),
+        });
+        if (!saved.ok) throw new Error(saved.error);
+      },
       catch: (e) =>
         new SaveDocumentFailed({
           reason: e instanceof Error ? e.message : "Failed to save document",

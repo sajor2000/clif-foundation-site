@@ -67,7 +67,7 @@ export function DocumentsWorkspace() {
         {
           generateUploadUrl,
           saveDocument: async (args) => {
-            await saveDocument({
+            return await saveDocument({
               storageId: args.storageId as Id<"_storage">,
               title: args.title,
               category: args.category as DocumentCategory,
