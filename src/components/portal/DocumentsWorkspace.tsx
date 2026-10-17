@@ -3,7 +3,7 @@
 import { useMutation, useQuery } from "convex/react";
 import { Cause, Effect, Exit } from "effect";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import { api } from "../../../convex/_generated/api";
 import type { Id } from "../../../convex/_generated/dataModel";
 import { Button } from "@/components/core/Button";
@@ -25,10 +25,12 @@ function isCategory(v: string): v is DocumentCategory {
 
 export function DocumentsWorkspace() {
   const searchParams = useSearchParams();
-  const initialCategory = searchParams.get("category") ?? "";
-  const [categoryFilter, setCategoryFilter] = useState<DocumentCategory | "">(
-    isCategory(initialCategory) ? initialCategory : "",
+  const urlCategory = searchParams.get("category") ?? "";
+  const urlFilter = isCategory(urlCategory) ? urlCategory : "";
+  const [filterOverride, setFilterOverride] = useState<DocumentCategory | "" | null>(
+    null,
   );
+  const categoryFilter = filterOverride ?? urlFilter;
   const [search, setSearch] = useState("");
   const docs = useQuery(api.documents.listDocuments, {
     category: categoryFilter || undefined,
@@ -42,23 +44,16 @@ export function DocumentsWorkspace() {
   const canManageDocs = role === "admin" || role === "secretary";
 
   const [title, setTitle] = useState("");
-  const [category, setCategory] = useState<DocumentCategory>(
-    isCategory(initialCategory) ? initialCategory : "governance",
+  const [categoryOverride, setCategoryOverride] = useState<DocumentCategory | null>(
+    null,
   );
+  const category = categoryOverride ?? (urlFilter || "governance");
   const [retentionClass, setRetentionClass] =
     useState<(typeof RETENTION_CLASSES)[number]["value"]>("permanent");
   const [taxYear, setTaxYear] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
-
-  useEffect(() => {
-    const c = searchParams.get("category") ?? "";
-    if (isCategory(c)) {
-      setCategoryFilter(c);
-      setCategory(c);
-    }
-  }, [searchParams]);
 
   async function onUpload(e: FormEvent) {
     e.preventDefault();
@@ -116,7 +111,9 @@ export function DocumentsWorkspace() {
         />
         <select
           value={categoryFilter}
-          onChange={(e) => setCategoryFilter(e.target.value as DocumentCategory | "")}
+          onChange={(e) =>
+            setFilterOverride(e.target.value as DocumentCategory | "")
+          }
           style={{ ...inputStyle, flex: "0 1 200px" }}
           aria-label="Filter by category"
         >
@@ -157,7 +154,9 @@ export function DocumentsWorkspace() {
             Category
             <select
               value={category}
-              onChange={(e) => setCategory(e.target.value as DocumentCategory)}
+              onChange={(e) =>
+                setCategoryOverride(e.target.value as DocumentCategory)
+              }
               style={inputStyle}
             >
               {DOCUMENT_CATEGORIES.map((c) => (

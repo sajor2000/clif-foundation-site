@@ -87,6 +87,8 @@ export default defineSchema({
     email: v.string(),
     role: v.optional(boardRole),
     displayName: v.optional(v.string()),
+    /** Counts toward meeting quorum / director attendance (not inferred from role). */
+    isDirector: v.optional(v.boolean()),
   }).index("by_email", ["email"]),
 
   meetings: defineTable({

@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery } from "convex/react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { api } from "../../../convex/_generated/api";
 import { Button } from "@/components/core/Button";
 import { inputStyle, pageTitle, panelStyle } from "@/components/portal/portal-styles";
@@ -10,26 +10,29 @@ export function CoiForm() {
   const year = new Date().getFullYear();
   const existing = useQuery(api.coi.getMyDisclosure, { year });
   const submit = useMutation(api.coi.submitDisclosure);
-  const [hasConflict, setHasConflict] = useState(false);
-  const [details, setDetails] = useState("");
+  const [draftConflict, setDraftConflict] = useState<boolean | null>(null);
+  const [draftDetails, setDraftDetails] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  useEffect(() => {
-    if (existing) {
-      setHasConflict(existing.hasConflict);
-      setDetails(existing.details ?? "");
-    }
-  }, [existing]);
+  const hasConflict = draftConflict ?? existing?.hasConflict ?? false;
+  const details = draftDetails ?? existing?.details ?? "";
 
   async function onSubmit() {
+    if (isSubmitting) return;
     setError(null);
     setSaved(false);
+    setIsSubmitting(true);
     try {
       await submit({ year, hasConflict, details: details || undefined });
       setSaved(true);
+      setDraftConflict(null);
+      setDraftDetails(null);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to save disclosure");
+    } finally {
+      setIsSubmitting(false);
     }
   }
 
@@ -58,7 +61,7 @@ export function CoiForm() {
           <input
             type="checkbox"
             checked={hasConflict}
-            onChange={(e) => setHasConflict(e.target.checked)}
+            onChange={(e) => setDraftConflict(e.target.checked)}
           />
           I have a reportable conflict or relationship to disclose
         </label>
@@ -66,7 +69,7 @@ export function CoiForm() {
           Details (if any)
           <textarea
             value={details}
-            onChange={(e) => setDetails(e.target.value)}
+            onChange={(e) => setDraftDetails(e.target.value)}
             rows={5}
             style={{ ...inputStyle, height: "auto", padding: 12 }}
           />
@@ -76,8 +79,8 @@ export function CoiForm() {
             {error}
           </p>
         ) : null}
-        <Button type="button" onClick={onSubmit}>
-          Submit {year} disclosure
+        <Button type="button" onClick={onSubmit} disabled={isSubmitting}>
+          {isSubmitting ? "Saving…" : `Submit ${year} disclosure`}
         </Button>
         {saved ? (
           <p role="status" style={{ margin: 0, color: "var(--accent-text)", fontSize: 14 }}>

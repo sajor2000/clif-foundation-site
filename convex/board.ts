@@ -14,6 +14,7 @@ export const listMembers = query({
       email: v.string(),
       role: v.optional(v.string()),
       displayName: v.optional(v.string()),
+      isDirector: v.boolean(),
     }),
   ),
   handler: async (ctx) => {
@@ -23,6 +24,7 @@ export const listMembers = query({
       email: m.email,
       role: m.role,
       displayName: m.displayName,
+      isDirector: m.isDirector !== false,
     }));
   },
 });
@@ -62,6 +64,7 @@ export const upsertMember = mutation({
       ),
     ),
     displayName: v.optional(v.string()),
+    isDirector: v.optional(v.boolean()),
   },
   returns: v.null(),
   handler: async (ctx, args) => {
@@ -75,12 +78,14 @@ export const upsertMember = mutation({
       await ctx.db.patch(existing._id, {
         role: args.role ?? existing.role,
         displayName: args.displayName ?? existing.displayName,
+        isDirector: args.isDirector ?? existing.isDirector ?? true,
       });
     } else {
       await ctx.db.insert("boardMembers", {
         email,
         role: args.role ?? "member",
         displayName: args.displayName,
+        isDirector: args.isDirector ?? true,
       });
     }
     await logAudit(ctx, {
@@ -126,6 +131,8 @@ export const bootstrapAdmin = mutation({
       email: identity.email,
       role: "admin",
       displayName: identity.name ?? undefined,
+      // Claiming admin is usually a director; toggle off in Members if not.
+      isDirector: true,
     });
     await logAudit(ctx, {
       kind: "board.bootstrap",

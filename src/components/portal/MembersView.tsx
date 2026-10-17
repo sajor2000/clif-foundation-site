@@ -15,6 +15,7 @@ export function MembersView() {
   const [email, setEmail] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [memberRole, setMemberRole] = useState<(typeof ROLES)[number]>("member");
+  const [isDirector, setIsDirector] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
 
@@ -26,9 +27,11 @@ export function MembersView() {
         email,
         role: memberRole,
         displayName: displayName || undefined,
+        isDirector,
       });
       setEmail("");
       setDisplayName("");
+      setIsDirector(true);
       setSaved(true);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to save member");
@@ -51,8 +54,8 @@ export function MembersView() {
       <div>
         <h1 style={pageTitle}>Members allowlist</h1>
         <p style={{ margin: "8px 0 0", maxWidth: 560, lineHeight: 1.55, fontSize: 15 }}>
-          Only these emails can use the portal once the list is non-empty. Add directors manually
-          (public roster JSON does not include emails).
+          Portal access is by email. Quorum counts only members marked as directors (role alone does
+          not count).
         </p>
       </div>
 
@@ -81,16 +84,32 @@ export function MembersView() {
         <label style={{ display: "grid", gap: 6, fontSize: 14 }}>
           Role
           <select
-          value={memberRole}
-          onChange={(e) => setMemberRole(e.target.value as (typeof ROLES)[number])}
-          style={inputStyle}
-        >
-          {ROLES.map((r) => (
-            <option key={r} value={r}>
-              {r}
-            </option>
-          ))}
+            value={memberRole}
+            onChange={(e) => setMemberRole(e.target.value as (typeof ROLES)[number])}
+            style={inputStyle}
+          >
+            {ROLES.map((r) => (
+              <option key={r} value={r}>
+                {r}
+              </option>
+            ))}
           </select>
+        </label>
+        <label
+          style={{
+            display: "flex",
+            gap: 8,
+            alignItems: "center",
+            fontSize: 14,
+            minHeight: 44,
+          }}
+        >
+          <input
+            type="checkbox"
+            checked={isDirector}
+            onChange={(e) => setIsDirector(e.target.checked)}
+          />
+          Counts as director for quorum
         </label>
         {error ? (
           <p role="alert" style={{ margin: 0, color: "var(--status-error)", fontSize: 14 }}>
@@ -126,7 +145,8 @@ export function MembersView() {
             >
               <span style={{ fontWeight: 500 }}>{m.displayName || m.email}</span>
               <span style={{ fontFamily: "var(--font-mono)", fontSize: 12, color: "var(--text-muted)" }}>
-                {m.email} · {m.role ?? "member"}
+                {m.email} · {m.role ?? "member"} ·{" "}
+                {m.isDirector ? "director" : "non-director"}
               </span>
             </li>
           ))

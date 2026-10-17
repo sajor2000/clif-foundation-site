@@ -4,6 +4,7 @@ import type { QueryCtx } from "./_generated/server";
 import { mutation, query } from "./_generated/server";
 import { logAudit } from "./lib/audit";
 import { requireBoardIdentity, requireBoardRole } from "./lib/auth";
+import { isDirector } from "./lib/directors";
 
 const motionReturn = v.object({
   _id: v.id("motions"),
@@ -74,7 +75,8 @@ async function computeTally(
     .withIndex("by_motion", (q) => q.eq("motionId", motionId))
     .take(500);
   const members = await ctx.db.query("boardMembers").take(200);
-  const directorCount = members.length > 0 ? members.length : 1;
+  const directors = members.filter(isDirector);
+  const directorCount = directors.length > 0 ? directors.length : 1;
   const yes = ballots.filter((b) => b.choice === "yes").length;
   const no = ballots.filter((b) => b.choice === "no").length;
   const abstain = ballots.filter((b) => b.choice === "abstain").length;

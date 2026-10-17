@@ -2,6 +2,7 @@ import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { logAudit } from "./lib/audit";
 import { requireBoardIdentity, requireBoardRole } from "./lib/auth";
+import { isDirector } from "./lib/directors";
 import { quorumMet, quorumRequired } from "./lib/quorum";
 
 const meetingReturn = v.object({
@@ -91,12 +92,8 @@ export const createMeeting = mutation({
       "admin",
     ]);
     const members = await ctx.db.query("boardMembers").take(200);
-    const settings = await ctx.db.query("orgSettings").take(1);
-    const fraction = settings[0]?.quorumFraction ?? 0.5;
-    const computedQuorum = quorumRequired(
-      Math.max(1, members.length),
-      fraction,
-    );
+    const directorCount = members.filter(isDirector).length;
+    const computedQuorum = quorumRequired(Math.max(1, directorCount));
     const id = await ctx.db.insert("meetings", {
       title: args.title.trim(),
       scheduledAt: args.scheduledAt,
@@ -142,7 +139,7 @@ export const updateAttendance = mutation({
     ];
     const members = await ctx.db.query("boardMembers").take(200);
     const directorEmails = new Set(
-      members.map((m) => m.email.trim().toLowerCase()),
+      members.filter(isDirector).map((m) => m.email.trim().toLowerCase()),
     );
     const directorPresent = unique.filter((e) => directorEmails.has(e));
     await ctx.db.patch(args.meetingId, {

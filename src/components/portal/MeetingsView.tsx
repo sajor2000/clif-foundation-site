@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useMutation, useQuery } from "convex/react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { api } from "../../../convex/_generated/api";
 import type { Id } from "../../../convex/_generated/dataModel";
 import { Button } from "@/components/core/Button";
@@ -11,7 +11,8 @@ import { inputStyle, pageTitle, panelStyle, sectionTitle } from "@/components/po
 export function MeetingsView({ meetingId }: { meetingId?: Id<"meetings"> } = {}) {
   const [title, setTitle] = useState("");
   const [scheduledAt, setScheduledAt] = useState("");
-  const [selected, setSelected] = useState<Id<"meetings"> | null>(meetingId ?? null);
+  const [pickedId, setPickedId] = useState<Id<"meetings"> | null>(null);
+  const selected = meetingId ?? pickedId;
   const meetings = useQuery(api.meetings.listMeetings);
   const createMeeting = useMutation(api.meetings.createMeeting);
   const upsertMinutes = useMutation(api.meetings.upsertMinutes);
@@ -21,23 +22,36 @@ export function MeetingsView({ meetingId }: { meetingId?: Id<"meetings"> } = {})
     api.meetings.getMinutesExport,
     selected ? { meetingId: selected } : "skip",
   );
-  const [minutesBody, setMinutesBody] = useState("");
-  const [attendees, setAttendees] = useState("");
+  const [draftMinutes, setDraftMinutes] = useState<string | null>(null);
+  const [draftAttendees, setDraftAttendees] = useState<string | null>(null);
+  const [draftMeetingId, setDraftMeetingId] = useState<Id<"meetings"> | null>(null);
   const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (meetingId) setSelected(meetingId);
-  }, [meetingId]);
 
   const detail = useQuery(
     api.meetings.getMeeting,
     selected ? { meetingId: selected } : "skip",
   );
 
-  useEffect(() => {
-    setMinutesBody(detail?.minutes?.body ?? "");
-    setAttendees(detail?.meeting.attendeeEmails.join(", ") ?? "");
-  }, [selected, detail?.minutes?._id, detail?.minutes?.updatedAt, detail?.meeting.attendeeEmails]);
+  const minutesBody =
+    selected && draftMeetingId === selected && draftMinutes !== null
+      ? draftMinutes
+      : (detail?.minutes?.body ?? "");
+  const attendees =
+    selected && draftMeetingId === selected && draftAttendees !== null
+      ? draftAttendees
+      : (detail?.meeting.attendeeEmails.join(", ") ?? "");
+
+  function editMinutes(value: string) {
+    if (!selected) return;
+    setDraftMeetingId(selected);
+    setDraftMinutes(value);
+  }
+
+  function editAttendees(value: string) {
+    if (!selected) return;
+    setDraftMeetingId(selected);
+    setDraftAttendees(value);
+  }
 
   async function onCreate() {
     if (!title || !scheduledAt) return;
@@ -45,20 +59,20 @@ export function MeetingsView({ meetingId }: { meetingId?: Id<"meetings"> } = {})
       title,
       scheduledAt: new Date(scheduledAt).getTime(),
     });
-    setSelected(id);
+    setPickedId(id);
     setTitle("");
   }
 
   async function saveMinutes(status?: "draft" | "published_for_review" | "approved") {
     if (!selected) return;
     setError(null);
-    const body = minutesBody || detail?.minutes?.body || "";
     try {
       await upsertMinutes({
         meetingId: selected,
-        body,
+        body: minutesBody,
         status,
       });
+      setDraftMinutes(null);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to save minutes");
     }
@@ -70,8 +84,9 @@ export function MeetingsView({ meetingId }: { meetingId?: Id<"meetings"> } = {})
     try {
       await reviseMinutes({
         meetingId: selected,
-        body: minutesBody || detail?.minutes?.body,
+        body: minutesBody,
       });
+      setDraftMinutes(null);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to revise");
     }
@@ -89,6 +104,7 @@ export function MeetingsView({ meetingId }: { meetingId?: Id<"meetings"> } = {})
       status: "held",
       heldAt: Date.now(),
     });
+    setDraftAttendees(null);
   }
 
   return (
@@ -167,7 +183,7 @@ export function MeetingsView({ meetingId }: { meetingId?: Id<"meetings"> } = {})
             Attendee emails (comma-separated)
             <input
               value={attendees}
-              onChange={(e) => setAttendees(e.target.value)}
+              onChange={(e) => editAttendees(e.target.value)}
               style={inputStyle}
             />
           </label>
@@ -178,7 +194,7 @@ export function MeetingsView({ meetingId }: { meetingId?: Id<"meetings"> } = {})
             Minutes body
             <textarea
               value={minutesBody}
-              onChange={(e) => setMinutesBody(e.target.value)}
+              onChange={(e) => editMinutes(e.target.value)}
               rows={8}
               style={{ ...inputStyle, height: "auto", padding: 12 }}
               disabled={detail.minutes?.status === "approved"}

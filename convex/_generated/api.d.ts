@@ -15,6 +15,7 @@ import type * as documents from "../documents.js";
 import type * as form990 from "../form990.js";
 import type * as lib_audit from "../lib/audit.js";
 import type * as lib_auth from "../lib/auth.js";
+import type * as lib_directors from "../lib/directors.js";
 import type * as lib_quorum from "../lib/quorum.js";
 import type * as meetings from "../meetings.js";
 import type * as motions from "../motions.js";
@@ -35,6 +36,7 @@ declare const fullApi: ApiFromModules<{
   form990: typeof form990;
   "lib/audit": typeof lib_audit;
   "lib/auth": typeof lib_auth;
+  "lib/directors": typeof lib_directors;
   "lib/quorum": typeof lib_quorum;
   meetings: typeof meetings;
   motions: typeof motions;

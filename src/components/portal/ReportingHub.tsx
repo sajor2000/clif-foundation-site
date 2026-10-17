@@ -21,7 +21,11 @@ export function ReportingHub() {
       ...pack,
       sections: pack.sections.map((section) => ({
         ...section,
-        documents: section.documents.map(({ downloadUrl: _url, ...doc }) => doc),
+        documents: section.documents.map((doc) => {
+          const { downloadUrl, ...rest } = doc;
+          void downloadUrl;
+          return rest;
+        }),
       })),
     };
     return JSON.stringify(redacted, null, 2);
