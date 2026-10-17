@@ -43,6 +43,12 @@ const motionStatus = v.union(
   v.literal("closed"),
 );
 
+const accessRequestStatus = v.union(
+  v.literal("pending"),
+  v.literal("approved"),
+  v.literal("denied"),
+);
+
 const motionType = v.union(v.literal("standard"), v.literal("consent"));
 
 const ballotChoice = v.union(
@@ -90,6 +96,19 @@ export default defineSchema({
     /** Counts toward meeting quorum / director attendance (not inferred from role). */
     isDirector: v.optional(v.boolean()),
   }).index("by_email", ["email"]),
+
+  /** Signed-in people asking to join the allowlist; an admin approves or denies. */
+  accessRequests: defineTable({
+    email: v.string(),
+    name: v.optional(v.string()),
+    subject: v.string(),
+    status: accessRequestStatus,
+    createdAt: v.number(),
+    decidedAt: v.optional(v.number()),
+    decidedBy: v.optional(v.string()),
+  })
+    .index("by_email", ["email"])
+    .index("by_status", ["status", "createdAt"]),
 
   meetings: defineTable({
     title: v.string(),

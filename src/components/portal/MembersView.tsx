@@ -3,6 +3,7 @@
 import { useMutation, useQuery } from "convex/react";
 import { useState } from "react";
 import { api } from "../../../convex/_generated/api";
+import type { Id } from "../../../convex/_generated/dataModel";
 import { Button } from "@/components/core/Button";
 import { inputStyle, pageTitle, panelStyle } from "@/components/portal/portal-styles";
 
@@ -58,6 +59,8 @@ export function MembersView() {
           not count).
         </p>
       </div>
+
+      <PendingRequests />
 
       <div style={{ ...panelStyle, maxWidth: 520 }}>
         <p style={{ margin: 0, fontWeight: 600 }}>Add or update member</p>
@@ -151,6 +154,77 @@ export function MembersView() {
             </li>
           ))
         )}
+      </ul>
+    </div>
+  );
+}
+
+function PendingRequests() {
+  const requests = useQuery(api.board.listAccessRequests);
+  const decide = useMutation(api.board.decideAccessRequest);
+  const [roles, setRoles] = useState<Record<string, (typeof ROLES)[number]>>({});
+  const [error, setError] = useState<string | null>(null);
+
+  async function onDecide(id: Id<"accessRequests">, approve: boolean) {
+    setError(null);
+    try {
+      await decide({ id, approve, role: approve ? (roles[id] ?? "member") : undefined });
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Could not update the request");
+    }
+  }
+
+  if (!requests || requests.length === 0) return null;
+
+  return (
+    <div style={{ ...panelStyle, maxWidth: 720 }}>
+      <p style={{ margin: 0, fontWeight: 600 }}>Pending requests ({requests.length})</p>
+      {error ? (
+        <p role="alert" style={{ margin: 0, color: "var(--status-error)", fontSize: 14 }}>
+          {error}
+        </p>
+      ) : null}
+      <ul style={{ margin: 0, padding: 0, listStyle: "none" }}>
+        {requests.map((r) => (
+          <li
+            key={r.id}
+            style={{
+              padding: "12px 0",
+              borderBottom: "1px solid var(--border)",
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "center",
+              gap: 12,
+            }}
+          >
+            <span style={{ display: "grid", gap: 2, minWidth: 220, flex: "1 1 220px" }}>
+              <span style={{ fontWeight: 500 }}>{r.name || r.email}</span>
+              <span style={{ fontFamily: "var(--font-mono)", fontSize: 12, color: "var(--text-muted)" }}>
+                {r.email} · requested {new Date(r.createdAt).toLocaleDateString()}
+              </span>
+            </span>
+            <select
+              aria-label={`Role for ${r.email}`}
+              value={roles[r.id] ?? "member"}
+              onChange={(e) =>
+                setRoles((prev) => ({ ...prev, [r.id]: e.target.value as (typeof ROLES)[number] }))
+              }
+              style={inputStyle}
+            >
+              {ROLES.map((role) => (
+                <option key={role} value={role}>
+                  {role}
+                </option>
+              ))}
+            </select>
+            <Button type="button" onClick={() => onDecide(r.id, true)}>
+              Approve
+            </Button>
+            <Button type="button" variant="secondary" onClick={() => onDecide(r.id, false)}>
+              Deny
+            </Button>
+          </li>
+        ))}
       </ul>
     </div>
   );

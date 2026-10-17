@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
+import { canBootstrapAdmin, requestAccessOutcome } from "./lib/access";
 import { logAudit } from "./lib/audit";
 import {
   requireBoardIdentity,
@@ -98,7 +99,10 @@ export const upsertMember = mutation({
   },
 });
 
-/** Bootstrap: first authenticated user can claim admin when allowlist is empty. */
+/**
+ * Bootstrap: claim admin while the allowlist is empty. Limited to
+ * BOOTSTRAP_ADMIN_EMAIL when that Convex env var is set.
+ */
 export const bootstrapAdmin = mutation({
   args: {},
   returns: v.null(),
@@ -106,6 +110,9 @@ export const bootstrapAdmin = mutation({
     const identity = await requireClerkIdentity(ctx);
     if (!identity.email) {
       throw new Error("Email required to bootstrap admin");
+    }
+    if (!canBootstrapAdmin(identity.email, process.env.BOOTSTRAP_ADMIN_EMAIL)) {
+      throw new Error("Only the foundation's designated admin email can claim admin");
     }
 
     // Serialize via singleton orgSettings row: only one bootstrap may create it.
@@ -139,6 +146,161 @@ export const bootstrapAdmin = mutation({
       summary: `Bootstrap admin: ${identity.email}`,
       actorSubject: identity.subject,
       actorEmail: identity.email,
+    });
+    return null;
+  },
+});
+
+const boardRoleArg = v.union(
+  v.literal("member"),
+  v.literal("secretary"),
+  v.literal("chair"),
+  v.literal("admin"),
+);
+
+const requestStatus = v.union(
+  v.literal("pending"),
+  v.literal("approved"),
+  v.literal("denied"),
+);
+
+/** Signed-in, not-yet-allowlisted user asks an admin for access. */
+export const requestAccess = mutation({
+  args: {},
+  returns: v.union(v.literal("already_member"), requestStatus),
+  handler: async (ctx) => {
+    const identity = await requireClerkIdentity(ctx);
+    const email = identity.email;
+    if (!email) {
+      throw new Error("A verified email is required to request access");
+    }
+    const member = await ctx.db
+      .query("boardMembers")
+      .withIndex("by_email", (q) => q.eq("email", email))
+      .unique();
+    const existing = await ctx.db
+      .query("accessRequests")
+      .withIndex("by_email", (q) => q.eq("email", email))
+      .unique();
+
+    const outcome = requestAccessOutcome(existing?.status ?? null, member !== null);
+    if (outcome === "already_member") return "already_member";
+    if (outcome === "keep") return "pending";
+
+    const name = identity.name ?? undefined;
+    if (outcome === "create") {
+      await ctx.db.insert("accessRequests", {
+        email,
+        name,
+        subject: identity.subject,
+        status: "pending",
+        createdAt: Date.now(),
+      });
+    } else if (existing) {
+      await ctx.db.patch(existing._id, {
+        name,
+        subject: identity.subject,
+        status: "pending",
+        createdAt: Date.now(),
+        decidedAt: undefined,
+        decidedBy: undefined,
+      });
+    }
+    await logAudit(ctx, {
+      kind: "board.access_requested",
+      summary: `Access requested: ${email}`,
+      actorSubject: identity.subject,
+      actorEmail: email,
+    });
+    return "pending";
+  },
+});
+
+/** The caller's own access request status, or null if they have not asked. */
+export const myAccessRequest = query({
+  args: {},
+  returns: v.union(requestStatus, v.null()),
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity || typeof identity.email !== "string" || identity.emailVerified === false) {
+      return null;
+    }
+    const email = identity.email.toLowerCase();
+    const existing = await ctx.db
+      .query("accessRequests")
+      .withIndex("by_email", (q) => q.eq("email", email))
+      .unique();
+    return existing?.status ?? null;
+  },
+});
+
+export const listAccessRequests = query({
+  args: {},
+  returns: v.array(
+    v.object({
+      id: v.id("accessRequests"),
+      email: v.string(),
+      name: v.optional(v.string()),
+      createdAt: v.number(),
+    }),
+  ),
+  handler: async (ctx) => {
+    await requireBoardRole(ctx, ["admin"]);
+    const rows = await ctx.db
+      .query("accessRequests")
+      .withIndex("by_status", (q) => q.eq("status", "pending"))
+      .order("desc")
+      .take(100);
+    return rows.map((r) => ({
+      id: r._id,
+      email: r.email,
+      name: r.name,
+      createdAt: r.createdAt,
+    }));
+  },
+});
+
+export const decideAccessRequest = mutation({
+  args: {
+    id: v.id("accessRequests"),
+    approve: v.boolean(),
+    role: v.optional(boardRoleArg),
+    isDirector: v.optional(v.boolean()),
+  },
+  returns: v.null(),
+  handler: async (ctx, args) => {
+    const { identity } = await requireBoardRole(ctx, ["admin"]);
+    const request = await ctx.db.get(args.id);
+    if (!request || request.status !== "pending") {
+      throw new Error("This request was already handled");
+    }
+
+    if (args.approve) {
+      const existing = await ctx.db
+        .query("boardMembers")
+        .withIndex("by_email", (q) => q.eq("email", request.email))
+        .unique();
+      if (!existing) {
+        await ctx.db.insert("boardMembers", {
+          email: request.email,
+          role: args.role ?? "member",
+          displayName: request.name,
+          isDirector: args.isDirector ?? true,
+        });
+      }
+    }
+
+    await ctx.db.patch(request._id, {
+      status: args.approve ? "approved" : "denied",
+      decidedAt: Date.now(),
+      decidedBy: identity.email,
+    });
+    await logAudit(ctx, {
+      kind: args.approve ? "board.access_approved" : "board.access_denied",
+      summary: `${args.approve ? "Approved" : "Denied"} access: ${request.email}`,
+      actorSubject: identity.subject,
+      actorEmail: identity.email,
+      metadata: args.approve ? { role: args.role ?? "member" } : undefined,
     });
     return null;
   },
