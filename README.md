@@ -18,6 +18,7 @@ Open [http://127.0.0.1:43127](http://127.0.0.1:43127).
 | `npm run dev` | Next.js dev server on **43127** |
 | `npm run build` | Production build (`next build`) |
 | `npm run start` | Start production server on 43127 |
+| `npm run test:e2e` | Browser tests (system Chrome) against the production build; run `npm run build` first. `BASE_URL=https://www.clificufoundation.org npm run test:e2e` tests the live site |
 
 ### Env checklist
 
@@ -44,7 +45,7 @@ Workflow helpers use **effect@4.0.2** (Effect 4 APIs: `Effect.gen`, `Data.Tagged
 
 ## Deploy on Vercel
 
-The Vercel project builds with `npm run build` (see `vercel.ts`). Push to `main` for production; pull requests get preview deployments. No environment variables are required.
+The Vercel project builds with `npm run build` (see `vercel.json`). Push to `main` for production; pull requests get preview deployments. No environment variables are required.
 
 A board document portal (Clerk + Convex) was removed in October 2026 to keep the site static; it is recoverable from git history if needed.
 
