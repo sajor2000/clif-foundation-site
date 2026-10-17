@@ -47,13 +47,7 @@ export default function PortalSignInPage() {
             }}
           >
             <p style={{ margin: 0, color: "var(--text-body)", lineHeight: 1.55 }}>
-              Clerk keys are not configured. Add{" "}
-              <code style={{ fontFamily: "var(--font-mono)" }}>
-                NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
-              </code>{" "}
-              and{" "}
-              <code style={{ fontFamily: "var(--font-mono)" }}>CLERK_SECRET_KEY</code>{" "}
-              to enable sign-in.
+              Board sign-in is not available right now. Please try again later.
             </p>
           </div>
         )}

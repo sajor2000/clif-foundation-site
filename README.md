@@ -76,7 +76,7 @@ For the **board portal**, `vercel.json` runs `npx convex deploy --cmd 'npm run b
 ### Access
 
 - Sign-up is open (email or Google). Signing up grants nothing: a person must click **Request access** on `/portal`, and an admin approves or denies it under **Members → Pending requests**.
-- **Claim admin** only works while the allowlist is empty, and only for `BOOTSTRAP_ADMIN_EMAIL` when that is set.
+- **Claim admin** only works while the allowlist is empty, and only for `BOOTSTRAP_ADMIN_EMAIL` (set on every Convex deployment; if it is missing, nobody can claim admin).
 - The allowlist is keyed by verified email. See `scripts/seed-board-allowlist.md` to seed rows directly.
 
 ### Portal features (board)

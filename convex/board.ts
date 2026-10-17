@@ -1,8 +1,10 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
-import { canBootstrapAdmin, requestAccessOutcome } from "./lib/access";
+import { canBootstrapAdmin, leavesNoAdmin, requestAccessOutcome } from "./lib/access";
 import { logAudit } from "./lib/audit";
+import { isDirector } from "./lib/directors";
 import {
+  getBoardMember,
   requireBoardIdentity,
   requireBoardRole,
   requireClerkIdentity,
@@ -60,6 +62,16 @@ export const myRole = query({
   },
 });
 
+/** Whether the signed-in member counts as a director (directors are the only voters). */
+export const amIDirector = query({
+  args: {},
+  returns: v.boolean(),
+  handler: async (ctx) => {
+    const identity = await requireBoardIdentity(ctx);
+    return isDirector(await getBoardMember(ctx, identity.email));
+  },
+});
+
 export const upsertMember = mutation({
   args: {
     email: v.string(),
@@ -82,6 +94,12 @@ export const upsertMember = mutation({
       .query("boardMembers")
       .withIndex("by_email", (q) => q.eq("email", email))
       .unique();
+    if (existing && args.role && args.role !== (existing.role ?? "member")) {
+      const members = await ctx.db.query("boardMembers").take(200);
+      if (leavesNoAdmin(members, email, args.role)) {
+        throw new Error("The board needs at least one admin. Make someone else admin first.");
+      }
+    }
     if (existing) {
       await ctx.db.patch(existing._id, {
         role: args.role ?? existing.role,
@@ -106,9 +124,36 @@ export const upsertMember = mutation({
   },
 });
 
+/** Take someone off the allowlist; they lose portal access immediately. */
+export const removeMember = mutation({
+  args: { email: v.string() },
+  returns: v.null(),
+  handler: async (ctx, args) => {
+    const { identity } = await requireBoardRole(ctx, ["admin"]);
+    const email = args.email.trim().toLowerCase();
+    const member = await ctx.db
+      .query("boardMembers")
+      .withIndex("by_email", (q) => q.eq("email", email))
+      .unique();
+    if (!member) throw new Error("That email is not on the allowlist");
+    const members = await ctx.db.query("boardMembers").take(200);
+    if (leavesNoAdmin(members, email, null)) {
+      throw new Error("The board needs at least one admin. Make someone else admin first.");
+    }
+    await ctx.db.delete(member._id);
+    await logAudit(ctx, {
+      kind: "board.member_remove",
+      summary: `Removed from allowlist: ${email}`,
+      actorSubject: identity.subject,
+      actorEmail: identity.email,
+    });
+    return null;
+  },
+});
+
 /**
  * Bootstrap: claim admin while the allowlist is empty. Limited to
- * BOOTSTRAP_ADMIN_EMAIL when that Convex env var is set.
+ * BOOTSTRAP_ADMIN_EMAIL; nobody if that Convex env var is unset.
  */
 export const bootstrapAdmin = mutation({
   args: {},

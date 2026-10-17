@@ -38,6 +38,7 @@ export const getReportingPack = query({
       .query("documents")
       .withIndex("by_created")
       .order("desc")
+      .filter((q) => q.eq(q.field("archivedAt"), undefined))
       .take(300);
 
     const withUrl = async (d: (typeof allDocs)[number]) => {

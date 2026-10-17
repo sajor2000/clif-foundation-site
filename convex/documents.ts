@@ -1,8 +1,10 @@
 import { v } from "convex/values";
-import { mutation, query } from "./_generated/server";
+import type { Doc } from "./_generated/dataModel";
+import { mutation, query, type QueryCtx } from "./_generated/server";
 import { logAudit } from "./lib/audit";
 import { uploadRejection } from "./lib/uploads";
 import { requireBoardIdentity, requireBoardRole } from "./lib/auth";
+import schema from "./schema";
 
 const categoryValidator = v.union(
   v.literal("governance"),
@@ -21,19 +23,11 @@ const retentionValidator = v.union(
   v.literal("1y"),
 );
 
+// Raw rows plus a download URL, so the validator must match the table exactly.
 const documentReturn = v.object({
   _id: v.id("documents"),
   _creationTime: v.number(),
-  title: v.string(),
-  category: v.string(),
-  storageId: v.id("_storage"),
-  contentType: v.string(),
-  uploadedBy: v.string(),
-  createdAt: v.number(),
-  retentionClass: v.string(),
-  legalHold: v.boolean(),
-  taxYear: v.optional(v.number()),
-  reportingTag: v.optional(v.string()),
+  ...schema.tables.documents.validator.fields,
   downloadUrl: v.union(v.string(), v.null()),
 });
 
@@ -98,23 +92,7 @@ export const saveDocument = mutation({
   },
 });
 
-async function attachUrls(
-  ctx: { storage: { getUrl: (id: import("./_generated/dataModel").Id<"_storage">) => Promise<string | null> } },
-  docs: Array<{
-    _id: import("./_generated/dataModel").Id<"documents">;
-    _creationTime: number;
-    title: string;
-    category: string;
-    storageId: import("./_generated/dataModel").Id<"_storage">;
-    contentType: string;
-    uploadedBy: string;
-    createdAt: number;
-    retentionClass: string;
-    legalHold: boolean;
-    taxYear?: number;
-    reportingTag?: string;
-  }>,
-) {
+async function attachUrls(ctx: QueryCtx, docs: Doc<"documents">[]) {
   return Promise.all(
     docs.map(async (doc) => ({
       ...doc,
@@ -127,24 +105,27 @@ export const listDocuments = query({
   args: {
     category: v.optional(categoryValidator),
     search: v.optional(v.string()),
+    /** Show only archived documents instead of the active library. */
+    archived: v.optional(v.boolean()),
   },
   returns: v.array(documentReturn),
   handler: async (ctx, args) => {
     await requireBoardIdentity(ctx);
-    let docs;
-    if (args.category) {
-      docs = await ctx.db
-        .query("documents")
-        .withIndex("by_category", (q) => q.eq("category", args.category!))
-        .order("desc")
-        .take(200);
-    } else {
-      docs = await ctx.db
-        .query("documents")
-        .withIndex("by_created")
-        .order("desc")
-        .take(200);
-    }
+    const wantArchived = args.archived === true;
+    const base = args.category
+      ? ctx.db
+          .query("documents")
+          .withIndex("by_category", (q) => q.eq("category", args.category!))
+      : ctx.db.query("documents").withIndex("by_created");
+    // Filter archive state before the limit so the cap never hides matching rows.
+    const docs = await base
+      .order("desc")
+      .filter((q) =>
+        wantArchived
+          ? q.neq(q.field("archivedAt"), undefined)
+          : q.eq(q.field("archivedAt"), undefined),
+      )
+      .take(200);
     const needle = args.search?.trim().toLowerCase();
     const filtered = needle
       ? docs.filter(
@@ -175,41 +156,44 @@ export const setLegalHold = mutation({
   },
 });
 
-export const getDocumentUrl = query({
-  args: { documentId: v.id("documents") },
-  returns: v.union(v.string(), v.null()),
-  handler: async (ctx, args) => {
-    await requireBoardIdentity(ctx);
-    const doc = await ctx.db.get(args.documentId);
-    if (!doc) return null;
-    return await ctx.storage.getUrl(doc.storageId);
-  },
-});
-
+/** Hide a document from the library and reporting pack. Nothing is deleted. */
 export const archiveDocument = mutation({
   args: { documentId: v.id("documents") },
   returns: v.null(),
   handler: async (ctx, args) => {
-    const { identity } = await requireBoardRole(ctx, ["admin"]);
+    const { identity } = await requireBoardRole(ctx, ["admin", "secretary"]);
     const doc = await ctx.db.get(args.documentId);
     if (!doc) throw new Error("Document not found");
     if (doc.legalHold) {
       throw new Error("Cannot archive: document is under legal hold");
     }
-    if (doc.retentionClass === "permanent") {
-      throw new Error(
-        "Cannot archive: retention class is permanent (clear legal hold alone is not enough)",
-      );
-    }
-    await ctx.db.delete(args.documentId);
-    try {
-      await ctx.storage.delete(doc.storageId);
-    } catch {
-      // Blob may already be gone; metadata delete already applied.
-    }
+    if (doc.archivedAt !== undefined) return null;
+    await ctx.db.patch(args.documentId, {
+      archivedAt: Date.now(),
+      archivedBy: identity.email ?? identity.subject,
+    });
     await logAudit(ctx, {
       kind: "document.archive",
       summary: `Archived document: ${doc.title}`,
+      actorSubject: identity.subject,
+      actorEmail: identity.email,
+    });
+    return null;
+  },
+});
+
+export const restoreDocument = mutation({
+  args: { documentId: v.id("documents") },
+  returns: v.null(),
+  handler: async (ctx, args) => {
+    const { identity } = await requireBoardRole(ctx, ["admin", "secretary"]);
+    const doc = await ctx.db.get(args.documentId);
+    if (!doc) throw new Error("Document not found");
+    if (doc.archivedAt === undefined) return null;
+    await ctx.db.patch(args.documentId, { archivedAt: undefined, archivedBy: undefined });
+    await logAudit(ctx, {
+      kind: "document.restore",
+      summary: `Restored document: ${doc.title}`,
       actorSubject: identity.subject,
       actorEmail: identity.email,
     });

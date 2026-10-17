@@ -2,7 +2,8 @@ import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { logAudit } from "./lib/audit";
 import { requireBoardIdentity, requireBoardRole } from "./lib/auth";
-import { isDirector } from "./lib/directors";
+import { isDirector, loadDirectorEmails } from "./lib/directors";
+import { tallyBallots } from "./lib/tally";
 import { quorumMet, quorumRequired } from "./lib/quorum";
 import schema from "./schema";
 
@@ -324,19 +325,21 @@ export const getMinutesExport = query({
       .withIndex("by_meeting", (q) => q.eq("meetingId", args.meetingId))
       .take(50);
     if (motions.length) {
+      const directorEmails = await loadDirectorEmails(ctx);
       lines.push(`## Motions and votes`, ``);
       for (const motion of motions) {
         const ballots = await ctx.db
           .query("ballots")
           .withIndex("by_motion", (q) => q.eq("motionId", motion._id))
           .take(200);
-        const yes = ballots.filter((b) => b.choice === "yes").length;
-        const no = ballots.filter((b) => b.choice === "no").length;
-        const abstain = ballots.filter((b) => b.choice === "abstain").length;
-        const recuse = ballots.filter((b) => b.choice === "recuse").length;
+        const t =
+          motion.status === "closed" && motion.finalTally
+            ? motion.finalTally
+            : tallyBallots(ballots, directorEmails, motion.motionType, motion.status);
         lines.push(
           `### ${motion.title} (${motion.status}, ${motion.motionType})`,
-          `Yes ${yes} · No ${no} · Abstain ${abstain} · Recuse ${recuse}`,
+          `Yes ${t.yes} · No ${t.no} · Abstain ${t.abstain} · Recuse ${t.recuse}` +
+            (motion.status === "closed" ? ` · ${t.passed ? "Passed" : "Not passed"}` : ""),
           ``,
         );
       }

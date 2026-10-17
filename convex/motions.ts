@@ -1,10 +1,11 @@
 import { v } from "convex/values";
-import type { Id } from "./_generated/dataModel";
+import type { Doc } from "./_generated/dataModel";
 import type { QueryCtx } from "./_generated/server";
 import { mutation, query } from "./_generated/server";
 import { logAudit } from "./lib/audit";
-import { requireBoardIdentity, requireBoardRole } from "./lib/auth";
-import { isDirector } from "./lib/directors";
+import { getBoardMember, requireBoardIdentity, requireBoardRole } from "./lib/auth";
+import { isDirector, loadDirectorEmails } from "./lib/directors";
+import { tallyBallots } from "./lib/tally";
 import schema from "./schema";
 
 // Raw motion rows are returned, so the validator must match the table exactly.
@@ -50,51 +51,35 @@ export const listMotions = query({
           .order("desc")
           .take(100);
 
+    const directorEmails = await loadDirectorEmails(ctx);
     const results = [];
     for (const motion of motions) {
       results.push({
         motion,
-        tally: await computeTally(ctx, motion._id, motion.motionType, motion.status),
+        tally: await computeTally(ctx, motion, directorEmails),
       });
     }
     return results;
   },
 });
 
+/** Live tally for open/draft motions; the frozen result for closed ones. */
 async function computeTally(
   ctx: QueryCtx,
-  motionId: Id<"motions">,
-  motionType: string,
-  status: string,
+  motion: Pick<Doc<"motions">, "_id" | "motionType" | "status" | "finalTally">,
+  directorEmails?: Set<string>,
 ) {
+  if (motion.status === "closed" && motion.finalTally) return motion.finalTally;
   const ballots = await ctx.db
     .query("ballots")
-    .withIndex("by_motion", (q) => q.eq("motionId", motionId))
+    .withIndex("by_motion", (q) => q.eq("motionId", motion._id))
     .take(500);
-  const members = await ctx.db.query("boardMembers").take(200);
-  const directors = members.filter(isDirector);
-  const directorCount = directors.length > 0 ? directors.length : 1;
-  const yes = ballots.filter((b) => b.choice === "yes").length;
-  const no = ballots.filter((b) => b.choice === "no").length;
-  const abstain = ballots.filter((b) => b.choice === "abstain").length;
-  const recuse = ballots.filter((b) => b.choice === "recuse").length;
-  const voted = ballots.length;
-  // Recused directors are excluded from the unanimous consent denominator.
-  const eligible =
-    motionType === "consent"
-      ? Math.max(1, directorCount - recuse)
-      : directorCount;
-
-  let passed = false;
-  if (status === "closed") {
-    if (motionType === "consent") {
-      passed = yes === eligible && no === 0 && abstain === 0;
-    } else {
-      passed = yes > no;
-    }
-  }
-
-  return { yes, no, abstain, recuse, eligible, voted, passed };
+  return tallyBallots(
+    ballots,
+    directorEmails ?? (await loadDirectorEmails(ctx)),
+    motion.motionType,
+    motion.status,
+  );
 }
 
 export const getMotion = query({
@@ -114,12 +99,7 @@ export const getMotion = query({
     const identity = await requireBoardIdentity(ctx);
     const motion = await ctx.db.get(args.motionId);
     if (!motion) return null;
-    const tally = await computeTally(
-      ctx,
-      args.motionId,
-      motion.motionType,
-      motion.status,
-    );
+    const tally = await computeTally(ctx, motion);
     const myBallot = await ctx.db
       .query("ballots")
       .withIndex("by_motion_voter", (q) =>
@@ -198,9 +178,14 @@ export const setMotionStatus = mutation({
       status: typeof args.status;
       openedAt?: number;
       closedAt?: number;
+      finalTally?: Doc<"motions">["finalTally"];
     } = { status: args.status };
     if (args.status === "open") patch.openedAt = Date.now();
-    if (args.status === "closed") patch.closedAt = Date.now();
+    if (args.status === "closed" && from !== "closed") {
+      patch.closedAt = Date.now();
+      // Freeze the result: this is the board record for the vote.
+      patch.finalTally = await computeTally(ctx, { ...motion, status: "closed", finalTally: undefined });
+    }
     await ctx.db.patch(args.motionId, patch);
     await logAudit(ctx, {
       kind: "motion.status",
@@ -225,6 +210,10 @@ export const castBallot = mutation({
   returns: v.null(),
   handler: async (ctx, args) => {
     const identity = await requireBoardIdentity(ctx);
+    // Only directors vote; officers or admins who are not directors cannot.
+    if (!isDirector(await getBoardMember(ctx, identity.email))) {
+      throw new Error("Only directors can vote on motions");
+    }
     const motion = await ctx.db.get(args.motionId);
     if (!motion) throw new Error("Motion not found");
     if (motion.status !== "open") {
@@ -240,6 +229,7 @@ export const castBallot = mutation({
       await ctx.db.patch(existing._id, {
         choice: args.choice,
         castAt: Date.now(),
+        voterEmail: identity.email, // backfill legacy ballots so they count
       });
     } else {
       await ctx.db.insert("ballots", {

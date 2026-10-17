@@ -84,6 +84,9 @@ export default defineSchema({
     taxYear: v.optional(v.number()),
     policyType: v.optional(policyType),
     reportingTag: v.optional(v.string()),
+    /** Archived documents are hidden from lists and the reporting pack, never deleted. */
+    archivedAt: v.optional(v.number()),
+    archivedBy: v.optional(v.string()),
   })
     .index("by_created", ["createdAt"])
     .index("by_category", ["category", "createdAt"])
@@ -158,6 +161,18 @@ export default defineSchema({
     policyAdoption: v.optional(policyType),
     openedAt: v.optional(v.number()),
     closedAt: v.optional(v.number()),
+    /** Result frozen when the motion closes; later allowlist changes never alter it. */
+    finalTally: v.optional(
+      v.object({
+        yes: v.number(),
+        no: v.number(),
+        abstain: v.number(),
+        recuse: v.number(),
+        eligible: v.number(),
+        voted: v.number(),
+        passed: v.boolean(),
+      }),
+    ),
     createdBy: v.string(),
     createdAt: v.number(),
   })
