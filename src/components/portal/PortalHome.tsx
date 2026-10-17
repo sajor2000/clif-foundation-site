@@ -10,6 +10,7 @@ export function PortalHome() {
   const year = new Date().getFullYear();
   const dashboard = useQuery(api.compliance.getDashboard, { year });
   const members = useQuery(api.board.listMembers);
+  const role = useQuery(api.board.myRole);
   const bootstrap = useMutation(api.board.bootstrapAdmin);
 
   return (
@@ -17,11 +18,7 @@ export function PortalHome() {
       <div style={{ display: "grid", gap: 10 }}>
         <h1 style={pageTitle}>Board workspace</h1>
         <p style={{ margin: 0, maxWidth: 640, lineHeight: 1.55, color: "var(--text-body)" }}>
-          Download everything you need for Form 990, audits, and grant reporting from{" "}
-          <Link href="/portal/reporting" style={{ color: "var(--link)" }}>
-            Reporting pack
-          </Link>
-          . Upload new files under Documents.
+          Three jobs: get paperwork for your CPA, run meetings and votes, stay compliant for Form 990.
         </p>
       </div>
 
@@ -29,7 +26,8 @@ export function PortalHome() {
         <div style={panelStyle}>
           <p style={{ margin: 0, fontWeight: 600 }}>First-time setup</p>
           <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5 }}>
-            No board allowlist yet. Claim admin to add director emails and roles.
+            No board allowlist yet. Claim admin, then add director emails under Members. Public
+            board roster JSON has no emails—add them here.
           </p>
           <Button type="button" onClick={() => bootstrap({})}>
             Claim admin for my account
@@ -41,38 +39,54 @@ export function PortalHome() {
         style={{
           display: "grid",
           gap: 16,
-          gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+          gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
         }}
       >
-        <QuickCard
+        <JobCard
           href="/portal/reporting"
-          title="Reporting pack"
-          body="Tax, policies, financials, and approved minutes with one-click downloads."
+          title="1. Get paperwork"
+          body="Download tax, policy, financial files and approved minutes for CPA or Form 990 prep."
           primary
         />
-        <QuickCard
-          href="/portal/documents"
-          title="All documents"
-          body="Search, filter, and upload board files."
+        <JobCard
+          href="/portal/meetings"
+          title="2. Do board work"
+          body="Record attendance, draft and approve minutes, and cast votes on motions."
         />
-        <QuickCard
+        <JobCard
           href="/portal/compliance"
-          title="Compliance checklist"
-          body="COI, policies, Form 990 review, and minutes gaps."
+          title="3. Stay compliant"
+          body="COI disclosures, policy checklist, Form 990 board review, and activity log."
         />
-        <QuickCard href="/portal/votes" title="Open votes" body="Cast ballots on pending motions." />
+      </div>
+
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 16, fontSize: 14 }}>
+        <Link href="/portal/documents" style={{ color: "var(--link)" }}>
+          Upload documents
+        </Link>
+        <Link href="/portal/votes" style={{ color: "var(--link)" }}>
+          Open votes
+        </Link>
+        <Link href="/portal/coi" style={{ color: "var(--link)" }}>
+          Annual COI
+        </Link>
+        {role === "admin" ? (
+          <Link href="/portal/members" style={{ color: "var(--link)" }}>
+            Members allowlist
+          </Link>
+        ) : null}
       </div>
 
       {dashboard ? (
         <div style={panelStyle}>
-          <p style={{ margin: 0, fontWeight: 600 }}>{year} compliance snapshot</p>
+          <p style={{ margin: 0, fontWeight: 600 }}>{year} at a glance</p>
           <ul style={{ margin: 0, paddingLeft: 18, lineHeight: 1.6, fontSize: 14 }}>
             <li>
-              COI disclosures: {dashboard.coi.submitted} / {dashboard.coi.eligible}{" "}
-              {dashboard.coi.complete ? "· complete" : "· incomplete"}
+              COI: {dashboard.coi.submitted} / {dashboard.coi.eligible}
+              {dashboard.coi.complete ? " · complete" : " · incomplete"}
             </li>
             <li>
-              Form 990 board review:{" "}
+              Form 990 review:{" "}
               {dashboard.form990.boardReviewedBeforeFiled ? "recorded" : "not recorded"}
             </li>
             <li>
@@ -81,7 +95,7 @@ export function PortalHome() {
                 ? dashboard.policies.missing.join(", ")
                 : "none"}
             </li>
-            <li>Held meetings without approved minutes: {dashboard.minutesGaps.length}</li>
+            <li>Meetings without approved minutes: {dashboard.minutesGaps.length}</li>
           </ul>
         </div>
       ) : null}
@@ -89,7 +103,7 @@ export function PortalHome() {
   );
 }
 
-function QuickCard({
+function JobCard({
   href,
   title,
   body,
@@ -108,9 +122,10 @@ function QuickCard({
         textDecoration: "none",
         color: "inherit",
         borderColor: primary ? "var(--accent-mint)" : "var(--border-strong)",
+        minHeight: 140,
       }}
     >
-      <p style={{ margin: 0, fontWeight: 600, fontSize: 17 }}>{title}</p>
+      <p style={{ margin: 0, fontWeight: 600, fontSize: 18 }}>{title}</p>
       <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5, color: "var(--text-body)" }}>
         {body}
       </p>

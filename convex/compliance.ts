@@ -86,7 +86,10 @@ export const getDashboard = query({
 });
 
 export const listAuditEvents = query({
-  args: {},
+  args: {
+    since: v.optional(v.number()),
+    until: v.optional(v.number()),
+  },
   returns: v.array(
     v.object({
       kind: v.string(),
@@ -95,18 +98,25 @@ export const listAuditEvents = query({
       actorEmail: v.optional(v.string()),
     }),
   ),
-  handler: async (ctx) => {
+  handler: async (ctx, args) => {
     await requireBoardIdentity(ctx);
     const events = await ctx.db
       .query("auditEvents")
       .withIndex("by_created")
       .order("desc")
-      .take(50);
-    return events.map((e) => ({
-      kind: e.kind,
-      summary: e.summary,
-      createdAt: e.createdAt,
-      actorEmail: e.actorEmail,
-    }));
+      .take(200);
+    return events
+      .filter((e) => {
+        if (args.since !== undefined && e.createdAt < args.since) return false;
+        if (args.until !== undefined && e.createdAt > args.until) return false;
+        return true;
+      })
+      .slice(0, 100)
+      .map((e) => ({
+        kind: e.kind,
+        summary: e.summary,
+        createdAt: e.createdAt,
+        actorEmail: e.actorEmail,
+      }));
   },
 });

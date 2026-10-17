@@ -1,13 +1,17 @@
 "use client";
 
+import Link from "next/link";
 import { useQuery } from "convex/react";
 import { useMemo, useState } from "react";
+import JSZip from "jszip";
 import { api } from "../../../convex/_generated/api";
 import { Button } from "@/components/core/Button";
 import { pageTitle, panelStyle, sectionTitle } from "@/components/portal/portal-styles";
 
 export function ReportingHub() {
   const [taxYear, setTaxYear] = useState(new Date().getFullYear());
+  const [zipping, setZipping] = useState(false);
+  const [zipError, setZipError] = useState<string | null>(null);
   const pack = useQuery(api.reporting.getReportingPack, { taxYear });
 
   const downloadManifest = useMemo(() => {
@@ -36,13 +40,50 @@ export function ReportingHub() {
     URL.revokeObjectURL(url);
   }
 
+  async function downloadZip() {
+    if (!pack) return;
+    setZipError(null);
+    setZipping(true);
+    try {
+      const zip = new JSZip();
+      zip.file(`manifest-${taxYear}.json`, JSON.stringify(pack, null, 2));
+      for (const section of pack.sections) {
+        const folder = zip.folder(section.id) ?? zip;
+        for (const doc of section.documents) {
+          if (!doc.downloadUrl) continue;
+          const res = await fetch(doc.downloadUrl);
+          if (!res.ok) continue;
+          const buf = await res.arrayBuffer();
+          const safe = doc.title.replace(/[^\w.\-]+/g, "_").slice(0, 80);
+          folder.file(safe || `${doc._id}`, buf);
+        }
+      }
+      const minutesFolder = zip.folder("minutes") ?? zip;
+      for (const m of pack.approvedMinutesExports) {
+        const safe = m.title.replace(/[^\w.\-]+/g, "_").slice(0, 80);
+        minutesFolder.file(`${safe}.md`, m.exportText);
+      }
+      const blob = await zip.generateAsync({ type: "blob" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `clif-board-reporting-${taxYear}.zip`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      setZipError(e instanceof Error ? e.message : "ZIP failed");
+    } finally {
+      setZipping(false);
+    }
+  }
+
   return (
     <div style={{ display: "grid", gap: 28 }}>
       <div style={{ display: "grid", gap: 10 }}>
-        <h1 style={pageTitle}>Reporting pack</h1>
+        <h1 style={pageTitle}>Get paperwork</h1>
         <p style={{ margin: 0, maxWidth: 680, lineHeight: 1.55 }}>
-          Board-ready downloads grouped for Form 990, audits, and grant reporting. Open any file
-          ↗ or export the full manifest for your CPA.
+          Board-ready downloads for Form 990, audits, and grant reporting. Open any file ↗ or
+          download everything as a ZIP for your CPA.
         </p>
         <label style={{ display: "flex", gap: 12, alignItems: "center", fontSize: 14 }}>
           Tax year
@@ -51,13 +92,22 @@ export function ReportingHub() {
             value={taxYear}
             onChange={(e) => setTaxYear(Number(e.target.value))}
             style={{ width: 100, height: 44, padding: "0 10px" }}
+            aria-label="Tax year"
           />
         </label>
-        <div>
-          <Button type="button" onClick={downloadManifestFile} disabled={!pack}>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
+          <Button type="button" onClick={downloadZip} disabled={!pack || zipping}>
+            {zipping ? "Building ZIP…" : "Download all (ZIP)"}
+          </Button>
+          <Button type="button" variant="secondary" onClick={downloadManifestFile} disabled={!pack}>
             Download manifest (JSON)
           </Button>
         </div>
+        {zipError ? (
+          <p role="alert" style={{ margin: 0, color: "var(--status-error)", fontSize: 14 }}>
+            {zipError}
+          </p>
+        ) : null}
       </div>
 
       {!pack ? (
@@ -74,8 +124,13 @@ export function ReportingHub() {
               </div>
               {section.documents.length === 0 ? (
                 <p style={{ fontSize: 14, color: "var(--text-muted)" }}>
-                  No files in this section yet. Upload under Documents with category &quot;
-                  {section.id === "tax" ? "Tax and Form 990" : section.label}&quot;.
+                  No files yet.{" "}
+                  <Link
+                    href={`/portal/documents?category=${section.id === "policies" ? "policy" : section.id === "meetings" ? "meeting" : section.id}`}
+                    style={{ color: "var(--link)" }}
+                  >
+                    Upload under Documents →
+                  </Link>
                 </p>
               ) : (
                 <ul
@@ -132,7 +187,10 @@ export function ReportingHub() {
             <h2 style={sectionTitle}>Approved minutes</h2>
             {pack.approvedMinutesExports.length === 0 ? (
               <p style={{ fontSize: 14, color: "var(--text-muted)" }}>
-                No approved minutes yet. Approve minutes on the Meetings page.
+                No approved minutes yet.{" "}
+                <Link href="/portal/meetings" style={{ color: "var(--link)" }}>
+                  Approve minutes →
+                </Link>
               </p>
             ) : (
               <div style={{ display: "grid", gap: 10 }}>

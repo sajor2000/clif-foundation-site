@@ -170,7 +170,9 @@ export const upsertMinutes = mutation({
       .first();
 
     if (existing?.status === "approved") {
-      throw new Error("Approved minutes are read-only. Create a new version.");
+      throw new Error(
+        "Approved minutes are read-only. Use reviseMinutes to start a new version.",
+      );
     }
 
     if (existing) {
@@ -195,6 +197,42 @@ export const upsertMinutes = mutation({
       createdAt: Date.now(),
       updatedAt: Date.now(),
     });
+  },
+});
+
+/** Start a new draft version after minutes were approved. */
+export const reviseMinutes = mutation({
+  args: {
+    meetingId: v.id("meetings"),
+    body: v.optional(v.string()),
+  },
+  returns: v.id("minutes"),
+  handler: async (ctx, args) => {
+    const { identity } = await requireBoardRole(ctx, ["secretary", "admin"]);
+    const existing = await ctx.db
+      .query("minutes")
+      .withIndex("by_meeting", (q) => q.eq("meetingId", args.meetingId))
+      .order("desc")
+      .first();
+    if (!existing || existing.status !== "approved") {
+      throw new Error("Only approved minutes can be revised into a new version");
+    }
+    const id = await ctx.db.insert("minutes", {
+      meetingId: args.meetingId,
+      body: args.body ?? existing.body,
+      status: "draft",
+      version: existing.version + 1,
+      createdBy: identity.subject,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    });
+    await logAudit(ctx, {
+      kind: "minutes.revise",
+      summary: `Started minutes v${existing.version + 1}`,
+      actorSubject: identity.subject,
+      actorEmail: identity.email,
+    });
+    return id;
   },
 });
 
@@ -263,6 +301,30 @@ export const getMinutesExport = query({
         lines.push(``);
       }
     }
+
+    const motions = await ctx.db
+      .query("motions")
+      .withIndex("by_meeting", (q) => q.eq("meetingId", args.meetingId))
+      .take(50);
+    if (motions.length) {
+      lines.push(`## Motions and votes`, ``);
+      for (const motion of motions) {
+        const ballots = await ctx.db
+          .query("ballots")
+          .withIndex("by_motion", (q) => q.eq("motionId", motion._id))
+          .take(200);
+        const yes = ballots.filter((b) => b.choice === "yes").length;
+        const no = ballots.filter((b) => b.choice === "no").length;
+        const abstain = ballots.filter((b) => b.choice === "abstain").length;
+        const recuse = ballots.filter((b) => b.choice === "recuse").length;
+        lines.push(
+          `### ${motion.title} (${motion.status}, ${motion.motionType})`,
+          `Yes ${yes} · No ${no} · Abstain ${abstain} · Recuse ${recuse}`,
+          ``,
+        );
+      }
+    }
+
     return lines.join("\n");
   },
 });

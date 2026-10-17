@@ -25,6 +25,8 @@ Open [http://127.0.0.1:43127](http://127.0.0.1:43127).
 | `npm run build` | Production build (`next build`) |
 | `npm run start` | Start production server on 43127 |
 | `npm run test:e2e` | Browser tests (system Chrome) against the production build; run `npm run build` first. `BASE_URL=https://www.clificufoundation.org npm run test:e2e` tests the live site |
+| `npm run test:unit` | Pure unit tests (e.g. quorum helpers) |
+| `npm run convex:dev` | Anonymous local Convex backend |
 
 ### Env checklist
 
@@ -54,9 +56,30 @@ Workflow helpers use **effect@4.0.2** (Effect 4 APIs: `Effect.gen`, `Data.Tagged
 
 ## Deploy on Vercel
 
-The Vercel project builds with `npm run build` (see `vercel.json`). Push to `main` for production; pull requests get preview deployments. No environment variables are required.
+The Vercel project builds with `npm run build` (see `vercel.json`). Push to `main` for production; pull requests get preview deployments. Public site needs no env vars.
 
-The board portal includes a **Reporting pack** (grouped downloads for Form 990 / audit prep), document library, meetings/minutes, votes, COI disclosures, policy registry, and a compliance checklist. See [`docs/plans/private-board-portal.md`](docs/plans/private-board-portal.md).
+### Board portal production checklist
+
+1. Create a Clerk application; activate the **Convex** integration; copy Frontend API URL.
+2. Create/link a Convex cloud project (`npx convex login` then `npx convex dev`).
+3. On the Convex deployment, set `CLERK_JWT_ISSUER_DOMAIN` to that Frontend API URL (dev and prod separately).
+4. On Vercel, set `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY`, and `NEXT_PUBLIC_CONVEX_URL` (or use `npx convex deploy --cmd 'npm run build' --cmd-url-env-var-name NEXT_PUBLIC_CONVEX_URL` with `CONVEX_DEPLOY_KEY`).
+5. First sign-in: open `/portal` → **Claim admin** → add director emails under **Members** (see `scripts/seed-board-allowlist.md`).
+
+### Portal features (board)
+
+| Job | Route |
+| --- | --- |
+| Get paperwork (ZIP / manifest) | `/portal/reporting` |
+| Documents upload | `/portal/documents` |
+| Meetings + minutes | `/portal/meetings` |
+| Votes | `/portal/votes` |
+| Compliance + audit CSV | `/portal/compliance` |
+| Annual COI | `/portal/coi` |
+| Policies | `/portal/policies` |
+| Members allowlist (admin) | `/portal/members` |
+
+`/portal` is noindex and omitted from the public sitemap. See [`docs/plans/private-board-portal.md`](docs/plans/private-board-portal.md).
 
 ## Design
 

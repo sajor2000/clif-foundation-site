@@ -1,6 +1,12 @@
 "use client";
 
 import { useAuth } from "@clerk/nextjs";
+import {
+  Authenticated,
+  AuthLoading,
+  Unauthenticated,
+  useConvexAuth,
+} from "convex/react";
 import { usePathname } from "next/navigation";
 import { Suspense, type ReactNode } from "react";
 import { Button } from "@/components/core/Button";
@@ -112,12 +118,53 @@ function SignedInGate({ children }: { children: ReactNode }) {
       <PortalShell>
         <StatusPanel
           title="Board sign-in required"
-          body="Sign in with your board Clerk account to access documents, minutes, and compliance tools."
+          body="Sign in with your board Clerk account to access documents, minutes, and votes."
           action={<Button href="/portal/sign-in">Sign in</Button>}
         />
       </PortalShell>
     );
   }
 
-  return <PortalShell>{children}</PortalShell>;
+  return (
+    <PortalShell>
+      <AuthLoading>
+        <StatusPanel
+          title="Connecting…"
+          body="Confirming your board session with Convex."
+        />
+      </AuthLoading>
+      <Unauthenticated>
+        <StatusPanel
+          title="Session not ready"
+          body="Clerk signed you in, but Convex has not validated the token yet. Refresh, or sign out and try again. Confirm CLERK_JWT_ISSUER_DOMAIN on the Convex deployment."
+          action={<Button href="/portal/sign-in">Sign in again</Button>}
+        />
+      </Unauthenticated>
+      <Authenticated>
+        <ConvexReady>{children}</ConvexReady>
+      </Authenticated>
+    </PortalShell>
+  );
+}
+
+/** Ensures useConvexAuth is authenticated before data children mount. */
+function ConvexReady({ children }: { children: ReactNode }) {
+  const { isAuthenticated, isLoading } = useConvexAuth();
+  if (isLoading) {
+    return (
+      <StatusPanel
+        title="Connecting…"
+        body="Confirming your board session with Convex."
+      />
+    );
+  }
+  if (!isAuthenticated) {
+    return (
+      <StatusPanel
+        title="Session not ready"
+        body="Waiting for Convex to accept your Clerk token."
+      />
+    );
+  }
+  return <>{children}</>;
 }

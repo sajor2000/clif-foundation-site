@@ -169,3 +169,24 @@ export const getDocumentUrl = query({
     return await ctx.storage.getUrl(args.storageId);
   },
 });
+
+export const archiveDocument = mutation({
+  args: { documentId: v.id("documents") },
+  returns: v.null(),
+  handler: async (ctx, args) => {
+    const { identity } = await requireBoardRole(ctx, ["admin"]);
+    const doc = await ctx.db.get(args.documentId);
+    if (!doc) throw new Error("Document not found");
+    if (doc.legalHold) {
+      throw new Error("Cannot archive: document is under legal hold");
+    }
+    await ctx.db.delete(args.documentId);
+    await logAudit(ctx, {
+      kind: "document.archive",
+      summary: `Archived document: ${doc.title}`,
+      actorSubject: identity.subject,
+      actorEmail: identity.email,
+    });
+    return null;
+  },
+});

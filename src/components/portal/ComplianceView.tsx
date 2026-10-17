@@ -9,12 +9,34 @@ import { pageTitle, panelStyle, sectionTitle } from "@/components/portal/portal-
 export function ComplianceView() {
   const [year, setYear] = useState(new Date().getFullYear());
   const dashboard = useQuery(api.compliance.getDashboard, { year });
-  const audit = useQuery(api.compliance.listAuditEvents);
+  const audit = useQuery(api.compliance.listAuditEvents, {});
   const upsert990 = useMutation(api.form990.upsertReview);
+
+  function exportCsv() {
+    if (!audit) return;
+    const header = "createdAt,kind,actorEmail,summary";
+    const rows = audit.map((e) =>
+      [
+        new Date(e.createdAt).toISOString(),
+        e.kind,
+        e.actorEmail ?? "",
+        `"${e.summary.replace(/"/g, '""')}"`,
+      ].join(","),
+    );
+    const blob = new Blob([[header, ...rows].join("\n")], {
+      type: "text/csv;charset=utf-8",
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `clif-board-audit-${year}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
 
   return (
     <div style={{ display: "grid", gap: 28 }}>
-      <h1 style={pageTitle}>Compliance</h1>
+      <h1 style={pageTitle}>Stay compliant</h1>
       <label style={{ display: "flex", gap: 12, alignItems: "center" }}>
         Year
         <input
@@ -22,6 +44,7 @@ export function ComplianceView() {
           value={year}
           onChange={(e) => setYear(Number(e.target.value))}
           style={{ width: 100, height: 44 }}
+          aria-label="Compliance year"
         />
       </label>
 
@@ -75,8 +98,13 @@ export function ComplianceView() {
         </div>
       ) : null}
 
-      <section>
-        <h2 style={sectionTitle}>Recent activity</h2>
+      <section style={{ display: "grid", gap: 12 }}>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 12, alignItems: "center" }}>
+          <h2 style={{ ...sectionTitle, margin: 0 }}>Activity log</h2>
+          <Button type="button" variant="secondary" onClick={exportCsv} disabled={!audit?.length}>
+            Export audit log (CSV)
+          </Button>
+        </div>
         {!audit ? (
           <p>Loading…</p>
         ) : (
@@ -86,7 +114,8 @@ export function ComplianceView() {
                 key={`${e.createdAt}-${i}`}
                 style={{ padding: "10px 0", borderBottom: "1px solid var(--border)", fontSize: 14 }}
               >
-                {new Date(e.createdAt).toLocaleString()} · {e.summary}
+                {new Date(e.createdAt).toLocaleString()} · {e.kind} · {e.summary}
+                {e.actorEmail ? ` · ${e.actorEmail}` : ""}
               </li>
             ))}
           </ul>

@@ -2,7 +2,8 @@
 
 import { useMutation, useQuery } from "convex/react";
 import { Cause, Effect, Exit } from "effect";
-import { useState, type FormEvent } from "react";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useState, type FormEvent } from "react";
 import { api } from "../../../convex/_generated/api";
 import type { Id } from "../../../convex/_generated/dataModel";
 import { Button } from "@/components/core/Button";
@@ -18,8 +19,16 @@ import {
 } from "@/lib/effect/upload";
 import { inputStyle, pageTitle, sectionTitle } from "@/components/portal/portal-styles";
 
+function isCategory(v: string): v is DocumentCategory {
+  return DOCUMENT_CATEGORIES.some((c) => c.value === v);
+}
+
 export function DocumentsWorkspace() {
-  const [categoryFilter, setCategoryFilter] = useState<DocumentCategory | "">("");
+  const searchParams = useSearchParams();
+  const initialCategory = searchParams.get("category") ?? "";
+  const [categoryFilter, setCategoryFilter] = useState<DocumentCategory | "">(
+    isCategory(initialCategory) ? initialCategory : "",
+  );
   const [search, setSearch] = useState("");
   const docs = useQuery(api.documents.listDocuments, {
     category: categoryFilter || undefined,
@@ -27,15 +36,27 @@ export function DocumentsWorkspace() {
   });
   const generateUploadUrl = useMutation(api.documents.generateUploadUrl);
   const saveDocument = useMutation(api.documents.saveDocument);
+  const archiveDocument = useMutation(api.documents.archiveDocument);
+  const setLegalHold = useMutation(api.documents.setLegalHold);
 
   const [title, setTitle] = useState("");
-  const [category, setCategory] = useState<DocumentCategory>("governance");
+  const [category, setCategory] = useState<DocumentCategory>(
+    isCategory(initialCategory) ? initialCategory : "governance",
+  );
   const [retentionClass, setRetentionClass] =
     useState<(typeof RETENTION_CLASSES)[number]["value"]>("permanent");
   const [taxYear, setTaxYear] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+
+  useEffect(() => {
+    const c = searchParams.get("category") ?? "";
+    if (isCategory(c)) {
+      setCategoryFilter(c);
+      setCategory(c);
+    }
+  }, [searchParams]);
 
   async function onUpload(e: FormEvent) {
     e.preventDefault();
@@ -232,6 +253,24 @@ export function DocumentsWorkspace() {
                   {doc.taxYear ? ` · ${doc.taxYear}` : ""}
                   {doc.legalHold ? " · hold" : ""}
                 </span>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() =>
+                    setLegalHold({ documentId: doc._id, legalHold: !doc.legalHold })
+                  }
+                >
+                  {doc.legalHold ? "Clear hold" : "Legal hold"}
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => archiveDocument({ documentId: doc._id }).catch((e: Error) => setError(e.message))}
+                >
+                  Archive
+                </Button>
               </li>
             ))}
           </ul>

@@ -179,6 +179,20 @@ export const setMotionStatus = mutation({
     const { identity } = await requireBoardRole(ctx, ["chair", "admin"]);
     const motion = await ctx.db.get(args.motionId);
     if (!motion) throw new Error("Motion not found");
+    if (args.status === "closed" && motion.motionType === "consent") {
+      const members = await ctx.db.query("boardMembers").take(200);
+      const eligible = members.length > 0 ? members.length : 1;
+      const ballots = await ctx.db
+        .query("ballots")
+        .withIndex("by_motion", (q) => q.eq("motionId", args.motionId))
+        .take(500);
+      const yes = ballots.filter((b) => b.choice === "yes").length;
+      if (yes !== eligible) {
+        throw new Error(
+          `Consent motion cannot close as passed: need yes from all ${eligible} directors (have ${yes})`,
+        );
+      }
+    }
     const patch: {
       status: typeof args.status;
       openedAt?: number;

@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
+import { logAudit } from "./lib/audit";
 import { requireBoardIdentity, requireBoardRole } from "./lib/auth";
 
 export const listMembers = query({
@@ -14,6 +15,20 @@ export const listMembers = query({
   handler: async (ctx) => {
     await requireBoardIdentity(ctx);
     return await ctx.db.query("boardMembers").take(200);
+  },
+});
+
+export const myRole = query({
+  args: {},
+  returns: v.union(v.string(), v.null()),
+  handler: async (ctx) => {
+    const identity = await requireBoardIdentity(ctx);
+    if (!identity.email) return null;
+    const member = await ctx.db
+      .query("boardMembers")
+      .withIndex("by_email", (q) => q.eq("email", identity.email!))
+      .unique();
+    return member?.role ?? (member ? "member" : null);
   },
 });
 
@@ -32,7 +47,7 @@ export const upsertMember = mutation({
   },
   returns: v.null(),
   handler: async (ctx, args) => {
-    await requireBoardRole(ctx, ["admin"]);
+    const { identity } = await requireBoardRole(ctx, ["admin"]);
     const email = args.email.trim().toLowerCase();
     const existing = await ctx.db
       .query("boardMembers")
@@ -50,6 +65,12 @@ export const upsertMember = mutation({
         displayName: args.displayName,
       });
     }
+    await logAudit(ctx, {
+      kind: "board.member_upsert",
+      summary: `Allowlist upsert: ${email}`,
+      actorSubject: identity.subject,
+      actorEmail: identity.email,
+    });
     return null;
   },
 });
@@ -71,6 +92,12 @@ export const bootstrapAdmin = mutation({
       email: identity.email,
       role: "admin",
       displayName: identity.name ?? undefined,
+    });
+    await logAudit(ctx, {
+      kind: "board.bootstrap",
+      summary: `Bootstrap admin: ${identity.email}`,
+      actorSubject: identity.subject,
+      actorEmail: identity.email,
     });
     return null;
   },

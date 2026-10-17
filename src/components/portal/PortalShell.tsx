@@ -9,13 +9,14 @@ const clerkReady = Boolean(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY);
 
 const NAV = [
   { href: "/portal", label: "Overview" },
-  { href: "/portal/reporting", label: "Reporting pack" },
+  { href: "/portal/reporting", label: "Get paperwork" },
   { href: "/portal/documents", label: "Documents" },
   { href: "/portal/meetings", label: "Meetings" },
   { href: "/portal/votes", label: "Votes" },
   { href: "/portal/compliance", label: "Compliance" },
-  { href: "/portal/coi", label: "COI disclosure" },
+  { href: "/portal/coi", label: "COI" },
   { href: "/portal/policies", label: "Policies" },
+  { href: "/portal/members", label: "Members" },
 ] as const;
 
 function PortalNav() {
