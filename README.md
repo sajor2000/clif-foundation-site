@@ -26,7 +26,7 @@ Open [http://127.0.0.1:43127](http://127.0.0.1:43127).
 | `npm run start` | Start production server on 43127 |
 | `npm run test:e2e` | Browser tests (system Chrome) against the production build; run `npm run build` first. `BASE_URL=https://www.clificufoundation.org npm run test:e2e` tests the live site |
 | `npm run test:unit` | Pure unit tests (e.g. quorum helpers) |
-| `npm run convex:dev` | Anonymous local Convex backend |
+| `npm run convex:dev` | Convex dev deployment (watch + push functions) |
 
 ### Env checklist
 

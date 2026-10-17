@@ -11,10 +11,12 @@ const clerkReady = Boolean(
 export default clerkReady
   ? clerkMiddleware(async (auth, req) => {
       if (isBoardPortal(req) && !isPortalSignIn(req)) {
-        await auth.protect();
+        const signIn = new URL("/portal/sign-in", req.url);
+        signIn.searchParams.set("redirect_url", req.url);
+        await auth.protect({ unauthenticatedUrl: signIn.toString() });
       }
     })
-  : function middleware() {
+  : function proxy() {
       return NextResponse.next();
     };
 

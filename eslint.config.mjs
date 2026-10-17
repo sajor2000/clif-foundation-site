@@ -21,6 +21,8 @@ const eslintConfig = defineConfig([
     ".cursor/**",
     ".claude/**",
     ".codex/**",
+    // Convex codegen output.
+    "convex/_generated/**",
   ]),
 ]);
 
