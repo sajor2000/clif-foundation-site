@@ -104,16 +104,39 @@ export const getReportingPack = query({
       .query("minutes")
       .withIndex("by_status", (q) => q.eq("status", "approved"))
       .order("desc")
-      .take(20);
+      .take(50);
+
+    // One export per meeting: highest approved version that is not superseded
+    // by a newer (draft/review) revision.
+    const latestApprovedByMeeting = new Map<
+      string,
+      (typeof approved)[number]
+    >();
+    for (const min of approved) {
+      const key = min.meetingId;
+      const prev = latestApprovedByMeeting.get(key);
+      if (!prev || min.version > prev.version) {
+        latestApprovedByMeeting.set(key, min);
+      }
+    }
 
     const approvedMinutesExports = [];
-    for (const min of approved) {
+    for (const min of latestApprovedByMeeting.values()) {
+      const newer = await ctx.db
+        .query("minutes")
+        .withIndex("by_meeting", (q) => q.eq("meetingId", min.meetingId))
+        .order("desc")
+        .first();
+      if (newer && newer.version > min.version) {
+        // Revision in progress — omit stale approved copy from CPA pack.
+        continue;
+      }
       const meeting = await ctx.db.get(min.meetingId);
       if (!meeting) continue;
       const items = await ctx.db
         .query("minutesItems")
         .withIndex("by_minutes", (q) => q.eq("minutesId", min._id))
-        .collect();
+        .take(100);
       const lines = [
         `# ${meeting.title}`,
         `Approved minutes v${min.version}`,

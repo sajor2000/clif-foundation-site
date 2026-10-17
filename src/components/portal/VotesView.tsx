@@ -10,7 +10,7 @@ import { inputStyle, pageTitle, panelStyle, sectionTitle } from "@/components/po
 type StatusFilter = "open" | "closed" | "draft" | "all";
 
 export function VotesView({ focusId }: { focusId?: string } = {}) {
-  const [filter, setFilter] = useState<StatusFilter>("open");
+  const [filter, setFilter] = useState<StatusFilter>(focusId ? "all" : "open");
   const open = useQuery(api.motions.listMotions, { status: "open" });
   const closed = useQuery(api.motions.listMotions, { status: "closed" });
   const draft = useQuery(api.motions.listMotions, { status: "draft" });
