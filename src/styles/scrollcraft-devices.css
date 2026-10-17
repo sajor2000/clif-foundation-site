@@ -145,8 +145,10 @@
 }
 
 @media (min-width: 1400px) {
+  /* Folio sits at left 16px and is ~88px wide ("Federation"); reserve its
+     column plus a gap so pinned stages never slide beneath it. */
   .sc-home {
-    padding-left: 96px;
+    padding-left: 120px;
   }
 
   .sc-folio {
@@ -279,7 +281,7 @@
   .fed__analysis {
     min-height: 0;
     padding-bottom: 6px;
-    font-size: 10px;
+    font-size: 11px;
   }
 
   .fed__sites {
@@ -296,7 +298,7 @@
   .fed__card {
     padding: 7px 6px;
     gap: 4px;
-    font-size: 9px;
+    font-size: 11px;
   }
 
   .fed__card-body {
@@ -306,7 +308,7 @@
 
   .fed__card-body::after {
     content: "local run";
-    font-size: 9px;
+    font-size: 11px;
   }
 
   .fed__arrow {
@@ -316,7 +318,7 @@
   .fed__aggregate {
     padding: 9px 10px;
     gap: 4px 12px;
-    font-size: 10px;
+    font-size: 11px;
   }
 }
 

@@ -22,7 +22,8 @@ export function PublicationRow({
         display: "flex",
         flexWrap: "wrap",
         gap: "8px 24px",
-        padding: "22px 0",
+        // 9px of the row padding moves onto the link so it is a 44px tap target.
+        padding: "13px 0",
         borderBottom: "1px solid var(--border)",
         alignItems: "baseline",
       }}
@@ -37,7 +38,8 @@ export function PublicationRow({
       >
         {year}
       </span>
-      <div style={{ flex: "1 1 420px", minWidth: 0, display: "grid", gap: 8 }}>
+      {/* No gap: the link's own 9px bottom padding spaces title and venue. */}
+      <div style={{ flex: "1 1 420px", minWidth: 0, display: "grid" }}>
         <a
           href={href}
           target="_blank"
@@ -45,6 +47,9 @@ export function PublicationRow({
           onMouseEnter={() => setHover(true)}
           onMouseLeave={() => setHover(false)}
           style={{
+            display: "block",
+            paddingBlock: 9,
+            minHeight: 44,
             fontSize: 19,
             fontWeight: 500,
             lineHeight: 1.35,
