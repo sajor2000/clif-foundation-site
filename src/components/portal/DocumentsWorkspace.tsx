@@ -38,6 +38,8 @@ export function DocumentsWorkspace() {
   const saveDocument = useMutation(api.documents.saveDocument);
   const archiveDocument = useMutation(api.documents.archiveDocument);
   const setLegalHold = useMutation(api.documents.setLegalHold);
+  const role = useQuery(api.board.myRole);
+  const canManageDocs = role === "admin" || role === "secretary";
 
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState<DocumentCategory>(
@@ -253,33 +255,38 @@ export function DocumentsWorkspace() {
                   {doc.taxYear ? ` · ${doc.taxYear}` : ""}
                   {doc.legalHold ? " · hold" : ""}
                 </span>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  onClick={() =>
-                    setLegalHold({ documentId: doc._id, legalHold: !doc.legalHold })
-                  }
-                >
-                  {doc.legalHold ? "Clear hold" : "Legal hold"}
-                </Button>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  onClick={() => {
-                    if (
-                      !window.confirm(
-                        `Archive “${doc.title}”? This removes it from the board library.`,
-                      )
-                    ) {
-                      return;
-                    }
-                    archiveDocument({ documentId: doc._id }).catch((e: Error) =>
-                      setError(e.message),
-                    );
-                  }}
-                >
-                  Archive
-                </Button>
+                {canManageDocs ? (
+                  <>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      onClick={() =>
+                        setLegalHold({ documentId: doc._id, legalHold: !doc.legalHold })
+                      }
+                    >
+                      {doc.legalHold ? "Clear hold" : "Legal hold"}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      disabled={doc.legalHold}
+                      onClick={() => {
+                        if (
+                          !window.confirm(
+                            `Permanently delete “${doc.title}” from the board library and file storage?`,
+                          )
+                        ) {
+                          return;
+                        }
+                        archiveDocument({ documentId: doc._id }).catch((e: Error) =>
+                          setError(e.message),
+                        );
+                      }}
+                    >
+                      Archive
+                    </Button>
+                  </>
+                ) : null}
               </li>
             ))}
           </ul>

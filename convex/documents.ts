@@ -162,11 +162,13 @@ export const setLegalHold = mutation({
 });
 
 export const getDocumentUrl = query({
-  args: { storageId: v.id("_storage") },
+  args: { documentId: v.id("documents") },
   returns: v.union(v.string(), v.null()),
   handler: async (ctx, args) => {
     await requireBoardIdentity(ctx);
-    return await ctx.storage.getUrl(args.storageId);
+    const doc = await ctx.db.get(args.documentId);
+    if (!doc) return null;
+    return await ctx.storage.getUrl(doc.storageId);
   },
 });
 
@@ -181,6 +183,11 @@ export const archiveDocument = mutation({
       throw new Error("Cannot archive: document is under legal hold");
     }
     await ctx.db.delete(args.documentId);
+    try {
+      await ctx.storage.delete(doc.storageId);
+    } catch {
+      // Blob may already be gone; metadata delete already applied.
+    }
     await logAudit(ctx, {
       kind: "document.archive",
       summary: `Archived document: ${doc.title}`,

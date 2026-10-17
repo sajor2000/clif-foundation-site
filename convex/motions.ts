@@ -74,17 +74,22 @@ async function computeTally(
     .withIndex("by_motion", (q) => q.eq("motionId", motionId))
     .take(500);
   const members = await ctx.db.query("boardMembers").take(200);
-  const eligible = members.length > 0 ? members.length : 1;
+  const directorCount = members.length > 0 ? members.length : 1;
   const yes = ballots.filter((b) => b.choice === "yes").length;
   const no = ballots.filter((b) => b.choice === "no").length;
   const abstain = ballots.filter((b) => b.choice === "abstain").length;
   const recuse = ballots.filter((b) => b.choice === "recuse").length;
   const voted = ballots.length;
+  // Recused directors are excluded from the unanimous consent denominator.
+  const eligible =
+    motionType === "consent"
+      ? Math.max(1, directorCount - recuse)
+      : directorCount;
 
   let passed = false;
   if (status === "closed") {
     if (motionType === "consent") {
-      passed = yes === eligible && no === 0;
+      passed = yes === eligible && no === 0 && abstain === 0;
     } else {
       passed = yes > no;
     }
@@ -179,20 +184,17 @@ export const setMotionStatus = mutation({
     const { identity } = await requireBoardRole(ctx, ["chair", "admin"]);
     const motion = await ctx.db.get(args.motionId);
     if (!motion) throw new Error("Motion not found");
-    if (args.status === "closed" && motion.motionType === "consent") {
-      const members = await ctx.db.query("boardMembers").take(200);
-      const eligible = members.length > 0 ? members.length : 1;
-      const ballots = await ctx.db
-        .query("ballots")
-        .withIndex("by_motion", (q) => q.eq("motionId", args.motionId))
-        .take(500);
-      const yes = ballots.filter((b) => b.choice === "yes").length;
-      if (yes !== eligible) {
-        throw new Error(
-          `Consent motion cannot close as passed: need yes from all ${eligible} directors (have ${yes})`,
-        );
-      }
+
+    const from = motion.status;
+    const to = args.status;
+    const allowed =
+      (from === "draft" && to === "open") ||
+      (from === "open" && to === "closed") ||
+      (from === "draft" && to === "draft");
+    if (from !== to && !allowed) {
+      throw new Error(`Invalid motion transition: ${from} → ${to}`);
     }
+
     const patch: {
       status: typeof args.status;
       openedAt?: number;

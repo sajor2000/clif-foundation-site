@@ -2,7 +2,7 @@ import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { logAudit } from "./lib/audit";
 import { requireBoardIdentity, requireBoardRole } from "./lib/auth";
-import { quorumMet } from "./lib/quorum";
+import { quorumMet, quorumRequired } from "./lib/quorum";
 
 const meetingReturn = v.object({
   _id: v.id("meetings"),
@@ -80,7 +80,7 @@ export const createMeeting = mutation({
   args: {
     title: v.string(),
     scheduledAt: v.number(),
-    quorumRequired: v.number(),
+    quorumRequired: v.optional(v.number()),
     committeeLabel: v.optional(v.string()),
   },
   returns: v.id("meetings"),
@@ -90,12 +90,19 @@ export const createMeeting = mutation({
       "chair",
       "admin",
     ]);
+    const members = await ctx.db.query("boardMembers").take(200);
+    const settings = await ctx.db.query("orgSettings").take(1);
+    const fraction = settings[0]?.quorumFraction ?? 0.5;
+    const computedQuorum = quorumRequired(
+      Math.max(1, members.length),
+      fraction,
+    );
     const id = await ctx.db.insert("meetings", {
       title: args.title.trim(),
       scheduledAt: args.scheduledAt,
       status: "scheduled",
       committeeLabel: args.committeeLabel,
-      quorumRequired: args.quorumRequired,
+      quorumRequired: args.quorumRequired ?? computedQuorum,
       attendeeEmails: [],
       createdBy: identity.identity.subject,
       createdAt: Date.now(),
@@ -128,9 +135,14 @@ export const updateAttendance = mutation({
     ]);
     const meeting = await ctx.db.get(args.meetingId);
     if (!meeting) throw new Error("Meeting not found");
-    const present = args.attendeeEmails.length;
+    const unique = [
+      ...new Set(
+        args.attendeeEmails.map((e) => e.trim().toLowerCase()).filter(Boolean),
+      ),
+    ];
+    const present = unique.length;
     await ctx.db.patch(args.meetingId, {
-      attendeeEmails: args.attendeeEmails.map((e) => e.toLowerCase()),
+      attendeeEmails: unique,
       quorumMet: quorumMet(present, meeting.quorumRequired),
       status: args.status ?? meeting.status,
       heldAt: args.heldAt ?? meeting.heldAt,
@@ -226,6 +238,20 @@ export const reviseMinutes = mutation({
       createdAt: Date.now(),
       updatedAt: Date.now(),
     });
+    const priorItems = await ctx.db
+      .query("minutesItems")
+      .withIndex("by_minutes", (q) => q.eq("minutesId", existing._id))
+      .take(200);
+    for (const item of priorItems) {
+      await ctx.db.insert("minutesItems", {
+        minutesId: id,
+        title: item.title,
+        discussion: item.discussion,
+        motionId: item.motionId,
+        sortOrder: item.sortOrder,
+        coiRecusals: item.coiRecusals,
+      });
+    }
     await logAudit(ctx, {
       kind: "minutes.revise",
       summary: `Started minutes v${existing.version + 1}`,

@@ -34,12 +34,16 @@ export function MeetingsView({ meetingId }: { meetingId?: Id<"meetings"> } = {})
     selected ? { meetingId: selected } : "skip",
   );
 
+  useEffect(() => {
+    setMinutesBody(detail?.minutes?.body ?? "");
+    setAttendees(detail?.meeting.attendeeEmails.join(", ") ?? "");
+  }, [selected, detail?.minutes?._id, detail?.minutes?.updatedAt, detail?.meeting.attendeeEmails]);
+
   async function onCreate() {
     if (!title || !scheduledAt) return;
     const id = await createMeeting({
       title,
       scheduledAt: new Date(scheduledAt).getTime(),
-      quorumRequired: 3,
     });
     setSelected(id);
     setTitle("");
@@ -48,10 +52,11 @@ export function MeetingsView({ meetingId }: { meetingId?: Id<"meetings"> } = {})
   async function saveMinutes(status?: "draft" | "published_for_review" | "approved") {
     if (!selected) return;
     setError(null);
+    const body = minutesBody || detail?.minutes?.body || "";
     try {
       await upsertMinutes({
         meetingId: selected,
-        body: minutesBody,
+        body,
         status,
       });
     } catch (e) {
@@ -172,7 +177,7 @@ export function MeetingsView({ meetingId }: { meetingId?: Id<"meetings"> } = {})
           <label style={{ display: "grid", gap: 6, fontSize: 14 }}>
             Minutes body
             <textarea
-              value={minutesBody || detail.minutes?.body || ""}
+              value={minutesBody}
               onChange={(e) => setMinutesBody(e.target.value)}
               rows={8}
               style={{ ...inputStyle, height: "auto", padding: 12 }}

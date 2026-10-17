@@ -8,10 +8,13 @@ import { panelStyle, pageTitle } from "@/components/portal/portal-styles";
 
 export function PortalHome() {
   const year = new Date().getFullYear();
-  const dashboard = useQuery(api.compliance.getDashboard, { year });
-  const members = useQuery(api.board.listMembers);
   const role = useQuery(api.board.myRole);
   const bootstrap = useMutation(api.board.bootstrapAdmin);
+  const canLoadBoard = role !== undefined && role !== null && role !== "bootstrap_eligible";
+  const dashboard = useQuery(
+    api.compliance.getDashboard,
+    canLoadBoard ? { year } : "skip",
+  );
 
   return (
     <div style={{ display: "grid", gap: 32 }}>
@@ -22,7 +25,7 @@ export function PortalHome() {
         </p>
       </div>
 
-      {members !== undefined && members.length === 0 ? (
+      {role === "bootstrap_eligible" ? (
         <div style={panelStyle}>
           <p style={{ margin: 0, fontWeight: 600 }}>First-time setup</p>
           <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5 }}>
@@ -32,6 +35,15 @@ export function PortalHome() {
           <Button type="button" onClick={() => bootstrap({})}>
             Claim admin for my account
           </Button>
+        </div>
+      ) : null}
+
+      {role === null ? (
+        <div style={panelStyle}>
+          <p style={{ margin: 0, fontWeight: 600 }}>Access not granted</p>
+          <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5 }}>
+            Your signed-in email is not on the board allowlist. Ask an admin to add you under Members.
+          </p>
         </div>
       ) : null}
 

@@ -32,7 +32,15 @@ export function CoiForm() {
         </p>
       ) : null}
       <div style={panelStyle}>
-        <label style={{ display: "flex", gap: 10, alignItems: "center", fontSize: 15 }}>
+        <label
+          style={{
+            display: "flex",
+            gap: 10,
+            alignItems: "center",
+            fontSize: 15,
+            minHeight: 44,
+          }}
+        >
           <input
             type="checkbox"
             checked={hasConflict}
