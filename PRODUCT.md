@@ -26,7 +26,7 @@ Distinct from the CLIF Consortium (clif-icu.com): the Consortium owns the specif
 
 ## Capabilities and Constraints
 
-- Stack: Next.js App Router, TypeScript, Tailwind, Effect 4; Stripe stubbed. No backend database.
+- Stack: Next.js App Router, TypeScript, Tailwind, Effect 4; Stripe stubbed. Public pages are static-friendly; **board portal** uses Clerk + Convex (`/portal`, not linked from public nav).
 - Legal status (confirmed): Illinois nonprofit corporation, EIN issued, 501(c)(3) application pending. Never claim tax-exempt status or deductibility until an IRS determination letter is posted.
 - Programs, board directors, and officer roles are published as current. Do not revive “proposed” labeling for them.
 - Do not invent biographies, partnerships, funding commitments, or impact statistics.
