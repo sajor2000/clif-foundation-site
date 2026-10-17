@@ -140,10 +140,14 @@ export const updateAttendance = mutation({
         args.attendeeEmails.map((e) => e.trim().toLowerCase()).filter(Boolean),
       ),
     ];
-    const present = unique.length;
+    const members = await ctx.db.query("boardMembers").take(200);
+    const directorEmails = new Set(
+      members.map((m) => m.email.trim().toLowerCase()),
+    );
+    const directorPresent = unique.filter((e) => directorEmails.has(e));
     await ctx.db.patch(args.meetingId, {
       attendeeEmails: unique,
-      quorumMet: quorumMet(present, meeting.quorumRequired),
+      quorumMet: quorumMet(directorPresent.length, meeting.quorumRequired),
       status: args.status ?? meeting.status,
       heldAt: args.heldAt ?? meeting.heldAt,
     });

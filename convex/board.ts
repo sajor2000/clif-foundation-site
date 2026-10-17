@@ -18,7 +18,12 @@ export const listMembers = query({
   ),
   handler: async (ctx) => {
     await requireBoardIdentity(ctx);
-    return await ctx.db.query("boardMembers").take(200);
+    const rows = await ctx.db.query("boardMembers").take(200);
+    return rows.map((m) => ({
+      email: m.email,
+      role: m.role,
+      displayName: m.displayName,
+    }));
   },
 });
 

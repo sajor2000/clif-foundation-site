@@ -14,9 +14,17 @@ export function ReportingHub() {
   const [zipError, setZipError] = useState<string | null>(null);
   const pack = useQuery(api.reporting.getReportingPack, { taxYear });
 
+  /** Manifest omits signed download URLs so the JSON file is safe to share with a CPA. */
   const downloadManifest = useMemo(() => {
     if (!pack) return null;
-    return JSON.stringify(pack, null, 2);
+    const redacted = {
+      ...pack,
+      sections: pack.sections.map((section) => ({
+        ...section,
+        documents: section.documents.map(({ downloadUrl: _url, ...doc }) => doc),
+      })),
+    };
+    return JSON.stringify(redacted, null, 2);
   }, [pack]);
 
   function downloadManifestFile() {
@@ -46,7 +54,10 @@ export function ReportingHub() {
     setZipping(true);
     try {
       const zip = new JSZip();
-      zip.file(`manifest-${taxYear}.json`, JSON.stringify(pack, null, 2));
+      zip.file(
+        `manifest-${taxYear}.json`,
+        downloadManifest ?? JSON.stringify({ generatedAt: pack.generatedAt }),
+      );
       for (const section of pack.sections) {
         const folder = zip.folder(section.id) ?? zip;
         for (const doc of section.documents) {

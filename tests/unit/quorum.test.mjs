@@ -2,9 +2,9 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
 /** Mirrors convex/lib/quorum.ts — keep in sync. */
-function quorumRequired(directorCount, fraction = 0.5) {
+function quorumRequired(directorCount) {
   if (directorCount <= 0) return 1;
-  return Math.max(1, Math.ceil(directorCount * fraction));
+  return Math.floor(directorCount / 2) + 1;
 }
 
 function quorumMet(present, required) {
@@ -12,10 +12,10 @@ function quorumMet(present, required) {
 }
 
 describe("quorum helpers", () => {
-  it("requires majority for even and odd boards", () => {
+  it("requires simple majority for even and odd boards", () => {
     assert.equal(quorumRequired(0), 1);
     assert.equal(quorumRequired(1), 1);
-    assert.equal(quorumRequired(4), 2);
+    assert.equal(quorumRequired(4), 3);
     assert.equal(quorumRequired(5), 3);
     assert.equal(quorumRequired(9), 5);
   });

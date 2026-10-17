@@ -56,14 +56,25 @@ export const upsertReview = mutation({
       .query("form990Reviews")
       .withIndex("by_tax_year", (q) => q.eq("taxYear", args.taxYear))
       .unique();
+    const alreadyReviewed = existing?.boardReviewedBeforeFiled === true;
     const payload = {
       taxYear: args.taxYear,
       boardReviewedBeforeFiled: args.boardReviewedBeforeFiled,
-      documentId: args.documentId,
-      reviewMeetingId: args.reviewMeetingId,
-      notes: args.notes,
-      reviewedAt: args.boardReviewedBeforeFiled ? Date.now() : undefined,
-      reviewedBy: args.boardReviewedBeforeFiled ? identity.subject : undefined,
+      documentId: args.documentId ?? existing?.documentId,
+      reviewMeetingId: args.reviewMeetingId ?? existing?.reviewMeetingId,
+      notes: args.notes ?? existing?.notes,
+      reviewedAt:
+        args.boardReviewedBeforeFiled
+          ? alreadyReviewed
+            ? existing?.reviewedAt
+            : Date.now()
+          : existing?.reviewedAt,
+      reviewedBy:
+        args.boardReviewedBeforeFiled
+          ? alreadyReviewed
+            ? existing?.reviewedBy
+            : identity.subject
+          : existing?.reviewedBy,
     };
     if (existing) {
       await ctx.db.patch(existing._id, payload);

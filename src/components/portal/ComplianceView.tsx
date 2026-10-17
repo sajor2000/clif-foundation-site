@@ -3,14 +3,22 @@
 import { useMutation, useQuery } from "convex/react";
 import { useState } from "react";
 import { api } from "../../../convex/_generated/api";
+import type { Id } from "../../../convex/_generated/dataModel";
 import { Button } from "@/components/core/Button";
-import { pageTitle, panelStyle, sectionTitle } from "@/components/portal/portal-styles";
+import { inputStyle, pageTitle, panelStyle, sectionTitle } from "@/components/portal/portal-styles";
 
 export function ComplianceView() {
   const [year, setYear] = useState(new Date().getFullYear());
+  const [notes, setNotes] = useState("");
+  const [meetingId, setMeetingId] = useState<Id<"meetings"> | "">("");
+  const [error, setError] = useState<string | null>(null);
+  const role = useQuery(api.board.myRole);
   const dashboard = useQuery(api.compliance.getDashboard, { year });
   const audit = useQuery(api.compliance.listAuditEvents, {});
+  const meetings = useQuery(api.meetings.listMeetings);
   const upsert990 = useMutation(api.form990.upsertReview);
+  const canMark990 =
+    role === "admin" || role === "secretary" || role === "chair";
 
   function exportCsv() {
     if (!audit) return;
@@ -32,6 +40,24 @@ export function ComplianceView() {
     a.download = `clif-board-audit-${year}.csv`;
     a.click();
     URL.revokeObjectURL(url);
+  }
+
+  async function mark990Reviewed() {
+    setError(null);
+    if (!meetingId && !notes.trim()) {
+      setError("Select a review meeting or enter notes before recording.");
+      return;
+    }
+    try {
+      await upsert990({
+        taxYear: year,
+        boardReviewedBeforeFiled: true,
+        reviewMeetingId: meetingId || undefined,
+        notes: notes.trim() || undefined,
+      });
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Failed to record 990 review");
+    }
   }
 
   return (
@@ -67,19 +93,49 @@ export function ComplianceView() {
               Board reviewed before filed:{" "}
               {dashboard.form990.boardReviewedBeforeFiled ? "yes" : "no"}
             </p>
-            <Button
-              type="button"
-              variant="secondary"
-              onClick={() =>
-                upsert990({
-                  taxYear: year,
-                  boardReviewedBeforeFiled: true,
-                  notes: "Recorded from compliance dashboard",
-                })
-              }
-            >
-              Mark {year} 990 as board-reviewed
-            </Button>
+            {canMark990 ? (
+              <>
+                <label style={{ display: "grid", gap: 6, fontSize: 14 }}>
+                  Review meeting (optional)
+                  <select
+                    value={meetingId}
+                    onChange={(e) =>
+                      setMeetingId((e.target.value || "") as Id<"meetings"> | "")
+                    }
+                    style={inputStyle}
+                  >
+                    <option value="">Select a meeting…</option>
+                    {(meetings ?? []).map((m) => (
+                      <option key={m._id} value={m._id}>
+                        {m.title} · {new Date(m.scheduledAt).toLocaleDateString()}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label style={{ display: "grid", gap: 6, fontSize: 14 }}>
+                  Notes (required if no meeting)
+                  <textarea
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
+                    rows={3}
+                    style={{ ...inputStyle, height: "auto", padding: 12 }}
+                    placeholder="Describe the board review (date, attendees, outcome)"
+                  />
+                </label>
+                {error ? (
+                  <p role="alert" style={{ margin: 0, color: "var(--status-error)", fontSize: 14 }}>
+                    {error}
+                  </p>
+                ) : null}
+                <Button type="button" variant="secondary" onClick={mark990Reviewed}>
+                  Mark {year} 990 as board-reviewed
+                </Button>
+              </>
+            ) : (
+              <p style={{ margin: 0, fontSize: 14, color: "var(--text-muted)" }}>
+                Secretary, chair, or admin can record the Form 990 board review.
+              </p>
+            )}
           </div>
           <div style={panelStyle}>
             <h2 style={{ ...sectionTitle, fontSize: 20 }}>Minutes gaps</h2>

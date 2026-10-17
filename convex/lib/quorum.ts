@@ -1,7 +1,10 @@
-/** Majority of eligible directors (simple default for v1). */
-export function quorumRequired(directorCount: number, fraction = 0.5): number {
+/**
+ * Simple majority of eligible directors: floor(n/2)+1.
+ * (ceil(n*0.5) is wrong for even boards — e.g. 4 directors need 3, not 2.)
+ */
+export function quorumRequired(directorCount: number, _fraction = 0.5): number {
   if (directorCount <= 0) return 1;
-  return Math.max(1, Math.ceil(directorCount * fraction));
+  return Math.floor(directorCount / 2) + 1;
 }
 
 export function quorumMet(present: number, required: number): boolean {

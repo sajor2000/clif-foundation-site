@@ -24,7 +24,16 @@ export const listPolicies = query({
   ),
   handler: async (ctx) => {
     await requireBoardIdentity(ctx);
-    return await ctx.db.query("policies").order("desc").take(50);
+    const rows = await ctx.db.query("policies").order("desc").take(50);
+    return rows.map((p) => ({
+      _id: p._id,
+      policyType: p.policyType,
+      version: p.version,
+      title: p.title,
+      adoptedAt: p.adoptedAt,
+      documentId: p.documentId,
+      reportingInstructions: p.reportingInstructions,
+    }));
   },
 });
 

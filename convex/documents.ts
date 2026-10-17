@@ -182,6 +182,11 @@ export const archiveDocument = mutation({
     if (doc.legalHold) {
       throw new Error("Cannot archive: document is under legal hold");
     }
+    if (doc.retentionClass === "permanent") {
+      throw new Error(
+        "Cannot archive: retention class is permanent (clear legal hold alone is not enough)",
+      );
+    }
     await ctx.db.delete(args.documentId);
     try {
       await ctx.storage.delete(doc.storageId);

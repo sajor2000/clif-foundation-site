@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery } from "convex/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { api } from "../../../convex/_generated/api";
 import { Button } from "@/components/core/Button";
 import { inputStyle, pageTitle, panelStyle } from "@/components/portal/portal-styles";
@@ -13,10 +13,24 @@ export function CoiForm() {
   const [hasConflict, setHasConflict] = useState(false);
   const [details, setDetails] = useState("");
   const [saved, setSaved] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (existing) {
+      setHasConflict(existing.hasConflict);
+      setDetails(existing.details ?? "");
+    }
+  }, [existing]);
 
   async function onSubmit() {
-    await submit({ year, hasConflict, details: details || undefined });
-    setSaved(true);
+    setError(null);
+    setSaved(false);
+    try {
+      await submit({ year, hasConflict, details: details || undefined });
+      setSaved(true);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Failed to save disclosure");
+    }
   }
 
   return (
@@ -57,6 +71,11 @@ export function CoiForm() {
             style={{ ...inputStyle, height: "auto", padding: 12 }}
           />
         </label>
+        {error ? (
+          <p role="alert" style={{ margin: 0, color: "var(--status-error)", fontSize: 14 }}>
+            {error}
+          </p>
+        ) : null}
         <Button type="button" onClick={onSubmit}>
           Submit {year} disclosure
         </Button>
