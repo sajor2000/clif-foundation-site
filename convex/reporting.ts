@@ -34,9 +34,12 @@ export const getReportingPack = query({
   }),
   handler: async (ctx, args) => {
     await requireBoardIdentity(ctx);
-    const allDocs = (
-      await ctx.db.query("documents").withIndex("by_created").order("desc").take(300)
-    ).filter((d) => d.archivedAt === undefined);
+    const allDocs = await ctx.db
+      .query("documents")
+      .withIndex("by_created")
+      .order("desc")
+      .filter((q) => q.eq(q.field("archivedAt"), undefined))
+      .take(300);
 
     const withUrl = async (d: (typeof allDocs)[number]) => {
       return {

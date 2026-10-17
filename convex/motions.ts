@@ -51,26 +51,35 @@ export const listMotions = query({
           .order("desc")
           .take(100);
 
+    const directorEmails = await loadDirectorEmails(ctx);
     const results = [];
     for (const motion of motions) {
       results.push({
         motion,
-        tally: await computeTally(ctx, motion),
+        tally: await computeTally(ctx, motion, directorEmails),
       });
     }
     return results;
   },
 });
 
+/** Live tally for open/draft motions; the frozen result for closed ones. */
 async function computeTally(
   ctx: QueryCtx,
-  motion: Pick<Doc<"motions">, "_id" | "motionType" | "status">,
+  motion: Pick<Doc<"motions">, "_id" | "motionType" | "status" | "finalTally">,
+  directorEmails?: Set<string>,
 ) {
+  if (motion.status === "closed" && motion.finalTally) return motion.finalTally;
   const ballots = await ctx.db
     .query("ballots")
     .withIndex("by_motion", (q) => q.eq("motionId", motion._id))
     .take(500);
-  return tallyBallots(ballots, await loadDirectorEmails(ctx), motion.motionType, motion.status);
+  return tallyBallots(
+    ballots,
+    directorEmails ?? (await loadDirectorEmails(ctx)),
+    motion.motionType,
+    motion.status,
+  );
 }
 
 export const getMotion = query({
@@ -169,9 +178,14 @@ export const setMotionStatus = mutation({
       status: typeof args.status;
       openedAt?: number;
       closedAt?: number;
+      finalTally?: Doc<"motions">["finalTally"];
     } = { status: args.status };
     if (args.status === "open") patch.openedAt = Date.now();
-    if (args.status === "closed") patch.closedAt = Date.now();
+    if (args.status === "closed" && from !== "closed") {
+      patch.closedAt = Date.now();
+      // Freeze the result: this is the board record for the vote.
+      patch.finalTally = await computeTally(ctx, { ...motion, status: "closed", finalTally: undefined });
+    }
     await ctx.db.patch(args.motionId, patch);
     await logAudit(ctx, {
       kind: "motion.status",
@@ -215,6 +229,7 @@ export const castBallot = mutation({
       await ctx.db.patch(existing._id, {
         choice: args.choice,
         castAt: Date.now(),
+        voterEmail: identity.email, // backfill legacy ballots so they count
       });
     } else {
       await ctx.db.insert("ballots", {

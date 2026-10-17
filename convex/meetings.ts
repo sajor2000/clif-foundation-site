@@ -332,7 +332,10 @@ export const getMinutesExport = query({
           .query("ballots")
           .withIndex("by_motion", (q) => q.eq("motionId", motion._id))
           .take(200);
-        const t = tallyBallots(ballots, directorEmails, motion.motionType, motion.status);
+        const t =
+          motion.status === "closed" && motion.finalTally
+            ? motion.finalTally
+            : tallyBallots(ballots, directorEmails, motion.motionType, motion.status);
         lines.push(
           `### ${motion.title} (${motion.status}, ${motion.motionType})`,
           `Yes ${t.yes} · No ${t.no} · Abstain ${t.abstain} · Recuse ${t.recuse}` +

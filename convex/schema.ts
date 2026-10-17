@@ -161,6 +161,18 @@ export default defineSchema({
     policyAdoption: v.optional(policyType),
     openedAt: v.optional(v.number()),
     closedAt: v.optional(v.number()),
+    /** Result frozen when the motion closes; later allowlist changes never alter it. */
+    finalTally: v.optional(
+      v.object({
+        yes: v.number(),
+        no: v.number(),
+        abstain: v.number(),
+        recuse: v.number(),
+        eligible: v.number(),
+        voted: v.number(),
+        passed: v.boolean(),
+      }),
+    ),
     createdBy: v.string(),
     createdAt: v.number(),
   })

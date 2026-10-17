@@ -111,22 +111,21 @@ export const listDocuments = query({
   returns: v.array(documentReturn),
   handler: async (ctx, args) => {
     await requireBoardIdentity(ctx);
-    let docs;
-    if (args.category) {
-      docs = await ctx.db
-        .query("documents")
-        .withIndex("by_category", (q) => q.eq("category", args.category!))
-        .order("desc")
-        .take(200);
-    } else {
-      docs = await ctx.db
-        .query("documents")
-        .withIndex("by_created")
-        .order("desc")
-        .take(200);
-    }
     const wantArchived = args.archived === true;
-    docs = docs.filter((d) => (d.archivedAt !== undefined) === wantArchived);
+    const base = args.category
+      ? ctx.db
+          .query("documents")
+          .withIndex("by_category", (q) => q.eq("category", args.category!))
+      : ctx.db.query("documents").withIndex("by_created");
+    // Filter archive state before the limit so the cap never hides matching rows.
+    const docs = await base
+      .order("desc")
+      .filter((q) =>
+        wantArchived
+          ? q.neq(q.field("archivedAt"), undefined)
+          : q.eq(q.field("archivedAt"), undefined),
+      )
+      .take(200);
     const needle = args.search?.trim().toLowerCase();
     const filtered = needle
       ? docs.filter(
