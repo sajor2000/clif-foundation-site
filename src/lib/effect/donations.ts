@@ -22,8 +22,9 @@ const DonationRequest = Schema.Struct({
 export type DonationRequest = typeof DonationRequest.Type;
 
 /**
- * Future Stripe Checkout entrypoint (Effect 4).
- * Until STRIPE_SECRET_KEY + nonprofit bank setup exist, fails typed.
+ * Legacy Stripe Checkout entrypoint (Effect 4).
+ * Public giving uses Givebutter on /support#give. This route stays as a typed
+ * 503 so old clients fail clearly.
  */
 export const createDonationSession = (input: unknown = {}) =>
   Effect.gen(function* () {
@@ -38,19 +39,10 @@ export const createDonationSession = (input: unknown = {}) =>
       ),
     );
 
-    if (!process.env.STRIPE_SECRET_KEY) {
-      return yield* new DonationsNotConfigured({
-        reason:
-          "Card checkout is not available yet. Give by Zelle to info@clificufoundation.org.",
-      });
-    }
-
-    // Later: stripe.checkout.sessions.create with pay-what-you-want Price
-    // using request.amountCents / request.email when present.
     void request;
     return yield* new DonationsNotConfigured({
       reason:
-        "Card checkout is not available yet. Give by Zelle to info@clificufoundation.org.",
+        "Online gifts are processed on /support via Givebutter. Card checkout via this API is not available.",
     });
   });
 

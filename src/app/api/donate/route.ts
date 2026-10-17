@@ -25,7 +25,7 @@ async function handle(request: Request) {
         {
           error: "DonationsNotConfigured",
           message:
-            "Card checkout is not available yet. Give by Zelle to info@clificufoundation.org, then email a gift notice.",
+            "Online gifts are processed on /support via Givebutter. This API is not available.",
         },
         { status: 503 },
       ),

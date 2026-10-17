@@ -4,23 +4,28 @@ import Link from "next/link";
 import { Button } from "@/components/core/Button";
 import { SiteShell } from "@/components/layout/SiteShell";
 import { CopyEmailButton } from "@/components/support/CopyEmailButton";
-import { InquiryForm } from "@/components/support/InquiryForm";
-import { ZelleGive } from "@/components/support/ZelleGive";
 import {
-  CONTACT_EMAIL,
-  GIFT_PROGRAMS,
-  SUPPORT_PATHS,
-  ZELLE_RECIPIENT,
-} from "@/lib/content";
+  GivebutterGift,
+  GivebutterNotConfigured,
+} from "@/components/support/GivebutterGift";
+import { InquiryForm } from "@/components/support/InquiryForm";
+import { CONTACT_EMAIL, GIFT_PROGRAMS, SUPPORT_PATHS } from "@/lib/content";
+import {
+  givebutterCampaignCode,
+  isGivebutterConfigured,
+} from "@/lib/givebutter";
 
 export const metadata: Metadata = pageMetadata({
   title: "Support",
   description:
-    "Support CLIF Foundation with a Zelle gift or an email inquiry. Illinois nonprofit corporation; 501(c)(3) application pending with the IRS.",
+    "Support CLIF Foundation with a secure online gift through Givebutter, or email an inquiry. Illinois nonprofit corporation; 501(c)(3) application pending with the IRS.",
   path: "/support",
 });
 
 export default function SupportPage() {
+  const campaignCode = givebutterCampaignCode();
+  const givebutterReady = isGivebutterConfigured() && Boolean(campaignCode);
+
   return (
     <SiteShell current="support">
       <section
@@ -40,7 +45,7 @@ export default function SupportPage() {
             className="display-xl"
             style={{ fontSize: "var(--type-display-xl)" }}
           >
-            Give by Zelle, or start with an email.
+            Give online, or start with an email.
           </h1>
         </div>
         <div style={{ flex: "1 1 380px", display: "grid", gap: 20 }}>
@@ -52,12 +57,14 @@ export default function SupportPage() {
               color: "var(--text-body)",
             }}
           >
-            Send a gift by Zelle to {ZELLE_RECIPIENT}, or email us to discuss a
-            partnership or another way to help. Card checkout is not available
-            yet.
+            Make a secure gift through Givebutter, or email us to discuss a
+            partnership or another way to help.
           </p>
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-            <Button href={`mailto:${CONTACT_EMAIL}`} size="lg">
+            <Button href="#give" size="lg">
+              Give online
+            </Button>
+            <Button href={`mailto:${CONTACT_EMAIL}`} size="lg" variant="ghost">
               {CONTACT_EMAIL}
             </Button>
             <CopyEmailButton />
@@ -73,6 +80,12 @@ export default function SupportPage() {
           gap: 32,
         }}
       >
+        {givebutterReady && campaignCode ? (
+          <GivebutterGift campaignCode={campaignCode} />
+        ) : (
+          <GivebutterNotConfigured />
+        )}
+
         <div
           style={{
             display: "grid",
@@ -133,17 +146,8 @@ export default function SupportPage() {
             </div>
           ))}
         </div>
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,280px),1fr))",
-            gap: 24,
-            alignItems: "start",
-          }}
-        >
-          <InquiryForm />
-          <ZelleGive />
-        </div>
+
+        <InquiryForm />
       </section>
 
       <section
@@ -281,8 +285,8 @@ export default function SupportPage() {
                 textWrap: "pretty",
               }}
             >
-              Give by Zelle for a direct gift, or email us first if you want to
-              talk through a larger gift or partnership.
+              Give online through Givebutter for an immediate receipt, or email
+              us first if you want to talk through a larger gift or partnership.
             </p>
           </div>
           <ol
@@ -297,23 +301,23 @@ export default function SupportPage() {
             {[
               [
                 "1",
-                "Zelle",
-                `Send your gift to ${ZELLE_RECIPIENT} in your bank's Zelle app. Confirm the recipient name is CLIF Foundation before sending.`,
+                "Give online",
+                "Use the Givebutter form on this page. You receive an emailed receipt with amount and date.",
               ],
               [
                 "2",
-                "Tell us",
-                `Email ${CONTACT_EMAIL} with your name, amount, and date so we can acknowledge the gift.`,
+                "Records",
+                "Givebutter keeps the donor ledger. Email us if you need a written acknowledgment for your files.",
               ],
               [
                 "3",
                 "Larger gifts",
-                "Zelle is final. For partnerships or larger gifts, email us first and we will arrange a call.",
+                `For partnerships, pledges, or restricted gifts, email ${CONTACT_EMAIL} first and we will arrange a call.`,
               ],
               [
                 "4",
                 "Tax status, stated plainly",
-                "CLIF Foundation is an Illinois nonprofit corporation with an EIN. Our application for 501(c)(3) recognition is pending with the IRS. Until it is approved, we cannot promise that a gift is tax-deductible; please ask your tax adviser.",
+                "CLIF Foundation is an Illinois nonprofit corporation with an EIN. Our application for 501(c)(3) recognition is pending with the IRS. Until it is approved, we cannot promise that a gift is tax-deductible; please ask your tax adviser. If recognition is granted effective as of formation, some earlier gifts may qualify under IRS rules.",
               ],
             ].map(([n, t, d]) => (
               <li

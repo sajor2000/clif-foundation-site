@@ -256,3 +256,36 @@ header:has(.site-menu-toggle:checked) .site-menu-panel {
 .linkish:hover {
   text-decoration: underline;
 }
+
+/* Givebutter giving panel — flat ink/petrol surface, no gradients */
+.givebutter-panel {
+  display: grid;
+  gap: 28px;
+  padding: clamp(28px, 4vw, 40px);
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  background: var(--bg-figure);
+}
+
+.givebutter-panel__intro {
+  display: grid;
+  gap: 12px;
+  max-width: 42rem;
+}
+
+.givebutter-panel__form {
+  width: 100%;
+  min-height: 320px;
+}
+
+.givebutter-panel__footnote {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--text-muted);
+}
+
+.givebutter-panel--pending {
+  min-height: 200px;
+  align-content: start;
+}
