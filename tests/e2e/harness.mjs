@@ -19,7 +19,7 @@ export const PHONE = {
 
 let server;
 let browser;
-export let baseUrl = process.env.BASE_URL;
+let baseUrl = process.env.BASE_URL;
 
 async function responds(url) {
   try {
