@@ -1,6 +1,4 @@
 export const CONTACT_EMAIL = "info@clificufoundation.org";
-/** Zelle recipient ID (email username registered with the bank). */
-export const ZELLE_RECIPIENT = CONTACT_EMAIL;
 export const CONSORTIUM_URL = "https://clif-icu.com/";
 export const GITHUB_URL =
   "https://github.com/Common-Longitudinal-ICU-data-Format/CLIF";
@@ -231,8 +229,8 @@ export const SUPPORT_PATHS = [
     n: "01",
     who: "Donors",
     body: "Individuals and foundations interested in supporting Foundation programs.",
-    cta: "Email a gift inquiry",
-    href: `mailto:${CONTACT_EMAIL}?subject=Gift%20inquiry`,
+    cta: "Give online",
+    href: "/support#give",
     external: false,
   },
   {
@@ -266,8 +264,8 @@ export const HOME_PATHS = [
     n: "01",
     who: "Donors",
     arrow: "→",
-    cta: "Email a gift inquiry",
-    href: `mailto:${CONTACT_EMAIL}?subject=Gift%20inquiry`,
+    cta: "Give online",
+    href: "/support#give",
   },
   {
     n: "02",

@@ -732,7 +732,9 @@ export function HomeScroll() {
               CLIF Consortium.
             </p>
             <p style={{ margin: 0, fontSize: 18, lineHeight: 1.5 }}>
-              Email a gift inquiry:{" "}
+              Give online:{" "}
+              <a href="/support#give">/support#give</a>
+              {" · "}
               <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
             </p>
           </div>

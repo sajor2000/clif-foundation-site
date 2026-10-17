@@ -1,11 +1,12 @@
 # CLIF Foundation website
 
-Public site for the CLIF Foundation (Illinois nonprofit; 501(c)(3) pending). Design system lives in `design/` (reference kit). Stack: **Next.js App Router**, **TypeScript**, **Tailwind**, **Effect 4**. Stripe checkout is stubbed as Coming soon.
+Public site for the CLIF Foundation (Illinois nonprofit; 501(c)(3) pending). Design system lives in `design/` (reference kit). Stack: **Next.js App Router**, **TypeScript**, **Tailwind**, **Effect 4**. Online giving uses **Givebutter** on `/support`.
 
 ## Local development
 
 ```bash
 npm install
+cp .env.example .env.local   # set NEXT_PUBLIC_GIVEBUTTER_CAMPAIGN_CODE when ready
 npm run dev   # Next.js on port 43127
 ```
 
@@ -22,16 +23,18 @@ Open [http://127.0.0.1:43127](http://127.0.0.1:43127).
 
 ### Env checklist
 
-See `.env.example`. The public site needs no variables.
+See `.env.example`. The public site runs without variables; the giving form needs a campaign code.
 
-- `STRIPE_SECRET_KEY` — omit until bank + Stripe Nonprofit exist (UI stays Coming soon; `/api/donate` returns **503**)
+- `NEXT_PUBLIC_GIVEBUTTER_CAMPAIGN_CODE` — required to show the Givebutter form on `/support`
+- `NEXT_PUBLIC_GIVEBUTTER_ACCOUNT_ID` — optional override (defaults to the Foundation widget account)
+- Setup details: [`docs/GIVEBUTTER.md`](docs/GIVEBUTTER.md)
 
 ## Routes
 
 | Route | Auth |
 |-------|------|
 | `/`, `/mission`, `/our-work`, `/research`, `/board`, `/support` | Public |
-| `/api/donate` | Public stub → 503 Coming soon |
+| `/api/donate` | Public stub → 503 (use Givebutter on `/support`) |
 
 ## Effect 4
 
@@ -45,7 +48,9 @@ Workflow helpers use **effect@4.0.2** (Effect 4 APIs: `Effect.gen`, `Data.Tagged
 
 ## Deploy on Vercel
 
-The Vercel project builds with `npm run build` (see `vercel.json`). Push to `main` for production; pull requests get preview deployments. No environment variables are required.
+The Vercel project builds with `npm run build` (see `vercel.json`). Push to `main` for production; pull requests get preview deployments.
+
+Set `NEXT_PUBLIC_GIVEBUTTER_CAMPAIGN_CODE` on Production and Preview so the Support page shows the form.
 
 A board document portal (Clerk + Convex) was removed in October 2026 to keep the site static; it is recoverable from git history if needed.
 
