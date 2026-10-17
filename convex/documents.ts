@@ -1,6 +1,7 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { logAudit } from "./lib/audit";
+import { uploadRejection } from "./lib/uploads";
 import { requireBoardIdentity, requireBoardRole } from "./lib/auth";
 
 const categoryValidator = v.union(
@@ -55,11 +56,24 @@ export const saveDocument = mutation({
     taxYear: v.optional(v.number()),
     reportingTag: v.optional(v.string()),
   },
-  returns: v.id("documents"),
+  returns: v.union(
+    v.object({ ok: v.literal(true), id: v.id("documents") }),
+    v.object({ ok: v.literal(false), error: v.string() }),
+  ),
   handler: async (ctx, args) => {
     const identity = await requireBoardIdentity(ctx);
     if (!args.title.trim()) {
       throw new Error("Title is required");
+    }
+    const file = await ctx.db.system.get(args.storageId);
+    if (!file) {
+      throw new Error("Upload not found; try again");
+    }
+    const rejection = uploadRejection(file.size, file.contentType ?? args.contentType);
+    if (rejection) {
+      // Return instead of throwing: a thrown error would roll back this delete.
+      await ctx.storage.delete(args.storageId);
+      return { ok: false as const, error: rejection };
     }
     const id = await ctx.db.insert("documents", {
       title: args.title.trim(),
@@ -80,7 +94,7 @@ export const saveDocument = mutation({
       actorEmail: identity.email,
       metadata: { documentId: id, category: args.category },
     });
-    return id;
+    return { ok: true as const, id };
   },
 });
 

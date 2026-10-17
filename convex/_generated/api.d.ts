@@ -18,6 +18,7 @@ import type * as lib_audit from "../lib/audit.js";
 import type * as lib_auth from "../lib/auth.js";
 import type * as lib_directors from "../lib/directors.js";
 import type * as lib_quorum from "../lib/quorum.js";
+import type * as lib_uploads from "../lib/uploads.js";
 import type * as meetings from "../meetings.js";
 import type * as motions from "../motions.js";
 import type * as policies from "../policies.js";
@@ -40,6 +41,7 @@ declare const fullApi: ApiFromModules<{
   "lib/auth": typeof lib_auth;
   "lib/directors": typeof lib_directors;
   "lib/quorum": typeof lib_quorum;
+  "lib/uploads": typeof lib_uploads;
   meetings: typeof meetings;
   motions: typeof motions;
   policies: typeof policies;

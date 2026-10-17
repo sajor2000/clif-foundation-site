@@ -4,27 +4,19 @@ import { logAudit } from "./lib/audit";
 import { requireBoardIdentity, requireBoardRole } from "./lib/auth";
 import { isDirector } from "./lib/directors";
 import { quorumMet, quorumRequired } from "./lib/quorum";
+import schema from "./schema";
 
+// Raw rows are returned, so these validators must match the tables exactly.
 const meetingReturn = v.object({
   _id: v.id("meetings"),
-  title: v.string(),
-  scheduledAt: v.number(),
-  heldAt: v.optional(v.number()),
-  status: v.string(),
-  committeeLabel: v.optional(v.string()),
-  quorumRequired: v.number(),
-  attendeeEmails: v.array(v.string()),
-  quorumMet: v.optional(v.boolean()),
+  _creationTime: v.number(),
+  ...schema.tables.meetings.validator.fields,
 });
 
 const minutesReturn = v.object({
   _id: v.id("minutes"),
-  meetingId: v.id("meetings"),
-  body: v.optional(v.string()),
-  status: v.string(),
-  version: v.number(),
-  certifiedAt: v.optional(v.number()),
-  updatedAt: v.number(),
+  _creationTime: v.number(),
+  ...schema.tables.minutes.validator.fields,
 });
 
 export const listMeetings = query({
@@ -49,10 +41,8 @@ export const getMeeting = query({
       items: v.array(
         v.object({
           _id: v.id("minutesItems"),
-          sortOrder: v.number(),
-          title: v.string(),
-          discussion: v.optional(v.string()),
-          coiRecusals: v.array(v.string()),
+          _creationTime: v.number(),
+          ...schema.tables.minutesItems.validator.fields,
         }),
       ),
     }),
