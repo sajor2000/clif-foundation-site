@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useMutation, useQuery } from "convex/react";
+import { useState } from "react";
 import { api } from "../../../convex/_generated/api";
 import { Button } from "@/components/core/Button";
 import { panelStyle, pageTitle } from "@/components/portal/portal-styles";
@@ -38,14 +39,7 @@ export function PortalHome() {
         </div>
       ) : null}
 
-      {role === null ? (
-        <div style={panelStyle}>
-          <p style={{ margin: 0, fontWeight: 600 }}>Access not granted</p>
-          <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5 }}>
-            Your signed-in email is not on the board allowlist. Ask an admin to add you under Members.
-          </p>
-        </div>
-      ) : null}
+      {role === null ? <RequestAccessPanel /> : null}
 
       <div
         style={{
@@ -111,6 +105,59 @@ export function PortalHome() {
           </ul>
         </div>
       ) : null}
+    </div>
+  );
+}
+
+function RequestAccessPanel() {
+  const status = useQuery(api.board.myAccessRequest);
+  const requestAccess = useMutation(api.board.requestAccess);
+  const [error, setError] = useState<string | null>(null);
+  const [sending, setSending] = useState(false);
+
+  async function onRequest() {
+    setError(null);
+    setSending(true);
+    try {
+      await requestAccess({});
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Could not send your request");
+    } finally {
+      setSending(false);
+    }
+  }
+
+  if (status === undefined) return null;
+
+  if (status === "pending") {
+    return (
+      <div style={panelStyle} role="status">
+        <p style={{ margin: 0, fontWeight: 600 }}>Request sent</p>
+        <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5 }}>
+          An admin will review your request. This page updates on its own once you are approved.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div style={panelStyle}>
+      <p style={{ margin: 0, fontWeight: 600 }}>
+        {status === "denied" ? "Access not approved" : "Request board access"}
+      </p>
+      <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5 }}>
+        {status === "denied"
+          ? "An admin did not approve your last request. If this is a mistake, you can ask again."
+          : "Your account is not on the board allowlist yet. Send a request and an admin will review it."}
+      </p>
+      {error ? (
+        <p role="alert" style={{ margin: 0, color: "var(--status-error)", fontSize: 14 }}>
+          {error}
+        </p>
+      ) : null}
+      <Button type="button" onClick={onRequest} disabled={sending}>
+        {status === "denied" ? "Ask again" : "Request access"}
+      </Button>
     </div>
   );
 }

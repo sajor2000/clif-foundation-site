@@ -4,7 +4,7 @@
 
 ## How to seed
 
-1. Sign in at `/portal/sign-in`.
+1. Sign in at `/portal/sign-in` (production: as `BOOTSTRAP_ADMIN_EMAIL`).
 2. If the allowlist is empty, click **Claim admin** on Overview.
 3. Open **Members** (`/portal/members`) and add each director email + role.
 

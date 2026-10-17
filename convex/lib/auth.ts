@@ -29,8 +29,12 @@ export async function requireBoardIdentity(ctx: Ctx) {
     throw new Error("Not authenticated");
   }
 
+  // The allowlist is keyed by email, so only a verified address may match
+  // (a token without the email_verified claim counts as unverified).
   const email =
-    typeof identity.email === "string" ? identity.email.toLowerCase() : undefined;
+    typeof identity.email === "string" && identity.emailVerified === true
+      ? identity.email.toLowerCase()
+      : undefined;
 
   const allowlist = await ctx.db.query("boardMembers").take(1);
   if (allowlist.length === 0) {
@@ -56,8 +60,12 @@ export async function requireClerkIdentity(ctx: Ctx) {
   if (!identity) {
     throw new Error("Not authenticated");
   }
+  // The allowlist is keyed by email, so only a verified address may match
+  // (a token without the email_verified claim counts as unverified).
   const email =
-    typeof identity.email === "string" ? identity.email.toLowerCase() : undefined;
+    typeof identity.email === "string" && identity.emailVerified === true
+      ? identity.email.toLowerCase()
+      : undefined;
   return { ...identity, email };
 }
 

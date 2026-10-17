@@ -13,6 +13,7 @@ import type * as coi from "../coi.js";
 import type * as compliance from "../compliance.js";
 import type * as documents from "../documents.js";
 import type * as form990 from "../form990.js";
+import type * as lib_access from "../lib/access.js";
 import type * as lib_audit from "../lib/audit.js";
 import type * as lib_auth from "../lib/auth.js";
 import type * as lib_directors from "../lib/directors.js";
@@ -34,6 +35,7 @@ declare const fullApi: ApiFromModules<{
   compliance: typeof compliance;
   documents: typeof documents;
   form990: typeof form990;
+  "lib/access": typeof lib_access;
   "lib/audit": typeof lib_audit;
   "lib/auth": typeof lib_auth;
   "lib/directors": typeof lib_directors;

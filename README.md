@@ -62,22 +62,22 @@ The Vercel project builds with `npm run build` (see `vercel.json`). Push to `mai
 
 Set `NEXT_PUBLIC_GIVEBUTTER_CAMPAIGN_CODE` on Production and Preview so the Support page shows the form.
 
-For the **board portal**, production must deploy Convex functions and Next.js together:
+For the **board portal**, `vercel.json` runs `npx convex deploy --cmd 'npm run build'` whenever `CONVEX_DEPLOY_KEY` is set, so Convex functions and the site ship together; without the key (e.g. previews) it builds the public site only.
 
-```bash
-# Set CONVEX_DEPLOY_KEY in Vercel (or CI). Override the project Build Command with:
-npx convex deploy --cmd 'npm run build' --cmd-url-env-var-name NEXT_PUBLIC_CONVEX_URL
-```
+### Board portal production setup
 
-`vercel.json` currently defaults to `npm run build` (Next only)—switch the Vercel Build Command to the Convex deploy line above when enabling `/portal` in production. Preview PRs without `CONVEX_DEPLOY_KEY` still build the public site.
+| Piece | Where | Value |
+| --- | --- | --- |
+| Clerk app | `CLIF Foundation Board Portal` | prod instance on `clificufoundation.org` (DNS records in Vercel DNS) |
+| Clerk JWT template | Clerk prod instance | name `convex`; claims `aud=convex`, `email`, `name`, `email_verified` |
+| Convex project | `j-c-rojas/clif-foundation-site` | prod env: `CLERK_JWT_ISSUER_DOMAIN=https://clerk.clificufoundation.org`, `BOOTSTRAP_ADMIN_EMAIL=info@clificufoundation.org` |
+| Vercel (Production) | project env | `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY`, `CONVEX_DEPLOY_KEY` |
 
-### Board portal production checklist
+### Access
 
-1. Create a Clerk application; activate the **Convex** integration; copy Frontend API URL.
-2. Create/link a Convex cloud project (`npx convex login` then `npx convex dev` locally).
-3. On the Convex **prod** deployment, set `CLERK_JWT_ISSUER_DOMAIN` to that Frontend API URL.
-4. On Vercel: `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY`, `CONVEX_DEPLOY_KEY`; Build Command = Convex deploy line above.
-5. First sign-in: open `/portal` → **Claim admin** → add director emails under **Members** (see `scripts/seed-board-allowlist.md`).
+- Sign-up is open (email or Google). Signing up grants nothing: a person must click **Request access** on `/portal`, and an admin approves or denies it under **Members → Pending requests**.
+- **Claim admin** only works while the allowlist is empty, and only for `BOOTSTRAP_ADMIN_EMAIL` when that is set.
+- The allowlist is keyed by verified email. See `scripts/seed-board-allowlist.md` to seed rows directly.
 
 ### Portal features (board)
 
