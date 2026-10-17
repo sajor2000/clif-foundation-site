@@ -22,6 +22,8 @@ export function Button({
   type = "button",
   onClick,
   disabled,
+  "aria-pressed": ariaPressed,
+  "aria-label": ariaLabel,
 }: {
   variant?: Variant;
   size?: Size;
@@ -32,6 +34,8 @@ export function Button({
   type?: "button" | "submit";
   onClick?: () => void;
   disabled?: boolean;
+  "aria-pressed"?: boolean;
+  "aria-label"?: string;
 }) {
   const [hover, setHover] = useState(false);
   const v = {
@@ -88,7 +92,7 @@ export function Button({
 
   if (href) {
     return (
-      <Link href={href} style={s} {...handlers}>
+      <Link href={href} style={s} aria-label={ariaLabel} {...handlers}>
         {children}
       </Link>
     );
@@ -100,6 +104,8 @@ export function Button({
       style={s}
       onClick={onClick}
       disabled={disabled}
+      aria-pressed={ariaPressed}
+      aria-label={ariaLabel}
       {...handlers}
     >
       {children}

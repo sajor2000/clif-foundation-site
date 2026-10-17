@@ -41,39 +41,50 @@ export function PoliciesView() {
 
       <div style={{ ...panelStyle, maxWidth: 520 }}>
         <p style={{ margin: 0, fontWeight: 600 }}>Register policy</p>
-        <select
-          value={policyType}
-          onChange={(e) =>
-            setPolicyType(e.target.value as (typeof POLICY_TYPES)[number]["value"])
-          }
-          style={inputStyle}
-        >
-          {POLICY_TYPES.map((p) => (
-            <option key={p.value} value={p.value}>
-              {p.label}
-            </option>
-          ))}
-        </select>
-        <input
-          placeholder="Policy title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          style={inputStyle}
-        />
-        <input
-          type="number"
-          value={version}
-          onChange={(e) => setVersion(Number(e.target.value))}
-          style={inputStyle}
-          aria-label="Version"
-        />
-        <textarea
-          placeholder="Reporting instructions (optional)"
-          value={instructions}
-          onChange={(e) => setInstructions(e.target.value)}
-          rows={2}
-          style={{ ...inputStyle, height: "auto", padding: 12 }}
-        />
+        <label style={{ display: "grid", gap: 6, fontSize: 14 }}>
+          Policy type
+          <select
+            value={policyType}
+            onChange={(e) =>
+              setPolicyType(e.target.value as (typeof POLICY_TYPES)[number]["value"])
+            }
+            style={inputStyle}
+          >
+            {POLICY_TYPES.map((p) => (
+              <option key={p.value} value={p.value}>
+                {p.label}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label style={{ display: "grid", gap: 6, fontSize: 14 }}>
+          Title
+          <input
+            placeholder="e.g. Conflict of interest policy"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            style={inputStyle}
+          />
+        </label>
+        <label style={{ display: "grid", gap: 6, fontSize: 14 }}>
+          Version
+          <input
+            type="number"
+            value={version}
+            onChange={(e) => setVersion(Number(e.target.value))}
+            style={inputStyle}
+          />
+        </label>
+        <label style={{ display: "grid", gap: 6, fontSize: 14 }}>
+          Reporting instructions (optional)
+          <textarea
+            placeholder="Where auditors can find the signed PDF"
+            value={instructions}
+            onChange={(e) => setInstructions(e.target.value)}
+            rows={2}
+            style={{ ...inputStyle, height: "auto", padding: 12 }}
+          />
+        </label>
         <Button type="button" onClick={onRegister}>
           Register
         </Button>

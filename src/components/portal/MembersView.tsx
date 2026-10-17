@@ -58,39 +58,47 @@ export function MembersView() {
 
       <div style={{ ...panelStyle, maxWidth: 520 }}>
         <p style={{ margin: 0, fontWeight: 600 }}>Add or update member</p>
-        <input
-          placeholder="email@example.org"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          style={inputStyle}
-          type="email"
-          autoComplete="off"
-        />
-        <input
-          placeholder="Display name (optional)"
-          value={displayName}
-          onChange={(e) => setDisplayName(e.target.value)}
-          style={inputStyle}
-        />
-        <select
+        <label style={{ display: "grid", gap: 6, fontSize: 14 }}>
+          Email
+          <input
+            placeholder="email@example.org"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            style={inputStyle}
+            type="email"
+            autoComplete="off"
+          />
+        </label>
+        <label style={{ display: "grid", gap: 6, fontSize: 14 }}>
+          Display name (optional)
+          <input
+            placeholder="Jane Director"
+            value={displayName}
+            onChange={(e) => setDisplayName(e.target.value)}
+            style={inputStyle}
+          />
+        </label>
+        <label style={{ display: "grid", gap: 6, fontSize: 14 }}>
+          Role
+          <select
           value={memberRole}
           onChange={(e) => setMemberRole(e.target.value as (typeof ROLES)[number])}
           style={inputStyle}
-          aria-label="Role"
         >
           {ROLES.map((r) => (
             <option key={r} value={r}>
               {r}
             </option>
           ))}
-        </select>
+          </select>
+        </label>
         {error ? (
           <p role="alert" style={{ margin: 0, color: "var(--status-error)", fontSize: 14 }}>
             {error}
           </p>
         ) : null}
         {saved ? (
-          <p role="status" style={{ margin: 0, fontSize: 14, color: "var(--accent-mint)" }}>
+          <p role="status" style={{ margin: 0, fontSize: 14, color: "var(--accent-text)" }}>
             Saved.
           </p>
         ) : null}

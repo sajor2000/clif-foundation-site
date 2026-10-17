@@ -93,18 +93,24 @@ export function MeetingsView({ meetingId }: { meetingId?: Id<"meetings"> } = {})
       {!meetingId ? (
         <div style={{ ...panelStyle, maxWidth: 520 }}>
           <p style={{ margin: 0, fontWeight: 600 }}>Schedule meeting</p>
-          <input
-            placeholder="Title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            style={inputStyle}
-          />
-          <input
-            type="datetime-local"
-            value={scheduledAt}
-            onChange={(e) => setScheduledAt(e.target.value)}
-            style={inputStyle}
-          />
+          <label style={{ display: "grid", gap: 6, fontSize: 14 }}>
+            Title
+            <input
+              placeholder="e.g. Q4 board meeting"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              style={inputStyle}
+            />
+          </label>
+          <label style={{ display: "grid", gap: 6, fontSize: 14 }}>
+            Date and time
+            <input
+              type="datetime-local"
+              value={scheduledAt}
+              onChange={(e) => setScheduledAt(e.target.value)}
+              style={inputStyle}
+            />
+          </label>
           <Button type="button" onClick={onCreate}>
             Create meeting
           </Button>

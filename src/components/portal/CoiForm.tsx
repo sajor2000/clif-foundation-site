@@ -53,7 +53,7 @@ export function CoiForm() {
           Submit {year} disclosure
         </Button>
         {saved ? (
-          <p role="status" style={{ margin: 0, color: "var(--accent-mint)", fontSize: 14 }}>
+          <p role="status" style={{ margin: 0, color: "var(--accent-text)", fontSize: 14 }}>
             Saved.
           </p>
         ) : null}

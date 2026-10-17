@@ -54,7 +54,7 @@ export function VotesView({ focusId }: { focusId?: string } = {}) {
             key={f}
             type="button"
             variant={filter === f ? "primary" : "secondary"}
-            size="sm"
+            aria-pressed={filter === f}
             onClick={() => setFilter(f)}
           >
             {f}
@@ -64,20 +64,26 @@ export function VotesView({ focusId }: { focusId?: string } = {}) {
 
       <div style={{ ...panelStyle, maxWidth: 520 }}>
         <p style={{ margin: 0, fontWeight: 600 }}>New motion</p>
-        <input
-          placeholder="Motion title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          style={inputStyle}
-        />
-        <textarea
-          placeholder="Description (optional)"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          rows={3}
-          style={{ ...inputStyle, height: "auto", padding: 12 }}
-        />
-        <label style={{ fontSize: 14, display: "flex", gap: 8, alignItems: "center" }}>
+        <label style={{ display: "grid", gap: 6, fontSize: 14 }}>
+          Title
+          <input
+            placeholder="e.g. Approve Q3 minutes"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            style={inputStyle}
+          />
+        </label>
+        <label style={{ display: "grid", gap: 6, fontSize: 14 }}>
+          Description (optional)
+          <textarea
+            placeholder="Context for directors"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            rows={3}
+            style={{ ...inputStyle, height: "auto", padding: 12 }}
+          />
+        </label>
+        <label style={{ fontSize: 14, display: "flex", gap: 8, alignItems: "center", minHeight: 44 }}>
           <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} />
           Written consent (all directors must vote yes)
         </label>
@@ -106,7 +112,7 @@ export function VotesView({ focusId }: { focusId?: string } = {}) {
               style={{
                 ...panelStyle,
                 outline:
-                  focusId === motion._id ? "2px solid var(--accent-mint)" : undefined,
+                  focusId === motion._id ? "2px solid var(--accent)" : undefined,
               }}
             >
               <p style={{ margin: 0, fontWeight: 600 }}>
@@ -158,7 +164,7 @@ export function VotesView({ focusId }: { focusId?: string } = {}) {
                   </>
                 ) : null}
                 {motion.status === "closed" && tally.passed ? (
-                  <span style={{ fontSize: 14, fontWeight: 600, color: "var(--accent-mint)" }}>
+                  <span style={{ fontSize: 14, fontWeight: 600, color: "var(--accent-text)" }}>
                     Passed
                   </span>
                 ) : null}

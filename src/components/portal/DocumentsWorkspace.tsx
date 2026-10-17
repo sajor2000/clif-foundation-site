@@ -248,7 +248,7 @@ export function DocumentsWorkspace() {
                     doc.title
                   )}
                 </span>
-                <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--text-muted)" }}>
+                <span style={{ fontFamily: "var(--font-mono)", fontSize: 12, color: "var(--text-muted)" }}>
                   {doc.category}
                   {doc.taxYear ? ` · ${doc.taxYear}` : ""}
                   {doc.legalHold ? " · hold" : ""}
@@ -256,7 +256,6 @@ export function DocumentsWorkspace() {
                 <Button
                   type="button"
                   variant="ghost"
-                  size="sm"
                   onClick={() =>
                     setLegalHold({ documentId: doc._id, legalHold: !doc.legalHold })
                   }
@@ -266,8 +265,18 @@ export function DocumentsWorkspace() {
                 <Button
                   type="button"
                   variant="ghost"
-                  size="sm"
-                  onClick={() => archiveDocument({ documentId: doc._id }).catch((e: Error) => setError(e.message))}
+                  onClick={() => {
+                    if (
+                      !window.confirm(
+                        `Archive “${doc.title}”? This removes it from the board library.`,
+                      )
+                    ) {
+                      return;
+                    }
+                    archiveDocument({ documentId: doc._id }).catch((e: Error) =>
+                      setError(e.message),
+                    );
+                  }}
                 >
                   Archive
                 </Button>

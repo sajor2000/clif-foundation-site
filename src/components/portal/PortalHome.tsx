@@ -121,7 +121,7 @@ function JobCard({
         ...panelStyle,
         textDecoration: "none",
         color: "inherit",
-        borderColor: primary ? "var(--accent-mint)" : "var(--border-strong)",
+        borderColor: primary ? "var(--accent)" : "var(--border-strong)",
         minHeight: 140,
       }}
     >

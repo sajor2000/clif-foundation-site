@@ -41,13 +41,17 @@ function PortalNav() {
           <Link
             key={item.href}
             href={item.href}
+            aria-current={active ? "page" : undefined}
             style={{
               padding: "12px 14px",
+              minHeight: 44,
+              display: "inline-flex",
+              alignItems: "center",
               fontSize: 14,
               fontWeight: active ? 600 : 500,
               color: active ? "var(--text-primary)" : "var(--link)",
               borderBottom: active
-                ? "2px solid var(--accent-mint)"
+                ? "2px solid var(--accent)"
                 : "2px solid transparent",
               textDecoration: "none",
             }}
@@ -98,7 +102,7 @@ export function PortalShell({ children }: { children: ReactNode }) {
           <span
             style={{
               fontFamily: "var(--font-mono)",
-              fontSize: 11,
+              fontSize: 12,
               color: "var(--text-muted)",
             }}
           >
