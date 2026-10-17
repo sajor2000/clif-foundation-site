@@ -29,9 +29,10 @@ export async function requireBoardIdentity(ctx: Ctx) {
     throw new Error("Not authenticated");
   }
 
-  // The allowlist is keyed by email, so an unverified address must not match.
+  // The allowlist is keyed by email, so only a verified address may match
+  // (a token without the email_verified claim counts as unverified).
   const email =
-    typeof identity.email === "string" && identity.emailVerified !== false
+    typeof identity.email === "string" && identity.emailVerified === true
       ? identity.email.toLowerCase()
       : undefined;
 
@@ -59,9 +60,10 @@ export async function requireClerkIdentity(ctx: Ctx) {
   if (!identity) {
     throw new Error("Not authenticated");
   }
-  // The allowlist is keyed by email, so an unverified address must not match.
+  // The allowlist is keyed by email, so only a verified address may match
+  // (a token without the email_verified claim counts as unverified).
   const email =
-    typeof identity.email === "string" && identity.emailVerified !== false
+    typeof identity.email === "string" && identity.emailVerified === true
       ? identity.email.toLowerCase()
       : undefined;
   return { ...identity, email };

@@ -222,7 +222,7 @@ export const myAccessRequest = query({
   returns: v.union(requestStatus, v.null()),
   handler: async (ctx) => {
     const identity = await ctx.auth.getUserIdentity();
-    if (!identity || typeof identity.email !== "string" || identity.emailVerified === false) {
+    if (!identity || typeof identity.email !== "string" || identity.emailVerified !== true) {
       return null;
     }
     const email = identity.email.toLowerCase();
