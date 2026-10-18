@@ -1,30 +1,48 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useId, useRef } from "react";
+import { usePathname } from "next/navigation";
+import { useEffect, useId, useRef, useState } from "react";
 import { Lockup } from "@/components/brand/Lockup";
 import { NAV_ITEMS } from "@/lib/content";
 
 export function SiteHeader({ current }: { current?: string }) {
-  const toggleId = useId();
-  const toggleRef = useRef<HTMLInputElement>(null);
+  const pathname = usePathname();
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  // Next keeps earlier pages mounted (hidden) for instant back navigation, so
+  // several headers can exist at once: each needs its own panel id.
+  const uid = useId().replace(/:/g, "");
+  const panelId = `site-menu-${uid}`;
+  const themeId = `clif-theme-toggle-${uid}`;
+  const themeRef = useRef<HTMLInputElement>(null);
+  // The menu is open only for the page it was opened on, so any navigation closes it.
+  const [openOn, setOpenOn] = useState<string | null>(null);
+  const open = openOn === pathname;
 
   useEffect(() => {
+    // A header mounted after navigation must reflect the current theme.
+    if (themeRef.current) {
+      themeRef.current.checked = document.documentElement.dataset.theme === "dark";
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!open) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && toggleRef.current?.checked) {
-        toggleRef.current.checked = false;
+      if (e.key === "Escape") {
+        setOpenOn(null);
+        buttonRef.current?.focus();
       }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, []);
+  }, [open]);
 
   useEffect(() => {
+    // Widening past the mobile breakpoint closes the panel (desktop nav takes over).
     const mq = window.matchMedia("(max-width: 999px)");
     const onChange = () => {
-      if (!mq.matches && toggleRef.current) {
-        toggleRef.current.checked = false;
-      }
+      if (!mq.matches) setOpenOn(null);
     };
     mq.addEventListener("change", onChange);
     return () => mq.removeEventListener("change", onChange);
@@ -106,13 +124,14 @@ export function SiteHeader({ current }: { current?: string }) {
           }}
         >
           <input
-            id="clif-theme-toggle"
+            ref={themeRef}
+            id={themeId}
             type="checkbox"
             className="clif-theme-toggle"
             aria-label="Toggle dark mode"
           />
           <label
-            htmlFor="clif-theme-toggle"
+            htmlFor={themeId}
             className="clif-theme-btn"
             style={{
               height: "var(--control-md)",
@@ -143,16 +162,13 @@ export function SiteHeader({ current }: { current?: string }) {
             <span className="clif-theme-label-light">Light</span>
             <span className="clif-theme-label-dark">Dark</span>
           </label>
-          <input
-            ref={toggleRef}
-            id={toggleId}
-            type="checkbox"
-            className="site-menu-toggle"
-            aria-controls="site-menu"
-          />
-          <label
-            htmlFor={toggleId}
+          <button
+            ref={buttonRef}
+            type="button"
             className="site-menu-btn"
+            aria-controls={panelId}
+            aria-expanded={open}
+            onClick={() => setOpenOn(open ? null : pathname)}
             style={{
               height: "var(--control-md)",
               padding: "0 16px",
@@ -164,12 +180,20 @@ export function SiteHeader({ current }: { current?: string }) {
               boxSizing: "border-box",
             }}
           >
-            <span className="site-menu-label-open">Menu</span>
-            <span className="site-menu-label-close">Close</span>
-          </label>
+            {open ? "Close" : "Menu"}
+          </button>
         </div>
       </div>
-      <nav id="site-menu" className="site-menu-panel" aria-label="Primary">
+      <nav
+        id={panelId}
+        className="site-menu-panel"
+        aria-label="Primary"
+        hidden={!open}
+        // Close before leaving, so a cached page never comes back with its menu open.
+        onClick={(e) => {
+          if ((e.target as HTMLElement).closest("a")) setOpenOn(null);
+        }}
+      >
         {NAV_ITEMS.map((item) => (
           <Link
             key={item.id}
@@ -220,7 +244,7 @@ export function SiteHeader({ current }: { current?: string }) {
         <button
           type="button"
           className="site-menu-theme"
-          onClick={() => document.getElementById("clif-theme-toggle")?.click()}
+          onClick={() => themeRef.current?.click()}
         >
           <span>Theme</span>
           <span className="clif-theme-label-light">Light</span>

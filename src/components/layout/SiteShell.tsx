@@ -11,6 +11,9 @@ export function SiteShell({
   current?: string;
   children: ReactNode;
 }) {
+  // Unique per page: earlier pages stay mounted (hidden) after navigation, and
+  // the skip link must reach this page's <main>, not a cached one.
+  const mainId = `main-${current ?? "page"}`;
   return (
     <div
       style={{
@@ -24,12 +27,12 @@ export function SiteShell({
         flexDirection: "column",
       }}
     >
-      <a className="skip-link" href="#main">
+      <a className="skip-link" href={`#${mainId}`}>
         Skip to content
       </a>
       <ContextBar />
       <SiteHeader current={current} />
-      <main id="main" tabIndex={-1} style={{ outline: "none", flex: 1 }}>
+      <main id={mainId} tabIndex={-1} style={{ outline: "none", flex: 1 }}>
         <RouteFocus />
         {children}
       </main>

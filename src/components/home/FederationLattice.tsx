@@ -44,7 +44,7 @@ export function FederationLattice() {
         ))}
       </div>
 
-      <div className="fed__aggregate" data-sc-cue="0.72 1 0.28 0">
+      <div className="fed__aggregate" data-sc-cue="0.45 1 0.2 0">
         <span className="fed__aggregate-lead">Aggregate results only</span>
         <span className="fed__aggregate-trail">
           No patient-level data leaves an institution

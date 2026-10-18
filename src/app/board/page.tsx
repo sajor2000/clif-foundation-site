@@ -62,44 +62,26 @@ export default function BoardPage() {
             overflow: "hidden",
           }}
         >
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              gap: 16,
-              padding: "12px 20px",
-              background: "var(--bg-panel)",
-              borderBottom: "1px solid var(--border-strong)",
-              fontFamily: "var(--font-mono)",
-              fontSize: 12,
-              color: "var(--text-muted)",
-            }}
-          >
-            <span style={{ flex: "0 0 140px" }}>seat</span>
-            <span style={{ flex: "1 1 220px" }}>name</span>
-            <span style={{ flex: "1 1 240px" }}>affiliation</span>
-          </div>
-          {[...BOARD_OFFICERS, ...BOARD_DIRECTORS].map((member) => (
-            <div
-              key={member.id}
-              style={{
-                display: "flex",
-                flexWrap: "wrap",
-                gap: "4px 16px",
-                padding: 20,
-                borderBottom: "1px solid var(--border-subtle)",
-                alignItems: "baseline",
-              }}
-            >
-              <span style={{ flex: "0 0 140px", fontSize: 18, fontWeight: 500 }}>
-                {member.role}
-              </span>
-              <span style={{ flex: "1 1 220px" }}>{member.name}</span>
-              <span style={{ flex: "1 1 240px", color: "var(--text-muted)" }}>
-                {member.affiliation}
-              </span>
-            </div>
-          ))}
+          {/* Explicit roles keep table semantics when the rows stack on phones. */}
+          <table className="board-roster" role="table">
+            <caption className="sr-only">CLIF Foundation board: seat, name, and affiliation</caption>
+            <thead role="rowgroup">
+              <tr role="row">
+                <th scope="col" role="columnheader">seat</th>
+                <th scope="col" role="columnheader">name</th>
+                <th scope="col" role="columnheader">affiliation</th>
+              </tr>
+            </thead>
+            <tbody role="rowgroup">
+              {[...BOARD_OFFICERS, ...BOARD_DIRECTORS].map((member) => (
+                <tr key={member.id} role="row">
+                  <td role="cell" className="board-roster__seat">{member.role}</td>
+                  <th scope="row" role="rowheader" className="board-roster__name">{member.name}</th>
+                  <td role="cell" className="board-roster__affiliation">{member.affiliation}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </section>
 

@@ -387,7 +387,7 @@ export function HomeScroll() {
               {PROGRAMS.map((p) => (
                 <Link
                   key={p.id}
-                  href="/our-work"
+                  href={`/our-work#${p.id}`}
                   className="sc-program-card"
                 >
                   <span

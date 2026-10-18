@@ -508,7 +508,8 @@
     // never-revealed element in a removed subtree is retained for the life of the
     // tab, once per re-mount.
     var io = null, cio = null;
-    if ('IntersectionObserver' in window) {
+    // Under reduced motion there is nothing to reveal: show it all now.
+    if ('IntersectionObserver' in window && !reduce) {
       io = new IntersectionObserver(function (entries) {
         entries.forEach(function (e) {
           if (!e.isIntersecting) return;
@@ -526,7 +527,10 @@
       }, { rootMargin: '0px 0px -12% 0px', threshold: 0.01 });
       Array.prototype.forEach.call(root.querySelectorAll('[data-sc-in]'), function (el) { io.observe(el); });
     } else {
-      Array.prototype.forEach.call(root.querySelectorAll('[data-sc-in]'), function (el) { el.classList.add('sc-in'); });
+      Array.prototype.forEach.call(root.querySelectorAll('[data-sc-in]'), function (el) {
+        el.classList.add('sc-in');
+        Array.prototype.forEach.call(el.children, function (kid) { kid.classList.add('sc-in'); });
+      });
     }
 
     // ---- entry counters (fire once) --------------------------------------
@@ -929,11 +933,24 @@
         for (var c = 0; c < a.cues.length; c++) {
           var q = a.cues[c];
           var vis;
-          if (q.to === null) {
+          if (reduce) {
+            // Reduced motion: no fades to time. A cue is fully shown for its
+            // whole window, so nothing depends on stopping at an exact pixel.
+            // Cues that never leave are simply shown; only captions designed
+            // to replace each other keep their window.
+            var exits = q.to !== null && q.rOut > 0 && q.to < 1;
+            vis = !exits || (a.p >= q.from && a.p <= q.to) ? 1 : 0;
+          } else if (q.from <= 0 && q.to === null) {
+            // Cues that open the act are already there as it scrolls into view
+            // (progress is clamped at 0 until the pin), rather than arriving as
+            // a blank band that fills in late.
+            vis = 1;
+          } else if (q.to === null) {
             vis = smooth((a.p - q.from) / 0.18);
           } else {
             var win = Math.max(q.to - q.from, 0.001);
-            var inEnd = q.from + win * q.rIn;        // full opacity from here
+            // Opening cues (from 0) skip the ramp in, for the same reason.
+            var inEnd = q.from <= 0 ? q.from : q.from + win * q.rIn; // full opacity from here
             var outStart = q.to - win * q.rOut;      // starts leaving here
             if (a.p < inEnd) vis = smooth((a.p - q.from) / Math.max(inEnd - q.from, 0.001));
             else if (a.p <= outStart) vis = 1;       // the plateau

@@ -104,7 +104,7 @@ const hourTicks = [0, 12, 24, 36, 48, 60, 72].map((h, i, a) => ({
 export function IcuStayFigure() {
   return (
     <DataPanel
-      title={<span id="fig-stay">One ICU stay, as CLIF records it</span>}
+      title={<span id="fig-stay-title">One ICU stay, as CLIF records it</span>}
       meta="Illustrative schematic · not patient data"
       footer={
         <span

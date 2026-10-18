@@ -1,7 +1,7 @@
 "use client";
 
 import { CONTACT_EMAIL } from "@/lib/content";
-import type { GivebutterEmbed } from "@/lib/givebutter";
+import { GIVEBUTTER_CAMPAIGN_URL, type GivebutterEmbed } from "@/lib/givebutter";
 
 export function GivebutterGift({ embed }: { embed: GivebutterEmbed }) {
   return (
@@ -49,6 +49,12 @@ export function GivebutterGift({ embed }: { embed: GivebutterEmbed }) {
           <givebutter-giving-form campaign={embed.campaign} max-width="100%" />
         )}
       </div>
+      <p className="givebutter-panel__footnote">
+        Form not loading?{" "}
+        <a href={GIVEBUTTER_CAMPAIGN_URL} target="_blank" rel="noopener noreferrer" className="linkish">
+          Open the secure donation page ↗
+        </a>
+      </p>
       <p className="givebutter-panel__footnote">
         For a pledge, named purpose, or institutional gift, email{" "}
         <a href={`mailto:${CONTACT_EMAIL}`} className="linkish">
