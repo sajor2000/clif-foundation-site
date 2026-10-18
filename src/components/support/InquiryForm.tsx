@@ -65,8 +65,10 @@ export function InquiryForm() {
   }
 
   return (
+    // Any field edit (onChange bubbles from each control) re-enables submit.
     <form
       onSubmit={onSubmit}
+      onChange={edited}
       style={{
         border: "1px solid var(--border-strong)",
         borderRadius: "var(--radius-panel)",
@@ -112,10 +114,7 @@ export function InquiryForm() {
           autoComplete="name"
           aria-required="true"
           value={name}
-          onChange={(e) => {
-            setName(e.target.value);
-            edited();
-          }}
+          onChange={(e) => setName(e.target.value)}
           style={inputStyle}
         />
       </label>
@@ -125,10 +124,7 @@ export function InquiryForm() {
           name="organization"
           autoComplete="organization"
           value={organization}
-          onChange={(e) => {
-            setOrganization(e.target.value);
-            edited();
-          }}
+          onChange={(e) => setOrganization(e.target.value)}
           style={inputStyle}
         />
       </label>
@@ -138,10 +134,7 @@ export function InquiryForm() {
           name="kind"
           autoComplete="off"
           value={kind}
-          onChange={(e) => {
-            setKind(e.target.value as (typeof KINDS)[number]);
-            edited();
-          }}
+          onChange={(e) => setKind(e.target.value as (typeof KINDS)[number])}
           style={inputStyle}
         >
           {KINDS.map((k) => (
@@ -159,10 +152,7 @@ export function InquiryForm() {
           aria-describedby="inquiry-message-hint"
           autoComplete="off"
           value={message}
-          onChange={(e) => {
-            setMessage(e.target.value);
-            edited();
-          }}
+          onChange={(e) => setMessage(e.target.value)}
           rows={4}
           style={{ ...inputStyle, height: "auto", padding: 12 }}
         />

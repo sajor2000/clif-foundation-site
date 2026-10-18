@@ -1280,7 +1280,7 @@
       // Ignore URL-bar-only height changes on phones. Relaying out on those
       // makes the page jump under the reader's thumb for no reason.
       if (scDead) return;
-      if (innerWidth === lastW && isMobile()) { vh = innerHeight; return; }
+      if (innerWidth === lastW && isMobile()) { vh = innerHeight; measureDoc(); return; }
       lastW = innerWidth;
       layout();
     }, { passive: true });

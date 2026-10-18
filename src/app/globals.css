@@ -284,8 +284,8 @@ html[data-theme="dark"] .clif-theme-label-dark {
   color: var(--status-error);
   font-size: 14px;
   transition:
-    opacity 160ms var(--ease-out),
-    transform 160ms var(--ease-out);
+    opacity var(--duration-hover) var(--ease-out),
+    transform var(--duration-hover) var(--ease-out);
 }
 
 @starting-style {
@@ -561,7 +561,7 @@ input[type="file"]::file-selector-button:hover {
   transition:
     background-color var(--duration-fast) var(--ease-standard),
     border-color var(--duration-fast) var(--ease-standard),
-    transform 160ms var(--ease-out);
+    transform var(--duration-hover) var(--ease-out);
 }
 
 .btn--primary {
@@ -628,7 +628,7 @@ input[type="file"]::file-selector-button:hover {
   transition:
     background-color var(--duration-fast) var(--ease-standard),
     color var(--duration-fast) var(--ease-standard),
-    transform 160ms var(--ease-out);
+    transform var(--duration-hover) var(--ease-out);
 }
 
 .chip[aria-pressed="true"] {
@@ -657,7 +657,7 @@ input[type="file"]::file-selector-button:hover {
   cursor: pointer;
   transition:
     background-color var(--duration-fast) var(--ease-standard),
-    transform 160ms var(--ease-out);
+    transform var(--duration-hover) var(--ease-out);
 }
 
 .copy-btn__label {
