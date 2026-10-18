@@ -26,12 +26,14 @@ export function SiteHeader({ current }: { current?: string }) {
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
-      // Leave Escape to whatever already handled it, and only act when the
-      // reader is inside this header's menu.
+      // Leave Escape to whatever already handled it. A hidden page's menu is
+      // already closed, so an open menu is this page's. Return focus to the
+      // button only when it was in the header or nowhere, never out of content.
       if (e.key !== "Escape" || e.defaultPrevented) return;
-      if (!headerRef.current?.contains(document.activeElement)) return;
+      const active = document.activeElement;
+      const inHeader = !!headerRef.current?.contains(active);
       setOpen(false);
-      buttonRef.current?.focus();
+      if (inHeader || !active || active === document.body) buttonRef.current?.focus();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);

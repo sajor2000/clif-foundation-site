@@ -1,8 +1,8 @@
-// Site check against `next start -p 43139`. Run from the repo root: node scripts/checks/r01.mjs
+// Site check against `next start -p 43139` (or SITE_URL; CHROME_PATH for the browser). Exits 1 on any failure. Run from the repo root: node scripts/checks/r01.mjs
 import { tmpdir } from "node:os";
 const { chromium } = await import((process.argv[2] ?? process.cwd()) + "/node_modules/playwright-core/index.mjs");
 const S = (process.argv[3] ?? tmpdir());
-const b = await chromium.launch({ executablePath: "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" });
+const b = await chromium.launch({ executablePath: process.env.CHROME_PATH ?? "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" });
 for (const motion of ["no-preference", "reduce"]) {
   const p = await b.newPage({ viewport: { width: 1280, height: 720 }, reducedMotion: motion });
   await p.goto("http://127.0.0.1:43139/", { waitUntil: "load" }); await p.waitForTimeout(1500);
@@ -24,6 +24,8 @@ for (const motion of ["no-preference", "reduce"]) {
     if (r.hits.length) worst.push(`y=${r.y}: ${r.hits.length} faint — ${r.hits.slice(0,4).join(" | ")}`);
     if ([1440, 2880, 4320].includes(y)) await p.screenshot({ path: `${S}/r01-${motion}-${y}.png` });
   }
+  // Mid-scrub fades are expected with motion on; under reduced motion nothing may be faint.
+  if (motion === "reduce" && worst.length) process.exitCode = 1;
   console.log(`== ${motion}: ${worst.length} positions with faint in-view text`); worst.slice(0, 8).forEach((l) => console.log("  " + l));
   await p.close();
 }

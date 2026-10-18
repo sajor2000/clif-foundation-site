@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { CONTACT_EMAIL } from "@/lib/content";
 
 type CopyState = "idle" | "copied" | "failed";
@@ -17,22 +17,34 @@ const ANNOUNCEMENTS: Record<CopyState, string> = {
   failed: "Copy failed, select the address instead",
 };
 
-export function CopyEmailButton() {
-  const [state, setState] = useState<CopyState>("idle");
-  const reset = useRef<number | undefined>(undefined);
+const STATES = Object.keys(LABELS) as CopyState[];
 
-  useEffect(() => () => window.clearTimeout(reset.current), []);
+export function CopyEmailButton() {
+  // `n` counts copies, so a repeat click restarts the reset window.
+  const [copy, setCopy] = useState<{ state: CopyState; n: number }>({
+    state: "idle",
+    n: 0,
+  });
+
+  // The reset lives in an effect, not the click handler: its cleanup owns the
+  // timer, and it re-arms when a hidden (Activity) page is shown again.
+  useEffect(() => {
+    if (copy.state === "idle") return;
+    const reset = window.setTimeout(
+      () => setCopy((c) => (c.n === copy.n ? { state: "idle", n: c.n } : c)),
+      1800,
+    );
+    return () => window.clearTimeout(reset);
+  }, [copy]);
 
   async function onCopy() {
-    window.clearTimeout(reset.current);
     let next: CopyState = "copied";
     try {
       await navigator.clipboard.writeText(CONTACT_EMAIL);
     } catch {
       next = "failed";
     }
-    setState(next);
-    reset.current = window.setTimeout(() => setState("idle"), 1800);
+    setCopy((c) => ({ state: next, n: c.n + 1 }));
   }
 
   return (
@@ -44,19 +56,19 @@ export function CopyEmailButton() {
         onClick={onCopy}
         className="copy-btn"
       >
-        {(Object.keys(LABELS) as CopyState[]).map((key) => (
+        {STATES.map((key) => (
           <span
             key={key}
             aria-hidden="true"
             className="copy-btn__label"
-            data-active={key === state}
+            data-active={key === copy.state}
           >
             {LABELS[key]}
           </span>
         ))}
       </button>
       <span role="status" className="sr-only copy-btn-status">
-        {ANNOUNCEMENTS[state]}
+        {ANNOUNCEMENTS[copy.state]}
       </span>
     </>
   );

@@ -1,7 +1,7 @@
-// Site check against `next start -p 43139`. Run from the repo root: node scripts/checks/review-checks.mjs
+// Site check against `next start -p 43139` (or SITE_URL; CHROME_PATH for the browser). Exits 1 on any failure. Run from the repo root: node scripts/checks/review-checks.mjs
 const { chromium } = await import((process.argv[2] ?? process.cwd()) + "/node_modules/playwright-core/index.mjs");
-const B = "http://127.0.0.1:43139"; const res = []; const ok = (n, c, x = "") => res.push(`${c ? "PASS" : "FAIL"}  ${n}${x ? " — " + x : ""}`);
-const b = await chromium.launch({ executablePath: "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" });
+const B = (process.env.SITE_URL ?? "http://127.0.0.1:43139"); const res = []; const ok = (n, c, x = "") => res.push(`${c ? "PASS" : "FAIL"}  ${n}${x ? " — " + x : ""}`);
+const b = await chromium.launch({ executablePath: process.env.CHROME_PATH ?? "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" });
 const btn = (p) => p.locator(".site-menu-btn:visible");
 const panelOpen = async (p) => (await p.locator(".site-menu-panel:visible").count()) > 0;
 let p = await (await b.newContext({ viewport: { width: 390, height: 844 } })).newPage();
@@ -32,3 +32,4 @@ const f = await (await b.newContext()).newPage(); await f.goto(B + "/support"); 
 const h = await f.evaluate(() => { const ta = document.getElementById("inquiry-message"); const hint = document.getElementById("inquiry-message-hint"); return { describedby: ta?.getAttribute("aria-describedby"), hintInsideLabel: !!hint?.closest("label"), labelText: ta?.labels?.[0]?.textContent?.trim() }; });
 ok("Inquiry hint is announced once", h.describedby === "inquiry-message-hint" && !h.hintInsideLabel && h.labelText === "Message (optional)", JSON.stringify(h));
 await b.close(); console.log(res.join("\n"));
+if (res.some((l) => l.startsWith("FAIL"))) process.exitCode = 1;

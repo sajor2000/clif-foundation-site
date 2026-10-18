@@ -104,6 +104,23 @@ test("phone menu fades in on open and closes instantly", async () => {
   await page.context().close();
 });
 
+test("Escape closes the phone menu after focus leaves the header", async () => {
+  const page = await open("/mission", PHONE);
+  await page.locator(".site-menu-btn").first().click();
+  await page.locator("main a, main button").first().focus();
+  await page.keyboard.press("Escape");
+  const display = await page.evaluate(
+    () =>
+      new Promise((r) =>
+        requestAnimationFrame(() =>
+          r([...document.querySelectorAll(".site-menu-panel")].some((el) => getComputedStyle(el).display !== "none")),
+        ),
+      ),
+  );
+  assert.equal(display, false, "a menu panel stayed open after Escape");
+  await page.context().close();
+});
+
 test("phone menu links show at full opacity without JavaScript", async () => {
   const page = await open("/mission", PHONE, { javaScriptEnabled: false });
   const panel = page.locator(".site-menu-panel").first();
@@ -167,7 +184,28 @@ test("copy button keeps its width and name and announces the result", async () =
   await page.waitForTimeout(1200);
   await btn.click();
   await page.waitForTimeout(1200);
-  assert.match(await btn.textContent(), /Copied/);
+  // 2400ms after the first click: past its window, inside the second one.
+  const active = page.locator('.copy-btn__label[data-active="true"]');
+  assert.equal((await active.textContent()).trim(), "Copied");
+  assert.equal((await page.locator(".copy-btn-status").textContent()).trim(), "Email address copied");
+  await page.waitForTimeout(900);
+  assert.equal((await active.textContent()).trim(), "Copy email address");
+  await page.context().close();
+});
+
+test("copy button resets after navigating away and back", async () => {
+  const page = await open("/support", DESKTOP, {
+    permissions: ["clipboard-read", "clipboard-write"],
+  });
+  await page.getByRole("button", { name: "Copy email address" }).click();
+  await page.waitForTimeout(100);
+  await page.locator('header a[href="/mission"]').first().click();
+  await page.waitForURL("**/mission");
+  await page.goBack();
+  await page.waitForURL("**/support");
+  await page.waitForTimeout(2200);
+  const active = page.locator('.copy-btn__label[data-active="true"]').first();
+  assert.equal((await active.textContent()).trim(), "Copy email address");
   await page.context().close();
 });
 
