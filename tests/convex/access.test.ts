@@ -71,13 +71,13 @@ describe("members", () => {
     ).rejects.toThrow(/at least one admin/);
   });
 
-  it("only admins manage the allowlist", async () => {
+  it("only officers manage the allowlist; directors cannot", async () => {
     const t = backend();
-    await seedBoard(t, [{ email: "sec@x.org", role: "secretary" }]);
+    await seedBoard(t, [{ email: "dir@x.org", role: "member" }]);
     await expect(
-      as(t, "sec@x.org").mutation(api.board.upsertMember, { email: "x@x.org" }),
+      as(t, "dir@x.org").mutation(api.board.upsertMember, { email: "x@x.org" }),
     ).rejects.toThrow(/insufficient board role/);
-    await expect(as(t, "sec@x.org").mutation(api.board.removeMember, { email: ADMIN })).rejects.toThrow(
+    await expect(as(t, "dir@x.org").mutation(api.board.removeMember, { email: ADMIN })).rejects.toThrow(
       /insufficient board role/,
     );
   });

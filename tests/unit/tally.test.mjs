@@ -3,7 +3,7 @@ import { describe, it } from "node:test";
 import { tallyBallots } from "../../convex/lib/tally.ts";
 
 const directors = new Set(["a@x.org", "b@x.org", "c@x.org"]);
-const ballot = (voterEmail, choice) => ({ voterEmail, choice });
+const ballot = (voterEmail, choice, castAt = 0) => ({ voterEmail, choice, castAt });
 
 describe("tallyBallots", () => {
   it("counts only current directors' ballots", () => {
@@ -68,5 +68,15 @@ describe("tallyBallots", () => {
   it("never passes with no directors", () => {
     const t = tallyBallots([], new Set(), "consent", "closed");
     assert.equal(t.passed, false);
+  });
+
+  it("counts each director once, using their latest ballot", () => {
+    const t = tallyBallots(
+      [ballot("a@x.org", "no", 1), ballot("A@x.org", "yes", 2), ballot("b@x.org", "yes", 1)],
+      directors, "standard", "closed",
+    );
+    assert.equal(t.voted, 2);
+    assert.equal(t.yes, 2);
+    assert.equal(t.no, 0);
   });
 });

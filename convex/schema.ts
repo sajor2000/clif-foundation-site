@@ -44,6 +44,8 @@ export default defineSchema({
     email: v.string(),
     role: v.optional(boardRole),
     displayName: v.optional(v.string()),
+    /** Board title shown in the portal, e.g. President, Secretary, Treasurer, Director. */
+    title: v.optional(v.string()),
     /** Counts toward meeting quorum / director attendance (not inferred from role). */
     isDirector: v.optional(v.boolean()),
   }).index("by_email", ["email"]),
@@ -80,6 +82,8 @@ export default defineSchema({
     meetingId: v.id("meetings"),
     body: v.optional(v.string()),
     storageId: v.optional(v.id("_storage")),
+    /** The minutes file (PDF or Word) in the document library. */
+    documentId: v.optional(v.id("documents")),
     status: minutesStatus,
     version: v.number(),
     certifiedBy: v.optional(v.string()),
@@ -109,6 +113,10 @@ export default defineSchema({
     policyAdoption: v.optional(policyType),
     openedAt: v.optional(v.number()),
     closedAt: v.optional(v.number()),
+    /** Set when this motion approves a minutes version; passing it approves them. */
+    minutesId: v.optional(v.id("minutes")),
+    /** Officer who recorded votes taken outside the portal (e.g. in a meeting). */
+    recordedBy: v.optional(v.string()),
     /** Result frozen when the motion closes; later allowlist changes never alter it. */
     finalTally: v.optional(
       v.object({

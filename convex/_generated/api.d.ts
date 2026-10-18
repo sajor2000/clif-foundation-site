@@ -28,6 +28,7 @@ import type * as meetings from "../meetings.js";
 import type * as motions from "../motions.js";
 import type * as policies from "../policies.js";
 import type * as reporting from "../reporting.js";
+import type * as todos from "../todos.js";
 
 import type {
   ApiFromModules,
@@ -56,6 +57,7 @@ declare const fullApi: ApiFromModules<{
   motions: typeof motions;
   policies: typeof policies;
   reporting: typeof reporting;
+  todos: typeof todos;
 }>;
 
 /**

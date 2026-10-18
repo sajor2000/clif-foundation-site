@@ -34,7 +34,7 @@ export type UploadDocumentDeps = {
     title: string;
     category: DocumentMeta["category"];
     contentType: string;
-  }) => Promise<{ ok: true } | { ok: false; error: string }>;
+  }) => Promise<{ ok: true; id: string } | { ok: false; error: string }>;
 };
 
 /**
@@ -105,7 +105,7 @@ export function uploadDocumentProgram(
       },
     });
 
-    yield* Effect.tryPromise({
+    const documentId = yield* Effect.tryPromise({
       try: async () => {
         const saved = await deps.saveDocument({
           storageId,
@@ -114,6 +114,7 @@ export function uploadDocumentProgram(
           contentType: meta.contentType,
         });
         if (!saved.ok) throw new Error(saved.error);
+        return saved.id;
       },
       catch: (e) =>
         new SaveDocumentFailed({
@@ -121,7 +122,7 @@ export function uploadDocumentProgram(
         }),
     });
 
-    return { storageId, meta } as const;
+    return { storageId, meta, documentId } as const;
   });
 }
 

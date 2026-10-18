@@ -4,7 +4,16 @@ import { useMutation, useQuery } from "convex/react";
 import { useState } from "react";
 import { api } from "../../../convex/_generated/api";
 import type { Id } from "../../../convex/_generated/dataModel";
-import { BOARD_ROLES, type BoardRole } from "../../../convex/lib/vocab";
+import type { BoardRole } from "../../../convex/lib/vocab";
+
+/** Two access levels: officers run the board's records, directors vote and read. */
+const ACCESS_LEVELS: { value: BoardRole; label: string }[] = [
+  { value: "member", label: "Director: votes and reads" },
+  { value: "admin", label: "Officer: full admin" },
+];
+const TITLES = ["Director", "President", "Secretary", "Treasurer"] as const;
+const accessLabel = (role: string | undefined) =>
+  role === "admin" || role === "secretary" || role === "chair" ? "officer" : "director access";
 import { Button } from "@/components/core/Button";
 import { inputStyle, pageTitle, panelStyle } from "@/components/portal/portal-styles";
 
@@ -18,7 +27,10 @@ export function MembersView() {
   const [listError, setListError] = useState<string | null>(null);
   const [email, setEmail] = useState("");
   const [displayName, setDisplayName] = useState("");
-  const [memberRole, setMemberRole] = useState<BoardRole>("member");
+  // "" = keep the member's current value when updating (new members default
+  // to director access with the Director title on the server).
+  const [memberRole, setMemberRole] = useState<BoardRole | "">("");
+  const [memberTitle, setMemberTitle] = useState<string>("");
   const [isDirector, setIsDirector] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
@@ -40,7 +52,8 @@ export function MembersView() {
     try {
       await upsert({
         email,
-        role: memberRole,
+        role: memberRole || undefined,
+        title: memberTitle || undefined,
         displayName: displayName || undefined,
         isDirector,
       });
@@ -99,15 +112,27 @@ export function MembersView() {
           />
         </label>
         <label style={{ display: "grid", gap: 6, fontSize: 14 }}>
-          Role
+          Title
+          <select value={memberTitle} onChange={(e) => setMemberTitle(e.target.value)} style={inputStyle}>
+            <option value="">Keep current (new members: Director)</option>
+            {TITLES.map((t) => (
+              <option key={t} value={t}>
+                {t}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label style={{ display: "grid", gap: 6, fontSize: 14 }}>
+          Access
           <select
             value={memberRole}
-            onChange={(e) => setMemberRole(e.target.value as BoardRole)}
+            onChange={(e) => setMemberRole(e.target.value as BoardRole | "")}
             style={inputStyle}
           >
-            {BOARD_ROLES.map((r) => (
-              <option key={r} value={r}>
-                {r}
+            <option value="">Keep current (new members: Director)</option>
+            {ACCESS_LEVELS.map((r) => (
+              <option key={r.value} value={r.value}>
+                {r.label}
               </option>
             ))}
           </select>
@@ -126,7 +151,7 @@ export function MembersView() {
             checked={isDirector}
             onChange={(e) => setIsDirector(e.target.checked)}
           />
-          Counts as director for quorum
+          Voting director (counts toward quorum)
         </label>
         {error ? (
           <p role="alert" style={{ margin: 0, color: "var(--status-error)", fontSize: 14 }}>
@@ -165,10 +190,13 @@ export function MembersView() {
                 gap: 12,
               }}
             >
-              <span style={{ fontWeight: 500 }}>{m.displayName || m.email}</span>
+              <span style={{ fontWeight: 500 }}>
+                {m.displayName || m.email}
+                {m.title ? <span style={{ color: "var(--text-muted)", fontWeight: 400 }}> · {m.title}</span> : null}
+              </span>
               <span style={{ fontFamily: "var(--font-mono)", fontSize: 12, color: "var(--text-muted)" }}>
-                {m.email} · {m.role ?? "member"} ·{" "}
-                {m.isDirector ? "director" : "non-director"}
+                {m.email} · {accessLabel(m.role)}
+                {m.isDirector ? "" : " · does not vote"}
               </span>
               <span style={{ marginLeft: "auto", display: "flex", gap: 8 }}>
                 {confirmRemove === m.email ? (
@@ -251,9 +279,9 @@ function PendingRequests() {
               }
               style={inputStyle}
             >
-              {BOARD_ROLES.map((role) => (
-                <option key={role} value={role}>
-                  {role}
+              {ACCESS_LEVELS.map((level) => (
+                <option key={level.value} value={level.value}>
+                  {level.label}
                 </option>
               ))}
             </select>

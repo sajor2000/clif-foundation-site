@@ -1,11 +1,11 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { logAudit } from "./lib/audit";
-import { requireBoardIdentity, requireBoardRole } from "./lib/auth";
+import { requireBoardIdentity, requireOfficer } from "./lib/auth";
 import { isDirector, loadDirectorEmails } from "./lib/directors";
 import { minutesTransitionError } from "./lib/minutes";
 import { buildMinutesText } from "./lib/minutesText";
-import { meetingStatus, minutesStatus } from "./lib/vocab";
+import { meetingStatus, minutesStatus, motionStatus } from "./lib/vocab";
 import { quorumMet, quorumRequired } from "./lib/quorum";
 import schema from "./schema";
 
@@ -49,6 +49,10 @@ export const getMeeting = query({
           ...schema.tables.minutesItems.validator.fields,
         }),
       ),
+      /** The attached minutes file, if any. */
+      minutesFile: v.union(v.object({ title: v.string(), url: v.union(v.string(), v.null()) }), v.null()),
+      /** The motion that puts these minutes to the board, if one exists. */
+      approvalMotion: v.union(v.object({ id: v.id("motions"), status: motionStatus }), v.null()),
     }),
     v.null(),
   ),
@@ -68,7 +72,19 @@ export const getMeeting = query({
           .withIndex("by_minutes", (q) => q.eq("minutesId", minutes._id))
           .take(200)
       : [];
-    return { meeting, minutes, items };
+    const doc = minutes?.documentId ? await ctx.db.get(minutes.documentId) : null;
+    const minutesFile = doc ? { title: doc.title, url: await ctx.storage.getUrl(doc.storageId) } : null;
+    let approvalMotion = null;
+    if (minutes) {
+      const motions = await ctx.db
+        .query("motions")
+        .withIndex("by_meeting", (q) => q.eq("meetingId", meeting._id))
+        .order("desc")
+        .take(50);
+      const m = motions.find((x) => x.minutesId === minutes._id);
+      if (m) approvalMotion = { id: m._id, status: m.status };
+    }
+    return { meeting, minutes, items, minutesFile, approvalMotion };
   },
 });
 
@@ -81,11 +97,7 @@ export const createMeeting = mutation({
   },
   returns: v.id("meetings"),
   handler: async (ctx, args) => {
-    const identity = await requireBoardRole(ctx, [
-      "secretary",
-      "chair",
-      "admin",
-    ]);
+    const identity = await requireOfficer(ctx);
     const members = await ctx.db.query("boardMembers").take(200);
     const directorCount = members.filter(isDirector).length;
     const computedQuorum = quorumRequired(Math.max(1, directorCount));
@@ -118,11 +130,7 @@ export const updateAttendance = mutation({
   },
   returns: v.null(),
   handler: async (ctx, args) => {
-    const { identity } = await requireBoardRole(ctx, [
-      "secretary",
-      "chair",
-      "admin",
-    ]);
+    const { identity } = await requireOfficer(ctx);
     const meeting = await ctx.db.get(args.meetingId);
     if (!meeting) throw new Error("Meeting not found");
     const unique = [
@@ -159,10 +167,7 @@ export const upsertMinutes = mutation({
   },
   returns: v.id("minutes"),
   handler: async (ctx, args) => {
-    const { identity } = await requireBoardRole(ctx, [
-      "secretary",
-      "admin",
-    ]);
+    const { identity } = await requireOfficer(ctx);
     const existing = await ctx.db
       .query("minutes")
       .withIndex("by_meeting", (q) => q.eq("meetingId", args.meetingId))
@@ -171,6 +176,12 @@ export const upsertMinutes = mutation({
 
     const meeting = await ctx.db.get(args.meetingId);
     if (!meeting) throw new Error("Meeting not found");
+    if (args.status && args.status !== "draft") {
+      throw new Error("Use “Send to board for approval” to put minutes to a vote.");
+    }
+    if (existing?.status === "published_for_review") {
+      throw new Error("These minutes are out for a vote. Close the vote before editing them.");
+    }
     const nextStatus = args.status ?? existing?.status ?? "draft";
     const blocked = minutesTransitionError(
       existing?.status ?? null,
@@ -212,6 +223,99 @@ export const upsertMinutes = mutation({
   },
 });
 
+/** Attach the minutes file (PDF or Word, already in the library) to a meeting's current draft. */
+export const attachMinutesFile = mutation({
+  args: { meetingId: v.id("meetings"), documentId: v.id("documents") },
+  returns: v.id("minutes"),
+  handler: async (ctx, args) => {
+    const { identity } = await requireOfficer(ctx);
+    const meeting = await ctx.db.get(args.meetingId);
+    if (!meeting) throw new Error("Meeting not found");
+    const doc = await ctx.db.get(args.documentId);
+    if (!doc) throw new Error("Document not found");
+    const latest = await ctx.db
+      .query("minutes")
+      .withIndex("by_meeting", (q) => q.eq("meetingId", meeting._id))
+      .order("desc")
+      .first();
+    if (latest?.status === "approved") {
+      throw new Error("These minutes are approved. Start a new version to replace the file.");
+    }
+    if (latest?.status === "published_for_review") {
+      throw new Error("These minutes are out for a vote. Close the vote before changing the file.");
+    }
+    let id;
+    if (latest) {
+      await ctx.db.patch(latest._id, { documentId: doc._id, updatedAt: Date.now() });
+      id = latest._id;
+    } else {
+      id = await ctx.db.insert("minutes", {
+        meetingId: meeting._id,
+        documentId: doc._id,
+        status: "draft",
+        version: 1,
+        createdBy: identity.subject,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      });
+    }
+    await logAudit(ctx, {
+      kind: "minutes.file",
+      summary: `Attached minutes file "${doc.title}" to ${meeting.title}`,
+      actorSubject: identity.subject,
+      actorEmail: identity.email,
+    });
+    return id;
+  },
+});
+
+/**
+ * Put a meeting's draft minutes to the board: opens a motion "Approve minutes"
+ * that approves them when it passes (see closeMotion in motions.ts).
+ */
+export const sendMinutesForApproval = mutation({
+  args: { meetingId: v.id("meetings") },
+  returns: v.id("motions"),
+  handler: async (ctx, args) => {
+    const { identity } = await requireOfficer(ctx);
+    const meeting = await ctx.db.get(args.meetingId);
+    if (!meeting) throw new Error("Meeting not found");
+    const minutes = await ctx.db
+      .query("minutes")
+      .withIndex("by_meeting", (q) => q.eq("meetingId", meeting._id))
+      .order("desc")
+      .first();
+    if (!minutes) throw new Error("Add the minutes (file or text) first");
+    if (!minutes.documentId && !minutes.body?.trim()) {
+      throw new Error("Attach the minutes file or enter the minutes text first");
+    }
+    const blocked = minutesTransitionError(minutes.status, "published_for_review", meeting.status === "held");
+    if (blocked) throw new Error(blocked);
+    if (minutes.status === "published_for_review") {
+      throw new Error("These minutes are already out for a vote");
+    }
+    await ctx.db.patch(minutes._id, { status: "published_for_review", updatedAt: Date.now() });
+    const motionId = await ctx.db.insert("motions", {
+      meetingId: meeting._id,
+      minutesId: minutes._id,
+      title: `Approve minutes: ${meeting.title}${minutes.version > 1 ? ` (v${minutes.version})` : ""}`,
+      description: "Approve the minutes as recorded.",
+      motionType: "standard",
+      status: "open",
+      openedAt: Date.now(),
+      createdBy: identity.subject,
+      createdAt: Date.now(),
+    });
+    await logAudit(ctx, {
+      kind: "minutes.sent_for_approval",
+      summary: `Minutes of ${meeting.title} sent to the board for approval`,
+      actorSubject: identity.subject,
+      actorEmail: identity.email,
+    });
+    return motionId;
+  },
+});
+
 /** Start a new draft version after minutes were approved. */
 export const reviseMinutes = mutation({
   args: {
@@ -220,7 +324,7 @@ export const reviseMinutes = mutation({
   },
   returns: v.id("minutes"),
   handler: async (ctx, args) => {
-    const { identity } = await requireBoardRole(ctx, ["secretary", "admin"]);
+    const { identity } = await requireOfficer(ctx);
     const existing = await ctx.db
       .query("minutes")
       .withIndex("by_meeting", (q) => q.eq("meetingId", args.meetingId))
@@ -273,11 +377,15 @@ export const addMinutesItem = mutation({
   },
   returns: v.id("minutesItems"),
   handler: async (ctx, args) => {
-    const { identity } = await requireBoardRole(ctx, ["secretary", "admin"]);
+    const { identity } = await requireOfficer(ctx);
     const minutes = await ctx.db.get(args.minutesId);
     if (!minutes) throw new Error("Minutes not found");
-    if (minutes.status === "approved") {
-      throw new Error("Cannot edit approved minutes");
+    if (minutes.status !== "draft") {
+      throw new Error(
+        minutes.status === "approved"
+          ? "Cannot edit approved minutes"
+          : "These minutes are out for a vote. Close the vote before editing them.",
+      );
     }
     if (!args.title.trim()) throw new Error("Item title is required");
     const directors = await loadDirectorEmails(ctx);
