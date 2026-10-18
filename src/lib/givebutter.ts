@@ -1,5 +1,6 @@
 /** The Foundation's hosted campaign page: a working fallback if the embed fails. */
-export const GIVEBUTTER_CAMPAIGN_URL = "https://givebutter.com/cliffoundation";
+export const GIVEBUTTER_CAMPAIGN_URL =
+  process.env.NEXT_PUBLIC_GIVEBUTTER_CAMPAIGN_URL?.trim() || "https://givebutter.com/cliffoundation";
 
 /** Public Givebutter account ID from the widget install snippet. */
 const DEFAULT_ACCOUNT_ID = "htqR98I4GhNJ6AiT";

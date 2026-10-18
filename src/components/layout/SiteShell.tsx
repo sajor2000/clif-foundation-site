@@ -8,12 +8,13 @@ export function SiteShell({
   current,
   children,
 }: {
-  current?: string;
+  /** Page key: also names this page's <main> (must be unique per route). */
+  current: string;
   children: ReactNode;
 }) {
   // Unique per page: earlier pages stay mounted (hidden) after navigation, and
   // the skip link must reach this page's <main>, not a cached one.
-  const mainId = `main-${current ?? "page"}`;
+  const mainId = `main-${current}`;
   return (
     <div
       style={{

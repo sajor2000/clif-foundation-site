@@ -1,23 +1,26 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import { Lockup } from "@/components/brand/Lockup";
 import { NAV_ITEMS } from "@/lib/content";
 
 export function SiteHeader({ current }: { current?: string }) {
-  const pathname = usePathname();
+  const headerRef = useRef<HTMLElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
+  const panelRef = useRef<HTMLElement>(null);
   // Next keeps earlier pages mounted (hidden) for instant back navigation, so
-  // several headers can exist at once: each needs its own panel id.
+  // several headers can exist at once: each needs its own ids.
   const uid = useId().replace(/:/g, "");
   const panelId = `site-menu-${uid}`;
   const themeId = `clif-theme-toggle-${uid}`;
   const themeRef = useRef<HTMLInputElement>(null);
-  // The menu is open only for the page it was opened on, so any navigation closes it.
-  const [openOn, setOpenOn] = useState<string | null>(null);
-  const open = openOn === pathname;
+  const [open, setOpen] = useState(false);
+
+  // When Next hides this page (any navigation away: links, logo, Back), close
+  // the menu so the page never comes back with it open. See Next's
+  // "Preserving UI state" guide.
+  useLayoutEffect(() => () => setOpen(false), []);
 
   useEffect(() => {
     // A header mounted after navigation must reflect the current theme.
@@ -29,20 +32,25 @@ export function SiteHeader({ current }: { current?: string }) {
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        setOpenOn(null);
-        buttonRef.current?.focus();
-      }
+      // Only Escape aimed at this menu: not one another widget already handled.
+      if (e.key !== "Escape" || e.defaultPrevented) return;
+      if (!headerRef.current?.contains(document.activeElement)) return;
+      setOpen(false);
+      buttonRef.current?.focus();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [open]);
 
   useEffect(() => {
-    // Widening past the mobile breakpoint closes the panel (desktop nav takes over).
+    // Widening past the mobile breakpoint closes the panel (desktop nav takes
+    // over). If focus was inside the panel, keep it on the page.
     const mq = window.matchMedia("(max-width: 999px)");
     const onChange = () => {
-      if (!mq.matches) setOpenOn(null);
+      if (mq.matches) return;
+      const hadFocus = panelRef.current?.contains(document.activeElement);
+      setOpen(false);
+      if (hadFocus) headerRef.current?.querySelector<HTMLElement>(".site-header-brand a")?.focus();
     };
     mq.addEventListener("change", onChange);
     return () => mq.removeEventListener("change", onChange);
@@ -50,6 +58,7 @@ export function SiteHeader({ current }: { current?: string }) {
 
   return (
     <header
+      ref={headerRef}
       style={{
         borderBottom: "1px solid var(--border)",
         background: "var(--bg-page)",
@@ -168,7 +177,7 @@ export function SiteHeader({ current }: { current?: string }) {
             className="site-menu-btn"
             aria-controls={panelId}
             aria-expanded={open}
-            onClick={() => setOpenOn(open ? null : pathname)}
+            onClick={() => setOpen(!open)}
             style={{
               height: "var(--control-md)",
               padding: "0 16px",
@@ -184,16 +193,12 @@ export function SiteHeader({ current }: { current?: string }) {
           </button>
         </div>
       </div>
-      <nav
-        id={panelId}
-        className="site-menu-panel"
-        aria-label="Primary"
-        hidden={!open}
-        // Close before leaving, so a cached page never comes back with its menu open.
-        onClick={(e) => {
-          if ((e.target as HTMLElement).closest("a")) setOpenOn(null);
-        }}
-      >
+      {/* Without JavaScript the toggle can't work: show the links instead. */}
+      <noscript>
+        <style>{`@media (max-width: 999px){.site-menu-panel{display:grid!important}.site-menu-btn{display:none!important}}`}</style>
+      </noscript>
+      {/* Closed = display:none (CSS), which also takes its links out of the tab order. */}
+      <nav ref={panelRef} id={panelId} className="site-menu-panel" aria-label="Primary" data-open={open}>
         {NAV_ITEMS.map((item) => (
           <Link
             key={item.id}
