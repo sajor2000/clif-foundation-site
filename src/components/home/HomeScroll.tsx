@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { EIN, IRS_STATUS_SHORT } from "@/lib/legal";
+import { IRS_STATUS_SHORT } from "@/lib/legal";
 import { Button } from "@/components/core/Button";
 import { Tag } from "@/components/core/Tag";
 import { KeyValueList } from "@/components/data/KeyValueList";
@@ -728,7 +728,7 @@ export function HomeScroll() {
 
           <div className="sc-colophon" data-sc-in>
             <p style={{ margin: 0, fontSize: 15, lineHeight: 1.55, color: "var(--text-muted)" }}>
-              CLIF Foundation · Illinois nonprofit · EIN {EIN} · helping more
+              CLIF Foundation · Illinois nonprofit · helping more
               organizations use CLIF · {IRS_STATUS_SHORT}. Research credited to
               the CLIF Consortium.
             </p>

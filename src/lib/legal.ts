@@ -1,10 +1,8 @@
 // The Foundation's legal identity and IRS status, stated once. Every page that
 // names the EIN or the tax status reads from here so the wording never drifts.
 
-/** Name exactly as on the IRS EIN assignment notice. */
-export const LEGAL_NAME = "CLIF FOUNDATION";
-
-export const EIN = "41-4473537";
+// The EIN is intentionally not published yet (owner decision, Oct 18 2026).
+// When approved, add it here and render it where the status appears.
 
 /**
  * IRS recognition stage. Keep this sentence accurate: change it only when the
@@ -17,4 +15,4 @@ export const IRS_STATUS =
 
 /** Shown where people give: no deductibility claim, receipts kept separate. */
 export const GIVING_TAX_NOTE =
-  "Until the IRS issues a determination letter, the Foundation cannot confirm that a gift is tax-deductible. Givebutter's emailed receipt records your gift; it does not establish tax deductibility.";
+  "Until the IRS issues a determination letter, the Foundation cannot confirm that a gift is tax-deductible. Givebutter's emailed receipt records your gift. It does not establish tax deductibility.";

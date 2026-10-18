@@ -1,4 +1,4 @@
-import { EIN, IRS_STATUS, IRS_STATUS_SHORT, LEGAL_NAME } from "@/lib/legal";
+import { IRS_STATUS, IRS_STATUS_SHORT } from "@/lib/legal";
 export const CONTACT_EMAIL = "info@clificufoundation.org";
 export const CONSORTIUM_URL = "https://clif-icu.com/";
 export const GITHUB_URL =
@@ -25,7 +25,6 @@ export const ORG_RECORD = [
   { k: "name", v: "CLIF Foundation" },
   { k: "supports", v: "Common Longitudinal ICU data Format" },
   { k: "entity", v: "Illinois nonprofit corporation" },
-  { k: "ein", v: EIN },
   { k: "tax_status", v: IRS_STATUS_SHORT },
   { k: "research_by", v: "CLIF Consortium" },
   { k: "contact", v: CONTACT_EMAIL },
@@ -225,7 +224,7 @@ export const GOVERNING_DOCS = [
   { name: "Conflict-of-interest policy", status: "published when adopted" },
   {
     name: "Organization",
-    status: `${LEGAL_NAME} · EIN ${EIN} · Illinois nonprofit corporation · ${IRS_STATUS_SHORT}`,
+    status: `Illinois nonprofit corporation · ${IRS_STATUS_SHORT}`,
   },
 ] as const;
 

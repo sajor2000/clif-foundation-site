@@ -1,7 +1,7 @@
 "use client";
 
 import { CONTACT_EMAIL } from "@/lib/content";
-import { EIN, GIVING_TAX_NOTE, IRS_STATUS, LEGAL_NAME } from "@/lib/legal";
+import { GIVING_TAX_NOTE, IRS_STATUS } from "@/lib/legal";
 import type { GivebutterEmbed } from "@/lib/givebutter";
 
 export function GivebutterGift({ embed }: { embed: GivebutterEmbed }) {
@@ -54,10 +54,7 @@ export function GivebutterGift({ embed }: { embed: GivebutterEmbed }) {
             paddingTop: 12,
           }}
         >
-          <strong style={{ fontWeight: 600, color: "var(--text-primary)" }}>
-            {LEGAL_NAME} · EIN {EIN}.
-          </strong>{" "}
-          An Illinois nonprofit corporation. {IRS_STATUS} {GIVING_TAX_NOTE}
+          CLIF Foundation is an Illinois nonprofit corporation. {IRS_STATUS} {GIVING_TAX_NOTE}
         </p>
       </div>
       <div className="givebutter-panel__form">

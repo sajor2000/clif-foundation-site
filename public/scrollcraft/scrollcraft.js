@@ -519,7 +519,11 @@
       }
       if (io) io.unobserve(el);
     }
-    if ('IntersectionObserver' in window) {
+    if (reduce) {
+      // Reduced motion: no entrance effects, so show every section at once
+      // rather than waiting for it to cross the reveal line.
+      Array.prototype.forEach.call(root.querySelectorAll('[data-sc-in]'), revealIn);
+    } else if ('IntersectionObserver' in window) {
       io = new IntersectionObserver(function (entries) {
         entries.forEach(function (e) {
           if (e.isIntersecting) revealIn(e.target);

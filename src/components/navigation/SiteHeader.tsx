@@ -15,6 +15,7 @@ export function SiteHeader({ current }: { current?: string }) {
   const panelRef = useRef<HTMLElement>(null);
   const desktopNavRef = useRef<HTMLElement>(null);
   const themeToggleRef = useRef<HTMLInputElement>(null);
+  const headerRef = useRef<HTMLElement>(null);
 
   // Close the menu when Activity hides this page, so it is never open when the
   // reader comes Back (pattern from Next's "Preserving UI state" guide).
@@ -25,37 +26,65 @@ export function SiteHeader({ current }: { current?: string }) {
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        setOpen(false);
-        buttonRef.current?.focus();
-      }
+      // Leave Escape to whatever already handled it, and only act when the
+      // reader is inside this header's menu.
+      if (e.key !== "Escape" || e.defaultPrevented) return;
+      if (!headerRef.current?.contains(document.activeElement)) return;
+      setOpen(false);
+      buttonRef.current?.focus();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [open]);
 
+  // Theme toggles on pages shown after a client navigation start unchecked;
+  // match the current theme when this header mounts.
+  useEffect(() => {
+    if (themeToggleRef.current) {
+      themeToggleRef.current.checked = document.documentElement.dataset.theme === "dark";
+    }
+  }, []);
+
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 999px)");
+    const panel = panelRef.current;
+    // CSS can hide the panel (dropping focus to <body>) before the media
+    // query handler runs, so track focus-in-panel ourselves.
+    let focusInPanel = false;
+    const onFocusIn = () => {
+      focusInPanel = true;
+    };
+    const onFocusOut = (e: FocusEvent) => {
+      if (e.relatedTarget && !panel?.contains(e.relatedTarget as Node)) focusInPanel = false;
+    };
+    panel?.addEventListener("focusin", onFocusIn);
+    panel?.addEventListener("focusout", onFocusOut);
     const onChange = () => {
       if (mq.matches) return;
       // Widening to desktop hides the panel; keep focus on the equivalent
       // desktop link instead of dropping it to the document body.
       const focused = document.activeElement;
-      if (focused && panelRef.current?.contains(focused)) {
-        const href = focused.getAttribute("href");
+      if (focusInPanel || (focused && panel?.contains(focused))) {
+        const href = focused?.getAttribute("href");
         const twin = href
           ? desktopNavRef.current?.querySelector<HTMLElement>(`a[href="${href}"]`)
           : null;
         (twin ?? desktopNavRef.current?.querySelector<HTMLElement>("a"))?.focus();
       }
+      focusInPanel = false;
       setOpen(false);
     };
     mq.addEventListener("change", onChange);
-    return () => mq.removeEventListener("change", onChange);
+    return () => {
+      mq.removeEventListener("change", onChange);
+      panel?.removeEventListener("focusin", onFocusIn);
+      panel?.removeEventListener("focusout", onFocusOut);
+    };
   }, []);
 
   return (
     <header
+      ref={headerRef}
       style={{
         borderBottom: "1px solid var(--border)",
         background: "var(--bg-page)",

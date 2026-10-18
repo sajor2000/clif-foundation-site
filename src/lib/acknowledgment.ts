@@ -1,5 +1,5 @@
 import { CONTACT_EMAIL } from "@/lib/content";
-import { EIN, IRS_STATUS } from "@/lib/legal";
+import { IRS_STATUS } from "@/lib/legal";
 
 /**
  * Fields Givebutter (and IRS gift acknowledgments) should include once
@@ -27,7 +27,7 @@ export function giftAcknowledgmentLetter(
     "",
     "No goods or services were provided in exchange for this gift.",
     "",
-    `CLIF Foundation (EIN ${EIN}) is an Illinois nonprofit corporation. ${IRS_STATUS} Until a determination letter is issued, the Foundation cannot say that this gift is tax-deductible. Please consult your tax adviser.`,
+    `CLIF Foundation is an Illinois nonprofit corporation. ${IRS_STATUS} Until a determination letter is issued, the Foundation cannot say that this gift is tax-deductible. Please consult your tax adviser.`,
     "",
     "Sincerely,",
     "CLIF Foundation",
@@ -40,6 +40,6 @@ export const GIVEBUTTER_THANK_YOU_MESSAGE = `Thank you for supporting CLIF Found
 
 You will receive an emailed receipt from Givebutter with your gift amount and date. No goods or services were provided in exchange for this gift.
 
-CLIF Foundation (EIN ${EIN}) is an Illinois nonprofit corporation. ${IRS_STATUS} Until a determination letter is issued, the Foundation cannot say that your gift is tax-deductible. Please consult your tax adviser.
+CLIF Foundation is an Illinois nonprofit corporation. ${IRS_STATUS} Until a determination letter is issued, the Foundation cannot say that your gift is tax-deductible. Please consult your tax adviser.
 
 Questions or a written acknowledgment for your files: ${CONTACT_EMAIL}`;
