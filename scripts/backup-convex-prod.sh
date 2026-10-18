@@ -5,7 +5,10 @@
 #   CONVEX_DEPLOY_KEY  prod deploy key; if unset, uses your `npx convex` login
 #   CLIF_BACKUP_DIR    destination (default: NAS backup share)
 #   CONVEX_CLI         Convex CLI command (default: npx convex)
-# Keeps the newest 30 snapshots.
+#   CLIF_OFFSITE       rclone destination for an off-site mirror, e.g.
+#                      "clif-dropbox:Work/CLIF Foundation/Backups/convex-prod"
+#   RCLONE_CLI         rclone command (default: rclone)
+# Keeps the newest 30 snapshots locally and off-site.
 set -euo pipefail
 
 DEPLOYMENT="hushed-gerbil-765" # j-c-rojas/clif-foundation-site production
@@ -26,3 +29,10 @@ echo "$(date -Iseconds) saved $(basename "$file") ($(du -h "$file" | cut -f1))"
 ls -1t "$DEST"/clif-convex-prod-*.zip 2>/dev/null | tail -n +$((KEEP + 1)) | while read -r old; do
   rm -- "$old"
 done
+
+# Off-site: mirror the snapshot folder (same 30-snapshot retention).
+if [ -n "${CLIF_OFFSITE:-}" ]; then
+  read -r -a RCLONE <<< "${RCLONE_CLI:-rclone}"
+  "${RCLONE[@]}" sync "$DEST" "$CLIF_OFFSITE" --include 'clif-convex-prod-*.zip'
+  echo "$(date -Iseconds) mirrored to ${CLIF_OFFSITE%%:*}"
+fi

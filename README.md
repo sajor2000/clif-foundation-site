@@ -84,6 +84,7 @@ For the **board portal**, `vercel.json` runs `npx convex deploy --cmd 'npm run b
 | Script + Convex CLI (mise Node 22) | `~/clif-backup/` |
 | Deploy key `omarchy-backup` (mode 600) | `~/.config/clif-backup/env` |
 | Schedule | systemd user timer `clif-convex-backup.timer` (`Persistent=true`) |
+| Off-site copy | Dropbox `Work/CLIF Foundation/Backups/convex-prod` via rclone remote `clif-dropbox` (`CLIF_OFFSITE` in the service; same 30-snapshot retention) |
 | Logs | `journalctl --user -u clif-convex-backup` |
 
 Restore with `npx convex import --deployment <name> <snapshot.zip>`. To update the script there, `scp scripts/backup-convex-prod.sh jcrojas@100.82.23.59:clif-backup/`.
