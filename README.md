@@ -74,6 +74,10 @@ For the **board portal**, `vercel.json` runs `npx convex deploy --cmd 'npm run b
 | Convex project | `j-c-rojas/clif-foundation-site` | prod env: `CLERK_JWT_ISSUER_DOMAIN=https://clerk.clificufoundation.org`, `BOOTSTRAP_ADMIN_EMAIL=info@clificufoundation.org` |
 | Vercel (Production) | project env | `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY`, `CONVEX_DEPLOY_KEY` |
 
+### Backups
+
+`scripts/backup-convex-prod.sh` exports the production Convex deployment (tables and stored files) to `~/Dropbox/Work/CLIF Foundation/Backups/convex-prod/` and keeps the newest 30. On J.C.'s MacBook it runs daily at 03:15 via the LaunchAgent `com.jc.clif-convex-backup` (log: `~/Library/Logs/clif-convex-backup.log`). Restore with `npx convex import --deployment <name> <snapshot.zip>`.
+
 ### Access
 
 - Sign-up is open (email or Google). Signing up grants nothing: a person must click **Request access** on `/portal`, and an admin approves or denies it under **Members → Pending requests**.
