@@ -507,24 +507,35 @@
     // every observed target, and unobserve only runs on first intersection, so a
     // never-revealed element in a removed subtree is retained for the life of the
     // tab, once per re-mount.
-    var io = null, cio = null;
+    var io = null, cio = null, onEnd = null;
+    function revealIn(el) {
+      el.classList.add('sc-in');
+      var stagger = parseFloat(el.getAttribute('data-sc-stagger'));
+      if (!isNaN(stagger)) {
+        Array.prototype.forEach.call(el.children, function (kid, i) {
+          kid.style.transitionDelay = (i * stagger) + 'ms';
+          kid.classList.add('sc-in');
+        });
+      }
+      if (io) io.unobserve(el);
+    }
     if ('IntersectionObserver' in window) {
       io = new IntersectionObserver(function (entries) {
         entries.forEach(function (e) {
-          if (!e.isIntersecting) return;
-          var el = e.target;
-          el.classList.add('sc-in');
-          var stagger = parseFloat(el.getAttribute('data-sc-stagger'));
-          if (!isNaN(stagger)) {
-            Array.prototype.forEach.call(el.children, function (kid, i) {
-              kid.style.transitionDelay = (i * stagger) + 'ms';
-              kid.classList.add('sc-in');
-            });
-          }
-          io.unobserve(el);
+          if (e.isIntersecting) revealIn(e.target);
         });
       }, { rootMargin: '0px 0px -12% 0px', threshold: 0.01 });
       Array.prototype.forEach.call(root.querySelectorAll('[data-sc-in]'), function (el) { io.observe(el); });
+      // The -12% bottom margin can never be met by content on the last screen,
+      // because the page cannot scroll further. At the end of the page, reveal
+      // whatever is still waiting.
+      onEnd = function () {
+        var d = document.documentElement;
+        if (window.innerHeight + window.scrollY < d.scrollHeight - 4) return;
+        Array.prototype.forEach.call(root.querySelectorAll('[data-sc-in]:not(.sc-in)'), revealIn);
+      };
+      window.addEventListener('scroll', onEnd, { passive: true });
+      onEnd();
     } else {
       Array.prototype.forEach.call(root.querySelectorAll('[data-sc-in]'), function (el) { el.classList.add('sc-in'); });
     }
@@ -883,7 +894,9 @@
           a.vp = a.dwell ? dwell(vraw, a.dwell) : vraw;
         }
         a.live = (y > a.top - vh * 1.25) && (y < a.top + a.height + vh * 1.25);
-        a.el.style.setProperty('--sc-p', a.p.toFixed(4));
+        // Under reduced motion the figure is static and complete: publish full
+        // progress so progress-driven art (connectors, aggregates) is drawn.
+        a.el.style.setProperty('--sc-p', (reduce ? 1 : a.p).toFixed(4));
 
         // Fetch earlier than we drive. A 1080p clip is megabytes, and a reader
         // who scrolls briskly will otherwise arrive at a stage that is still
@@ -939,6 +952,11 @@
             else if (a.p <= outStart) vis = 1;       // the plateau
             else vis = smooth(1 - (a.p - outStart) / Math.max(q.to - outStart, 0.001));
           }
+          // An opening cue (from 0, no exit) is part of the act's resting
+          // frame: show it as soon as the act is live, so a stage never slides
+          // into view blank before the pin engages. Under reduced motion every
+          // cue holds at full opacity, so nothing depends on scroll position.
+          if (reduce || (q.to === null && q.from === 0)) vis = 1;
           vis = clamp01(vis);
 
           if (q.kinetic) {
@@ -1249,6 +1267,7 @@
       if (scPointerFrame) { cancelAnimationFrame(scPointerFrame); scPointerFrame = 0; }
       // Both observers, or every element they still watch stays reachable.
       if (io) { io.disconnect(); io = null; }
+      if (onEnd) { window.removeEventListener('scroll', onEnd); onEnd = null; }
       if (cio) { cio.disconnect(); cio = null; }
       // A blob URL is a document-lifetime reference to a whole decoded clip, so
       // an unreleased one is the largest thing a re-mount can leak. Detaching

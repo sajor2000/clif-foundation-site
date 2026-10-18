@@ -125,8 +125,12 @@ export function InquiryForm() {
       </label>
       <label style={{ display: "grid", gap: 6, fontSize: 14 }}>
         Message (optional)
+        <span id="inquiry-message-hint" style={{ color: "var(--text-muted)", fontSize: 13 }}>
+          Do not include patient information.
+        </span>
         <textarea
           name="message"
+          aria-describedby="inquiry-message-hint"
           autoComplete="off"
           value={message}
           onChange={(e) => setMessage(e.target.value)}

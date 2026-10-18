@@ -12,6 +12,7 @@ import { GivebutterScript } from "@/components/support/GivebutterScript";
 import { InquiryForm } from "@/components/support/InquiryForm";
 import { CONTACT_EMAIL, GIFT_PROGRAMS, SUPPORT_PATHS } from "@/lib/content";
 import { givebutterEmbed } from "@/lib/givebutter";
+import { EIN, GIVING_TAX_NOTE, IRS_STATUS, LEGAL_NAME } from "@/lib/legal";
 
 export const metadata: Metadata = pageMetadata({
   title: "Support",
@@ -314,8 +315,8 @@ export default function SupportPage() {
               ],
               [
                 "4",
-                "Tax status, stated plainly",
-                "CLIF Foundation is an Illinois nonprofit corporation with an EIN. Its application for 501(c)(3) recognition is pending with the IRS. Until a determination letter is issued, the Foundation cannot say that a gift is tax-deductible. Please ask your tax adviser.",
+                "Tax status",
+                `${LEGAL_NAME} (EIN ${EIN}) is an Illinois nonprofit corporation. ${IRS_STATUS} ${GIVING_TAX_NOTE} Please ask your tax adviser.`,
               ],
             ].map(([n, t, d]) => (
               <li
@@ -397,9 +398,9 @@ export default function SupportPage() {
           <p style={{ margin: 0 }}>
             CLIF was built by the CLIF Consortium, a network of clinician-scientists
             and data scientists at academic medical centers. CLIF Foundation was
-            incorporated in Illinois to scale adoption beyond observational
-            research: tools, mapping, training, and implementation help that
-            research grants do not cover.
+            incorporated in Illinois to help more organizations use CLIF beyond
+            observational research, through tools, mapping, training, and
+            implementation help.
           </p>
           <p style={{ margin: 0 }}>
             The Board of Directors is listed on the board page. Governing

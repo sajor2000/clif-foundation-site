@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { EIN, IRS_STATUS_SHORT } from "@/lib/legal";
 import { Button } from "@/components/core/Button";
 import { Tag } from "@/components/core/Tag";
 import { KeyValueList } from "@/components/data/KeyValueList";
@@ -47,7 +48,7 @@ export function HomeScroll() {
           >
             <div style={{ flex: "1 1 560px", minWidth: 0, display: "grid", gap: 28 }}>
               <h1 id="home-title" className="display-xl">
-                Open infrastructure for critical care data.
+                Help more healthcare teams learn from intensive care data.
               </h1>
               <p
                 style={{
@@ -59,11 +60,11 @@ export function HomeScroll() {
                   textWrap: "pretty",
                 }}
               >
-                Every hospital records intensive care differently. CLIF is a free,
-                open standard that makes those records comparable. The Foundation
-                exists to help CLIF move beyond observational research, supporting
-                the tools, mapping, implementation help, and training that let more
-                organizations use it.
+                Hospitals organize intensive care unit (ICU) records differently.
+                CLIF is a free, shared format that lets teams describe those records
+                the same way. The Foundation helps more organizations use it, with
+                open-source software and guides, training, and help converting
+                hospital records into CLIF and checking their quality.
               </p>
               <div
                 style={{
@@ -74,10 +75,10 @@ export function HomeScroll() {
                 }}
               >
                 <Button href="/support" size="lg">
-                  Support CLIF
+                  Support the Foundation
                 </Button>
-                <Link href="/mission" className="linkish">
-                  Read the mission
+                <Link href="/our-work" className="linkish">
+                  See what gifts support
                 </Link>
               </div>
             </div>
@@ -387,7 +388,7 @@ export function HomeScroll() {
               {PROGRAMS.map((p) => (
                 <Link
                   key={p.id}
-                  href="/our-work"
+                  href={`/our-work#${p.id}`}
                   className="sc-program-card"
                 >
                   <span
@@ -473,8 +474,8 @@ export function HomeScroll() {
                 }}
               >
                 CLIF’s minimum Common ICU Data Elements (mCIDE) map each site’s
-                local terms to the same permissible values, so one analysis runs
-                the same way everywhere.
+                local terms to the same permissible values, so the same analysis
+                code can be shared and run across sites.
               </p>
               <a
                 href="https://clif-icu.com/data-dictionary"
@@ -727,9 +728,9 @@ export function HomeScroll() {
 
           <div className="sc-colophon" data-sc-in>
             <p style={{ margin: 0, fontSize: 15, lineHeight: 1.55, color: "var(--text-muted)" }}>
-              CLIF Foundation · Illinois nonprofit · scaling CLIF adoption beyond
-              research · 501(c)(3) application pending. Research credited to the
-              CLIF Consortium.
+              CLIF Foundation · Illinois nonprofit · EIN {EIN} · helping more
+              organizations use CLIF · {IRS_STATUS_SHORT}. Research credited to
+              the CLIF Consortium.
             </p>
             <p style={{ margin: 0, fontSize: 18, lineHeight: 1.5 }}>
               Give online:{" "}

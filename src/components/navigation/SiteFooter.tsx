@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { EIN, IRS_STATUS_SHORT, LEGAL_NAME } from "@/lib/legal";
 import { Lockup } from "@/components/brand/Lockup";
 import {
   CONTACT_EMAIL,
@@ -131,7 +132,9 @@ export function SiteFooter() {
           }}
         >
           <span>CLIF is open source under the Apache License 2.0</span>
-          <span>Illinois nonprofit · 2026</span>
+          <span>
+            {LEGAL_NAME} · EIN {EIN} · Illinois nonprofit corporation · {IRS_STATUS_SHORT}
+          </span>
         </div>
       </div>
     </footer>

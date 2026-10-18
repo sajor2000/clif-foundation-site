@@ -1,30 +1,33 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useId, useRef } from "react";
+import { usePathname } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 import { Lockup } from "@/components/brand/Lockup";
 import { NAV_ITEMS } from "@/lib/content";
 
 export function SiteHeader({ current }: { current?: string }) {
-  const toggleId = useId();
-  const toggleRef = useRef<HTMLInputElement>(null);
+  const pathname = usePathname();
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  // The menu is open only for the page it was opened on, so any route change closes it.
+  const [openOn, setOpenOn] = useState<string | null>(null);
+  const open = openOn === pathname;
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && toggleRef.current?.checked) {
-        toggleRef.current.checked = false;
+      if (e.key === "Escape" && openOn !== null) {
+        setOpenOn(null);
+        buttonRef.current?.focus();
       }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, []);
+  }, [openOn]);
 
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 999px)");
     const onChange = () => {
-      if (!mq.matches && toggleRef.current) {
-        toggleRef.current.checked = false;
-      }
+      if (!mq.matches) setOpenOn(null);
     };
     mq.addEventListener("change", onChange);
     return () => mq.removeEventListener("change", onChange);
@@ -143,16 +146,13 @@ export function SiteHeader({ current }: { current?: string }) {
             <span className="clif-theme-label-light">Light</span>
             <span className="clif-theme-label-dark">Dark</span>
           </label>
-          <input
-            ref={toggleRef}
-            id={toggleId}
-            type="checkbox"
-            className="site-menu-toggle"
-            aria-controls="site-menu"
-          />
-          <label
-            htmlFor={toggleId}
+          <button
+            ref={buttonRef}
+            type="button"
             className="site-menu-btn"
+            aria-controls="site-menu"
+            aria-expanded={open}
+            onClick={() => setOpenOn(open ? null : pathname)}
             style={{
               height: "var(--control-md)",
               padding: "0 16px",
@@ -164,12 +164,11 @@ export function SiteHeader({ current }: { current?: string }) {
               boxSizing: "border-box",
             }}
           >
-            <span className="site-menu-label-open">Menu</span>
-            <span className="site-menu-label-close">Close</span>
-          </label>
+            Menu
+          </button>
         </div>
       </div>
-      <nav id="site-menu" className="site-menu-panel" aria-label="Primary">
+      <nav id="site-menu" className="site-menu-panel" aria-label="Primary" hidden={!open}>
         {NAV_ITEMS.map((item) => (
           <Link
             key={item.id}
