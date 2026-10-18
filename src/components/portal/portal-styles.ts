@@ -4,7 +4,7 @@ export const inputStyle: CSSProperties = {
   height: 44,
   padding: "0 12px",
   border: "1px solid var(--border-strong)",
-  borderRadius: 3,
+  borderRadius: "var(--radius-control)",
   background: "var(--bg-page)",
   color: "var(--text-primary)",
   fontFamily: "var(--font-sans)",
@@ -13,7 +13,7 @@ export const inputStyle: CSSProperties = {
 
 export const panelStyle: CSSProperties = {
   border: "1px solid var(--border-strong)",
-  borderRadius: 6,
+  borderRadius: "var(--radius-panel)",
   background: "var(--bg-figure)",
   padding: 20,
   display: "grid",

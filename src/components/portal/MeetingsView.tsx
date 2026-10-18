@@ -5,6 +5,7 @@ import { useMutation, useQuery } from "convex/react";
 import { useState } from "react";
 import { api } from "../../../convex/_generated/api";
 import { Button } from "@/components/core/Button";
+import { MinutesItems } from "@/components/portal/MinutesItems";
 import { inputStyle, pageTitle, panelStyle, sectionTitle } from "@/components/portal/portal-styles";
 
 export function MeetingsView({ meetingId }: { meetingId?: string } = {}) {
@@ -238,6 +239,13 @@ export function MeetingsView({ meetingId }: { meetingId?: string } = {}) {
               </>
             )}
           </div>
+          {detail.minutes ? (
+            <MinutesItems minutes={detail.minutes} items={detail.items} />
+          ) : (
+            <p style={{ margin: 0, color: "var(--text-muted)", fontSize: 14 }}>
+              Save a draft to start adding agenda items.
+            </p>
+          )}
           {exportMinutes ? (
             <details>
               <summary style={{ cursor: "pointer", color: "var(--link)" }}>Preview export</summary>
@@ -247,7 +255,7 @@ export function MeetingsView({ meetingId }: { meetingId?: string } = {}) {
                   fontSize: 12,
                   background: "var(--bg-figure)",
                   padding: 16,
-                  borderRadius: 6,
+                  borderRadius: "var(--radius-panel)",
                 }}
               >
                 {exportMinutes}

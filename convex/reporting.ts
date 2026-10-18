@@ -1,6 +1,7 @@
 import { v } from "convex/values";
 import { query } from "./_generated/server";
 import { requireBoardIdentity } from "./lib/auth";
+import { buildMinutesText } from "./lib/minutesText";
 
 const sectionDoc = v.object({
   _id: v.id("documents"),
@@ -13,7 +14,12 @@ const sectionDoc = v.object({
 });
 
 export const getReportingPack = query({
-  args: { taxYear: v.optional(v.number()) },
+  args: {
+    taxYear: v.optional(v.number()),
+    /** Optional date range (ms since epoch) on document upload and meeting dates. */
+    from: v.optional(v.number()),
+    to: v.optional(v.number()),
+  },
   returns: v.object({
     generatedAt: v.number(),
     sections: v.array(
@@ -39,7 +45,8 @@ export const getReportingPack = query({
       .withIndex("by_created")
       .order("desc")
       .filter((q) => q.eq(q.field("archivedAt"), undefined))
-      .take(300);
+      .take(300)
+      .then((docs) => docs.filter((d) => inRange(d.createdAt, args.from, args.to)));
 
     const withUrl = async (d: (typeof allDocs)[number]) => {
       return {
@@ -134,24 +141,11 @@ export const getReportingPack = query({
         continue;
       }
       const meeting = await ctx.db.get(min.meetingId);
-      if (!meeting) continue;
-      const items = await ctx.db
-        .query("minutesItems")
-        .withIndex("by_minutes", (q) => q.eq("minutesId", min._id))
-        .take(100);
-      const lines = [
-        `# ${meeting.title}`,
-        `Approved minutes v${min.version}`,
-        meeting.attendeeEmails.length
-          ? `Present: ${meeting.attendeeEmails.join(", ")}`
-          : "",
-        min.body ?? "",
-        ...items.map((i) => `## ${i.title}\n${i.discussion ?? ""}`),
-      ].filter(Boolean);
+      if (!meeting || !inRange(meeting.heldAt ?? meeting.scheduledAt, args.from, args.to)) continue;
       approvedMinutesExports.push({
         meetingId: meeting._id,
         title: meeting.title,
-        exportText: lines.join("\n\n"),
+        exportText: await buildMinutesText(ctx, meeting, min),
       });
     }
 
@@ -162,3 +156,7 @@ export const getReportingPack = query({
     };
   },
 });
+
+function inRange(at: number, from: number | undefined, to: number | undefined) {
+  return (from === undefined || at >= from) && (to === undefined || at <= to);
+}

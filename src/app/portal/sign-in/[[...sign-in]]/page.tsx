@@ -39,7 +39,7 @@ export default function PortalSignInPage() {
           <div
             style={{
               border: "1px solid var(--border-strong)",
-              borderRadius: 6,
+              borderRadius: "var(--radius-panel)",
               padding: 24,
               maxWidth: 420,
               background: "var(--bg-figure)",

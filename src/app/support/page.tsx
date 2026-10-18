@@ -98,7 +98,7 @@ export default function SupportPage() {
                 gap: 12,
                 padding: "22px 20px",
                 border: "1px solid var(--border-strong)",
-                borderRadius: 6,
+                borderRadius: "var(--radius-panel)",
                 background: "var(--bg-figure)",
               }}
             >

@@ -13,6 +13,7 @@ export const listPolicies = query({
       version: v.number(),
       title: v.string(),
       adoptedAt: v.optional(v.number()),
+      motionId: v.optional(v.id("motions")),
       documentId: v.optional(v.id("documents")),
       reportingInstructions: v.optional(v.string()),
     }),
@@ -26,6 +27,7 @@ export const listPolicies = query({
       version: p.version,
       title: p.title,
       adoptedAt: p.adoptedAt,
+      motionId: p.motionId,
       documentId: p.documentId,
       reportingInstructions: p.reportingInstructions,
     }));
@@ -40,17 +42,28 @@ export const registerPolicy = mutation({
     documentId: v.optional(v.id("documents")),
     reportingInstructions: v.optional(v.string()),
     adoptedAt: v.optional(v.number()),
+    /** The passed motion that adopted this policy; its close date becomes adoptedAt. */
+    motionId: v.optional(v.id("motions")),
   },
   returns: v.id("policies"),
   handler: async (ctx, args) => {
     const { identity } = await requireBoardRole(ctx, ["secretary", "admin"]);
+    let adoptedAt = args.adoptedAt;
+    if (args.motionId) {
+      const motion = await ctx.db.get(args.motionId);
+      if (!motion || motion.status !== "closed" || !motion.finalTally?.passed) {
+        throw new Error("Link a closed motion that passed");
+      }
+      adoptedAt = motion.closedAt;
+    }
     const id = await ctx.db.insert("policies", {
       policyType: args.policyType,
       title: args.title.trim(),
       version: args.version,
       documentId: args.documentId,
       reportingInstructions: args.reportingInstructions,
-      adoptedAt: args.adoptedAt ?? Date.now(),
+      adoptedAt: adoptedAt ?? Date.now(),
+      motionId: args.motionId,
     });
     await logAudit(ctx, {
       kind: "policy.register",

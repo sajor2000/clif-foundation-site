@@ -26,7 +26,7 @@ function StatusPanel({
     <div
       style={{
         border: "1px solid var(--border-strong)",
-        borderRadius: 6,
+        borderRadius: "var(--radius-panel)",
         background: "var(--bg-figure)",
         padding: 28,
         display: "grid",

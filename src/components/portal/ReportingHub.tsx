@@ -13,7 +13,13 @@ export function ReportingHub() {
   const [taxYear, setTaxYear] = useState(new Date().getFullYear() - 1);
   const [zipping, setZipping] = useState(false);
   const [zipError, setZipError] = useState<string | null>(null);
-  const pack = useQuery(api.reporting.getReportingPack, { taxYear });
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
+  const pack = useQuery(api.reporting.getReportingPack, {
+    taxYear,
+    from: fromDate ? new Date(`${fromDate}T00:00:00`).getTime() : undefined,
+    to: toDate ? new Date(`${toDate}T23:59:59.999`).getTime() : undefined,
+  });
 
   /** Manifest omits signed download URLs so the JSON file is safe to share with a CPA. */
   const downloadManifest = useMemo(() => {
@@ -111,6 +117,29 @@ export function ReportingHub() {
             aria-label="Tax year"
           />
         </label>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 16, alignItems: "center", fontSize: 14 }}>
+          <label style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            From
+            <input
+              type="date"
+              value={fromDate}
+              onChange={(e) => setFromDate(e.target.value)}
+              style={{ height: 44, padding: "0 10px" }}
+            />
+          </label>
+          <label style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            To
+            <input
+              type="date"
+              value={toDate}
+              onChange={(e) => setToDate(e.target.value)}
+              style={{ height: 44, padding: "0 10px" }}
+            />
+          </label>
+          <span style={{ color: "var(--text-muted)" }}>
+            Optional: limit files by upload date and minutes by meeting date.
+          </span>
+        </div>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
           <Button type="button" onClick={downloadZip} disabled={!pack || zipping}>
             {zipping ? "Building ZIP…" : "Download all (ZIP)"}

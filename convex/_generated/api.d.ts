@@ -19,6 +19,7 @@ import type * as lib_auth from "../lib/auth.js";
 import type * as lib_compliance from "../lib/compliance.js";
 import type * as lib_directors from "../lib/directors.js";
 import type * as lib_minutes from "../lib/minutes.js";
+import type * as lib_minutesText from "../lib/minutesText.js";
 import type * as lib_quorum from "../lib/quorum.js";
 import type * as lib_tally from "../lib/tally.js";
 import type * as lib_uploads from "../lib/uploads.js";
@@ -46,6 +47,7 @@ declare const fullApi: ApiFromModules<{
   "lib/compliance": typeof lib_compliance;
   "lib/directors": typeof lib_directors;
   "lib/minutes": typeof lib_minutes;
+  "lib/minutesText": typeof lib_minutesText;
   "lib/quorum": typeof lib_quorum;
   "lib/tally": typeof lib_tally;
   "lib/uploads": typeof lib_uploads;

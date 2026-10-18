@@ -35,7 +35,7 @@ export function BoardMemberList({ members }: { members: BoardMember[] }) {
               height: "auto",
               aspectRatio: "1",
               objectFit: "cover",
-              borderRadius: 4,
+              borderRadius: "var(--radius-control)",
               background: "var(--bg-figure)",
               border: "1px solid var(--border-subtle)",
             }}

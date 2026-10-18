@@ -108,7 +108,7 @@ export default function MissionPage() {
               style={{
                 background: "var(--bg-figure)",
                 border: "1px solid var(--border-strong)",
-                borderRadius: 6,
+                borderRadius: "var(--radius-panel)",
                 overflow: "hidden",
               }}
             >
@@ -149,7 +149,7 @@ export default function MissionPage() {
               style={{
                 background: "var(--bg-figure)",
                 border: "1px solid var(--border-strong)",
-                borderRadius: 6,
+                borderRadius: "var(--radius-panel)",
                 overflow: "hidden",
               }}
             >

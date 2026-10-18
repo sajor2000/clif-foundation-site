@@ -89,3 +89,59 @@ describe("compliance", () => {
     expect(dash.form990.taxYear).toBe(2025);
   });
 });
+
+describe("deferred gaps", () => {
+  it("minutes items record COI recusals for directors only, and exports show them", async () => {
+    const t = backend();
+    await seedBoard(t, [{ email: "d1@x.org" }, { email: "officer@x.org", isDirector: false }]);
+    const meetingId = await as(t, ADMIN).mutation(api.meetings.createMeeting, { title: "Q1", scheduledAt: Date.now() });
+    const minutesId = await as(t, ADMIN).mutation(api.meetings.upsertMinutes, { meetingId, body: "notes" });
+    await expect(
+      as(t, ADMIN).mutation(api.meetings.addMinutesItem, {
+        minutesId, title: "Lease", sortOrder: 1, coiRecusals: ["officer@x.org"],
+      }),
+    ).rejects.toThrow(/Only directors/);
+    await as(t, ADMIN).mutation(api.meetings.addMinutesItem, {
+      minutesId, title: "Lease", sortOrder: 1, coiRecusals: ["D1@x.org"],
+    });
+    const text = await as(t, ADMIN).query(api.meetings.getMinutesExport, { meetingId });
+    expect(text).toContain("Recused: d1@x.org");
+  });
+
+  it("the reporting pack carries vote results and honors the date range", async () => {
+    const t = backend();
+    await seedBoard(t, []);
+    const meetingId = await as(t, ADMIN).mutation(api.meetings.createMeeting, { title: "Annual", scheduledAt: Date.UTC(2025, 5, 1) });
+    const motionId = await as(t, ADMIN).mutation(api.motions.createMotion, { title: "Adopt COI policy", motionType: "standard", meetingId });
+    await as(t, ADMIN).mutation(api.motions.setMotionStatus, { motionId, status: "open" });
+    await as(t, ADMIN).mutation(api.motions.castBallot, { motionId, choice: "yes" });
+    await as(t, ADMIN).mutation(api.motions.setMotionStatus, { motionId, status: "closed" });
+    await as(t, ADMIN).mutation(api.meetings.upsertMinutes, { meetingId, body: "x", status: "published_for_review" });
+    await as(t, ADMIN).mutation(api.meetings.updateAttendance, { meetingId, attendeeEmails: [ADMIN], status: "held", heldAt: Date.UTC(2025, 5, 1) });
+    await as(t, ADMIN).mutation(api.meetings.upsertMinutes, { meetingId, status: "approved" });
+
+    const all = await as(t, ADMIN).query(api.reporting.getReportingPack, {});
+    expect(all.approvedMinutesExports[0].exportText).toContain("Passed");
+    const later = await as(t, ADMIN).query(api.reporting.getReportingPack, { from: Date.UTC(2026, 0, 1) });
+    expect(later.approvedMinutesExports).toHaveLength(0);
+  });
+
+  it("a policy can only be linked to a motion that passed", async () => {
+    const t = backend();
+    await seedBoard(t, []);
+    const draft = await as(t, ADMIN).mutation(api.motions.createMotion, { title: "x", motionType: "standard" });
+    await expect(
+      as(t, ADMIN).mutation(api.policies.registerPolicy, {
+        policyType: "conflict_of_interest", title: "COI", version: 1, motionId: draft,
+      }),
+    ).rejects.toThrow(/passed/);
+    await as(t, ADMIN).mutation(api.motions.setMotionStatus, { motionId: draft, status: "open" });
+    await as(t, ADMIN).mutation(api.motions.castBallot, { motionId: draft, choice: "yes" });
+    await as(t, ADMIN).mutation(api.motions.setMotionStatus, { motionId: draft, status: "closed" });
+    await as(t, ADMIN).mutation(api.policies.registerPolicy, {
+      policyType: "conflict_of_interest", title: "COI", version: 1, motionId: draft,
+    });
+    const [p] = await as(t, ADMIN).query(api.policies.listPolicies, {});
+    expect(p.motionId).toBe(draft);
+  });
+});
