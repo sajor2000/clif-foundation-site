@@ -81,10 +81,15 @@ export async function open(path, viewport = DESKTOP, opts = {}) {
     isMobile: !!isMobile,
     hasTouch: !!hasTouch,
     reducedMotion: opts.reducedMotion ?? "no-preference",
+    javaScriptEnabled: opts.javaScriptEnabled ?? true,
   });
+  if (opts.permissions) {
+    await context.grantPermissions(opts.permissions, { origin: baseUrl });
+  }
   const page = await context.newPage();
+  if (opts.initScript) await page.addInitScript(opts.initScript);
   await page.goto(baseUrl + path, { waitUntil: "networkidle" });
-  if (path === "/") {
+  if (path === "/" && opts.javaScriptEnabled !== false) {
     await page.waitForFunction(() =>
       document.querySelector(".sc-home")?.classList.contains("sc-ready"),
     );

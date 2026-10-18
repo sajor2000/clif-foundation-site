@@ -20,6 +20,7 @@ export function DataPanel({
     <figure
       style={{
         margin: 0,
+        fontVariantNumeric: "tabular-nums",
         border: `1px solid ${line}`,
         borderRadius: "var(--radius-panel)",
         background: inverse ? "var(--bg-inverse)" : "var(--bg-figure)",

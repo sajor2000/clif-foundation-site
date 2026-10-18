@@ -61,11 +61,25 @@ export function ScrollCraftMount({ children }: { children: ReactNode }) {
     if (!root) return;
 
     let destroyed = false;
+    let engine: ScrollCraftApi | null = null;
     let instance: { destroy: () => void } | null = null;
+
+    // The engine reads reduced motion when it mounts, so follow a change of the
+    // OS setting by remounting. Destroy and mount run in one task, so no frame
+    // paints between them. A change while the script is still loading needs
+    // nothing: the first mount reads the current setting.
+    const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const onMotionChange = () => {
+      if (destroyed || !engine || !instance || !rootRef.current) return;
+      instance.destroy();
+      instance = engine.mount(rootRef.current, { lerp: 0.2 });
+    };
+    motion.addEventListener("change", onMotionChange);
 
     void loadEngine()
       .then((api) => {
         if (destroyed || !rootRef.current) return;
+        engine = api;
         instance = api.mount(rootRef.current, { lerp: 0.2 });
         if (destroyed) {
           instance.destroy();
@@ -82,6 +96,7 @@ export function ScrollCraftMount({ children }: { children: ReactNode }) {
 
     return () => {
       destroyed = true;
+      motion.removeEventListener("change", onMotionChange);
       instance?.destroy();
       instance = null;
     };

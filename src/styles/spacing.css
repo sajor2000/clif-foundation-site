@@ -32,5 +32,8 @@
   --touch-min: 44px;
 
   --duration-fast: 120ms;
+  --duration-hover: 160ms;
   --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  /* Anything arriving or pressed settles on this curve. */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
 }

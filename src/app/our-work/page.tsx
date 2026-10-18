@@ -56,6 +56,7 @@ export default function OurWorkPage() {
         {PROGRAMS.map((p) => (
           <article
             key={p.id}
+            id={p.id}
             style={{
               border: "1px solid var(--border-strong)",
               borderRadius: "var(--radius-panel)",
@@ -169,7 +170,7 @@ export default function OurWorkPage() {
                     builds_on
                   </dt>
                   <dd style={{ margin: 0, flex: "1 1 180px" }}>
-                    <a href={p.baseUrl} style={{ color: "var(--link)" }}>
+                    <a href={p.baseUrl} className="prose-link">
                       {p.base} ↗
                     </a>
                   </dd>

@@ -1,4 +1,10 @@
 @import "tailwindcss";
+/* Skill notes and docs name classes as examples, not markup: keep Tailwind
+   from generating CSS for them. */
+@source not "../../.agents";
+@source not "../../.claude";
+@source not "../../.cursor";
+@source not "../../docs";
 @import "../styles/colors.css";
 @import "../styles/typography.css";
 @import "../styles/spacing.css";
@@ -29,7 +35,12 @@
   font-weight: 500;
 }
 
-.site-menu-toggle,
+/* In-page anchors (e.g. /support#give, program sections) land below the
+   sticky header, with breathing room, at every breakpoint. */
+html {
+  scroll-padding-top: calc(var(--header-h) + 16px);
+}
+
 .clif-theme-toggle {
   position: absolute;
   width: 1px;
@@ -65,8 +76,10 @@ html[data-theme="dark"] .clif-theme-label-dark {
   align-items: center;
 }
 
-.site-menu-label-close {
-  display: none;
+.site-menu-btn:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 5px var(--focus-ring-halo);
 }
 
 .site-menu-panel {
@@ -75,30 +88,14 @@ html[data-theme="dark"] .clif-theme-label-dark {
   border-top: 1px solid var(--border);
 }
 
-.site-menu-toggle:focus-visible + .site-menu-btn {
-  outline: 2px solid var(--focus-ring);
-  outline-offset: 3px;
-  box-shadow: 0 0 0 5px var(--focus-ring-halo);
-}
-
-.site-menu-toggle:checked + .site-menu-btn .site-menu-label-open {
-  display: none;
-}
-
-.site-menu-toggle:checked + .site-menu-btn .site-menu-label-close {
-  display: inline;
-}
-
-header:has(.site-menu-toggle:checked) .site-menu-panel {
-  display: grid;
-}
-
 .site-nav-link {
   transition: background-color var(--duration-fast) var(--ease-standard);
 }
 
-.site-nav-link:hover {
-  background: var(--bg-hover);
+@media (hover: hover) and (pointer: fine) {
+  .site-nav-link:hover {
+    background: var(--bg-hover);
+  }
 }
 
 .site-nav-cta {
@@ -106,8 +103,10 @@ header:has(.site-menu-toggle:checked) .site-menu-panel {
   transition: background-color var(--duration-fast) var(--ease-standard);
 }
 
-.site-nav-cta:hover {
-  background: var(--action-primary-hover);
+@media (hover: hover) and (pointer: fine) {
+  .site-nav-cta:hover {
+    background: var(--action-primary-hover);
+  }
 }
 
 .clif-theme-btn {
@@ -120,9 +119,11 @@ header:has(.site-menu-toggle:checked) .site-menu-panel {
   transition: background-color var(--duration-fast) var(--ease-standard);
 }
 
-.clif-theme-btn:hover,
-.site-menu-btn:hover {
-  background: var(--action-secondary-hover);
+@media (hover: hover) and (pointer: fine) {
+  .clif-theme-btn:hover,
+  .site-menu-btn:hover {
+    background: var(--action-secondary-hover);
+  }
 }
 
 /* Theme control inside the open menu (below 1000px, per design/readme.md) */
@@ -143,14 +144,9 @@ header:has(.site-menu-toggle:checked) .site-menu-panel {
   transition: background-color var(--duration-fast) var(--ease-standard);
 }
 
-.site-menu-theme:hover {
-  background: var(--action-secondary-hover);
-}
-
-@media (min-width: 1000px) {
-  /* The menu checkbox has no visible label here; keep it out of the tab order */
-  .site-menu-toggle {
-    display: none;
+@media (hover: hover) and (pointer: fine) {
+  .site-menu-theme:hover {
+    background: var(--action-secondary-hover);
   }
 }
 
@@ -161,6 +157,29 @@ header:has(.site-menu-toggle:checked) .site-menu-panel {
 
   .site-menu-btn {
     display: inline-flex;
+  }
+
+  /* The open panel exists only below the desktop breakpoint. Closed, it is
+     display:none, so its links are out of the tab order and the a11y tree. */
+  .site-menu-panel[data-open="true"] {
+    display: grid;
+    /* Opening settles in. Only this rule carries the transition, so closing
+       is instant and the no-JS fallback (data-open="false") never fades. */
+    transition:
+      opacity 180ms var(--ease-out),
+      transform 180ms var(--ease-out),
+      display 180ms allow-discrete;
+  }
+
+  @starting-style {
+    .site-menu-panel[data-open="true"] {
+      opacity: 0;
+      transform: translateY(-4px);
+    }
+  }
+
+  .site-menu-btn[aria-expanded="true"] {
+    background: var(--bg-hover);
   }
 
   /* Theme toggle moves into the open menu so the header row fits narrow screens */
@@ -253,8 +272,53 @@ header:has(.site-menu-toggle:checked) .site-menu-panel {
   text-decoration: none;
 }
 
-.linkish:hover {
-  text-decoration: underline;
+@media (hover: hover) and (pointer: fine) {
+  .linkish:hover {
+    text-decoration: underline;
+  }
+}
+
+/* Inquiry form (components/support/InquiryForm.tsx) */
+.inquiry-error {
+  margin: 0;
+  color: var(--status-error);
+  font-size: 14px;
+  transition:
+    opacity var(--duration-hover) var(--ease-out),
+    transform var(--duration-hover) var(--ease-out);
+}
+
+@starting-style {
+  .inquiry-error {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+.inquiry-status {
+  margin: 0;
+  color: var(--text-body);
+  font-size: 14px;
+}
+
+/* Button labels that swap in place: each sits in one grid cell. */
+.label-stack {
+  display: inline-grid;
+}
+
+.label-stack > * {
+  grid-area: 1 / 1;
+}
+
+.label-stack > [data-active="false"] {
+  visibility: hidden;
+}
+
+/* Inline links in running text keep a full underline (WCAG 1.4.1); the base
+   link rule thickens it on hover. */
+.prose-link {
+  color: var(--link);
+  text-underline-offset: 0.2em;
 }
 
 /* Givebutter giving panel — flat ink/petrol surface, no gradients */
@@ -405,10 +469,214 @@ input[type="file"]::file-selector-button:hover {
 
 /* Portal checkboxes and radios: larger, in the accent, for touch and theme.
    Scoped to the portal: the public header uses hidden checkboxes for toggles. */
-#portal-main input[type="checkbox"],
-#portal-main input[type="radio"] {
+.portal-main input[type="checkbox"],
+.portal-main input[type="radio"] {
   width: 20px;
   height: 20px;
   accent-color: var(--accent);
   flex-shrink: 0;
+}
+
+/* Board roster: a real table (seat / name / affiliation) that wraps at narrow widths. */
+.board-roster {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+.board-roster th,
+.board-roster td {
+  padding: 20px;
+  text-align: left;
+  vertical-align: baseline;
+  border-bottom: 1px solid var(--border-subtle);
+  font-weight: 400;
+  /* Break inside a word only when it cannot fit on its own line. */
+  overflow-wrap: break-word;
+}
+.board-roster thead th {
+  padding: 12px 20px;
+  background: var(--bg-panel);
+  border-bottom: 1px solid var(--border-strong);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.board-roster thead th:first-child { width: 26%; }
+.board-roster thead th:last-child { width: 40%; }
+.board-roster .board-roster__seat {
+  font-size: 18px;
+  font-weight: 500;
+}
+.board-roster .board-roster__affiliation {
+  color: var(--text-muted);
+}
+@media (max-width: 560px) {
+  /* Stack each director: name, then seat · affiliation. Roles on the markup
+     keep the table semantics intact. */
+  .board-roster thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+  }
+  .board-roster,
+  .board-roster tbody {
+    display: block;
+  }
+  .board-roster tr {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 2px 8px;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  .board-roster th,
+  .board-roster td {
+    display: block;
+    padding: 0;
+    border: 0;
+    font-size: 15px;
+  }
+  .board-roster .board-roster__name {
+    grid-column: 1 / -1;
+    order: -1;
+    font-size: 17px;
+    font-weight: 500;
+  }
+  .board-roster .board-roster__seat {
+    font-size: 15px;
+    font-weight: 500;
+  }
+  .board-roster .board-roster__seat::after {
+    content: " ·";
+    color: var(--text-muted);
+  }
+}
+
+/* Buttons (components/core/Button.tsx). Hover only on real pointers so it
+   never sticks after a tap; a short press gives touch feedback. */
+.btn {
+  transition:
+    background-color var(--duration-fast) var(--ease-standard),
+    border-color var(--duration-fast) var(--ease-standard),
+    transform var(--duration-hover) var(--ease-out);
+}
+
+.btn--primary {
+  background: var(--action-primary-bg);
+  color: var(--action-primary-fg);
+  border: 1px solid transparent;
+}
+
+.btn--secondary {
+  background: transparent;
+  color: var(--text-primary);
+  border: 1px solid var(--action-secondary-border);
+}
+
+.btn--ghost {
+  background: transparent;
+  color: var(--text-primary);
+  border: 1px solid transparent;
+}
+
+.btn--inverse {
+  background: var(--text-inverse);
+  color: var(--bg-inverse);
+  border: 1px solid transparent;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .btn--primary:hover {
+    background: var(--action-primary-hover);
+  }
+
+  .btn--secondary:hover {
+    background: var(--action-secondary-hover);
+  }
+
+  .btn--ghost:hover {
+    background: var(--bg-hover);
+  }
+
+  .btn--inverse:hover {
+    background: var(--accent);
+  }
+}
+
+.btn:not(:disabled):active {
+  transform: scale(0.97);
+}
+
+/* Filter chips (components/core/FilterChip.tsx): pressed state from
+   aria-pressed, which keeps its fill under the pointer. */
+.chip {
+  height: var(--control-md);
+  padding: 0 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--text-primary);
+  font: 500 14px var(--font-sans);
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color var(--duration-fast) var(--ease-standard),
+    color var(--duration-fast) var(--ease-standard),
+    transform var(--duration-hover) var(--ease-out);
+}
+
+.chip[aria-pressed="true"] {
+  background: var(--action-primary-bg);
+  color: var(--action-primary-fg);
+}
+
+.chip__count {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+/* Copy-address button (components/support/CopyEmailButton.tsx): its labels
+   share one grid cell and crossfade, so the width never jumps. */
+.copy-btn {
+  display: inline-grid;
+  place-items: center;
+  min-height: 48px;
+  padding: 0 18px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--text-primary);
+  font: 500 15px var(--font-sans);
+  cursor: pointer;
+  transition:
+    background-color var(--duration-fast) var(--ease-standard),
+    transform var(--duration-hover) var(--ease-out);
+}
+
+.copy-btn__label {
+  grid-area: 1 / 1;
+  transition: opacity var(--duration-fast) var(--ease-out);
+}
+
+.copy-btn__label[data-active="false"] {
+  opacity: 0;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .chip:not([aria-pressed="true"]):hover,
+  .copy-btn:hover {
+    background: var(--action-secondary-hover);
+  }
+}
+
+.chip:active,
+.copy-btn:active {
+  transform: scale(0.97);
 }

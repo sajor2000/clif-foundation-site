@@ -1,3 +1,4 @@
+import { IRS_STATUS, IRS_STATUS_SHORT } from "@/lib/legal";
 export const CONTACT_EMAIL = "info@clificufoundation.org";
 export const CONSORTIUM_URL = "https://clif-icu.com/";
 export const GITHUB_URL =
@@ -24,7 +25,7 @@ export const ORG_RECORD = [
   { k: "name", v: "CLIF Foundation" },
   { k: "supports", v: "Common Longitudinal ICU data Format" },
   { k: "entity", v: "Illinois nonprofit corporation" },
-  { k: "tax_status", v: "501(c)(3) application pending" },
+  { k: "tax_status", v: IRS_STATUS_SHORT },
   { k: "research_by", v: "CLIF Consortium" },
   { k: "contact", v: CONTACT_EMAIL },
 ] as const;
@@ -221,7 +222,10 @@ export const GIFT_PROGRAMS = [
 export const GOVERNING_DOCS = [
   { name: "Bylaws", status: "published when adopted" },
   { name: "Conflict-of-interest policy", status: "published when adopted" },
-  { name: "Organizational status", status: "published when confirmed" },
+  {
+    name: "Organization",
+    status: `Illinois nonprofit corporation · ${IRS_STATUS_SHORT}`,
+  },
 ] as const;
 
 export const SUPPORT_PATHS = [
@@ -332,10 +336,9 @@ export const NEEDS = [
   {
     n: "06",
     need: "Open and testable",
-    how: "Open-source tools under Apache 2.0, and MIMIC-IV in CLIF format for testing code without institutional access.",
+    how: "Open-source tools under Apache 2.0, and MIMIC-IV in CLIF format, which lets eligible researchers develop code without access to their own institution's EHR data. PhysioNet credentialing and applicable data-use requirements still apply.",
     ex: "MIMIC-IV-Ext-CLIF",
   },
 ] as const;
 
-export const FOOTER_NOTE =
-  "An Illinois nonprofit corporation scaling adoption of the Common Longitudinal ICU data Format beyond observational research. Application for 501(c)(3) recognition is pending. Research is credited to the CLIF Consortium and its investigators.";
+export const FOOTER_NOTE = `An Illinois nonprofit corporation helping more organizations use the Common Longitudinal ICU data Format (CLIF). ${IRS_STATUS} Research is credited to the CLIF Consortium and its investigators.`;

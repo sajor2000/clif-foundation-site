@@ -1,6 +1,7 @@
 "use client";
 
 import { CONTACT_EMAIL } from "@/lib/content";
+import { GIVING_TAX_NOTE, IRS_STATUS } from "@/lib/legal";
 import type { GivebutterEmbed } from "@/lib/givebutter";
 
 export function GivebutterGift({ embed }: { embed: GivebutterEmbed }) {
@@ -36,10 +37,24 @@ export function GivebutterGift({ embed }: { embed: GivebutterEmbed }) {
             color: "var(--text-body)",
           }}
         >
-          Processed by Givebutter — card and other methods available on this
-          form. You receive an emailed receipt immediately. We keep donor
-          records in Givebutter so we can resend acknowledgment details for
+          Processed by Givebutter, with card and other methods on this form.
+          You receive an emailed receipt immediately. Donor records are kept in
+          Givebutter so the Foundation can resend acknowledgment details for
           your files.
+        </p>
+        <p
+          className="givebutter-panel__status"
+          style={{
+            margin: 0,
+            maxWidth: "42rem",
+            fontSize: 15,
+            lineHeight: 1.6,
+            color: "var(--text-body)",
+            borderTop: "1px solid var(--border-strong)",
+            paddingTop: 12,
+          }}
+        >
+          CLIF Foundation is an Illinois nonprofit corporation. {IRS_STATUS} {GIVING_TAX_NOTE}
         </p>
       </div>
       <div className="givebutter-panel__form">

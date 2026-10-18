@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, type CSSProperties, type FormEvent } from "react";
+import { useRef, useState, type CSSProperties, type FormEvent } from "react";
 import { Button } from "@/components/core/Button";
+import { CONTACT_EMAIL } from "@/lib/content";
 
 const KINDS = ["gift", "partnership", "program", "other"] as const;
 
@@ -12,10 +13,23 @@ export function InquiryForm() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  // After a draft opens, the button stays off until the visitor edits, so a
+  // second click cannot open a second draft.
+  const [sent, setSent] = useState(false);
+  const [status, setStatus] = useState("");
+  const busy = useRef(false);
+
+  function edited() {
+    setSent(false);
+    setStatus("");
+  }
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
+    if (busy.current || sent) return;
+    busy.current = true;
     setError(null);
+    setStatus("");
     setLoading(true);
     try {
       const res = await fetch("/api/inquiry", {
@@ -37,17 +51,24 @@ export function InquiryForm() {
         setError(data.message ?? "Invalid inquiry");
         return;
       }
+      setStatus(
+        `Opening your email app. If nothing opens, write to ${CONTACT_EMAIL}.`,
+      );
+      setSent(true);
       window.location.href = data.mailto;
     } catch {
       setError("Could not prepare inquiry email");
     } finally {
+      busy.current = false;
       setLoading(false);
     }
   }
 
   return (
+    // Any field edit (onChange bubbles from each control) re-enables submit.
     <form
       onSubmit={onSubmit}
+      onChange={edited}
       style={{
         border: "1px solid var(--border-strong)",
         borderRadius: "var(--radius-panel)",
@@ -123,10 +144,12 @@ export function InquiryForm() {
           ))}
         </select>
       </label>
-      <label style={{ display: "grid", gap: 6, fontSize: 14 }}>
+      <label htmlFor="inquiry-message" style={{ display: "grid", gap: 6, fontSize: 14 }}>
         Message (optional)
         <textarea
+          id="inquiry-message"
           name="message"
+          aria-describedby="inquiry-message-hint"
           autoComplete="off"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
@@ -134,14 +157,24 @@ export function InquiryForm() {
           style={{ ...inputStyle, height: "auto", padding: 12 }}
         />
       </label>
+      <p id="inquiry-message-hint" style={{ margin: "-8px 0 0", color: "var(--text-muted)", fontSize: 13 }}>
+        Do not include patient information.
+      </p>
       {error ? (
-        <p role="alert" style={{ margin: 0, color: "var(--status-error)", fontSize: 14 }}>
+        <p role="alert" className="inquiry-error">
           {error}
         </p>
       ) : null}
-      <Button type="submit" disabled={loading}>
-        {loading ? "Preparing…" : "Open email draft"}
+      <Button type="submit" disabled={loading || sent}>
+        {/* Both labels share one cell, so the button keeps its width. */}
+        <span className="label-stack">
+          <span data-active={!loading}>Open email draft</span>
+          <span data-active={loading}>Preparing…</span>
+        </span>
       </Button>
+      <p role="status" className="inquiry-status">
+        {status}
+      </p>
     </form>
   );
 }

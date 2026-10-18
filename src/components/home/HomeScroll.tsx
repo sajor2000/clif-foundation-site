@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { IRS_STATUS_SHORT } from "@/lib/legal";
 import { Button } from "@/components/core/Button";
 import { Tag } from "@/components/core/Tag";
 import { KeyValueList } from "@/components/data/KeyValueList";
@@ -36,8 +37,6 @@ export function HomeScroll() {
           aria-labelledby="home-title"
         >
           <div
-            data-sc-in
-            data-sc-stagger="70"
             style={{
               display: "flex",
               flexWrap: "wrap",
@@ -47,7 +46,7 @@ export function HomeScroll() {
           >
             <div style={{ flex: "1 1 560px", minWidth: 0, display: "grid", gap: 28 }}>
               <h1 id="home-title" className="display-xl">
-                Open infrastructure for critical care data.
+                Help more healthcare teams learn from intensive care data.
               </h1>
               <p
                 style={{
@@ -59,11 +58,11 @@ export function HomeScroll() {
                   textWrap: "pretty",
                 }}
               >
-                Every hospital records intensive care differently. CLIF is a free,
-                open standard that makes those records comparable. The Foundation
-                exists to help CLIF move beyond observational research, supporting
-                the tools, mapping, implementation help, and training that let more
-                organizations use it.
+                Hospitals organize intensive care unit (ICU) records differently.
+                CLIF is a free, shared format that lets teams describe those records
+                the same way. The Foundation helps more organizations use it, with
+                open-source software and guides, training, and help converting
+                hospital records into CLIF and checking their quality.
               </p>
               <div
                 style={{
@@ -74,10 +73,10 @@ export function HomeScroll() {
                 }}
               >
                 <Button href="/support" size="lg">
-                  Support CLIF
+                  Support the Foundation
                 </Button>
-                <Link href="/mission" className="linkish">
-                  Read the mission
+                <Link href="/our-work" className="linkish">
+                  See what gifts support
                 </Link>
               </div>
             </div>
@@ -92,7 +91,6 @@ export function HomeScroll() {
 
           <div
             data-sc-in
-            data-sc-stagger="60"
             className="sc-chapter-cut"
             style={{
               marginTop: "clamp(56px,7vw,96px)",
@@ -199,10 +197,10 @@ export function HomeScroll() {
                   <h2
                     id="fig-fed"
                     className="h2"
-                    data-sc-cue="0"
                     style={{ color: "var(--text-inverse)", margin: 0 }}
                   >
-                    Data stays at each hospital. Code travels.
+                    <span data-sc-cue="0">Data stays at each hospital.</span>{" "}
+                    <span data-sc-cue="0.1 1 0.16 0">Code travels.</span>
                   </h2>
                 </div>
                 <p
@@ -217,10 +215,10 @@ export function HomeScroll() {
                     maxWidth: "48ch",
                   }}
                 >
-                  The CLIF Consortium conducts federated research: each site
-                  converts its EHR data to CLIF locally, runs shared analysis
-                  code, and returns only aggregate results. The Foundation’s work
-                  helps more sites reach that first step.
+                  The CLIF Consortium conducts federated research: each hospital
+                  converts its own electronic health records to CLIF, runs the
+                  shared analysis code itself, and returns only aggregate results.
+                  The Foundation’s work helps more hospitals reach that first step.
                 </p>
               </div>
 
@@ -250,8 +248,6 @@ export function HomeScroll() {
             <span>Tables</span>
           </header>
           <div
-            data-sc-in
-            data-sc-stagger="70"
             style={{
               display: "flex",
               flexWrap: "wrap",
@@ -280,11 +276,11 @@ export function HomeScroll() {
             </p>
           </div>
 
-          <div data-sc-reveal="up" data-sc-reveal-at="0.12 0.55">
+          <div data-sc-act="flow" className="icu-scrub">
             <IcuStayFigure />
           </div>
 
-          <div data-sc-in data-sc-stagger="50">
+          <div>
             <h3
               style={{
                 margin: "0 0 20px",
@@ -347,47 +343,48 @@ export function HomeScroll() {
           </div>
         </section>
 
-        {/* 03 · Programs pan */}
+        {/* 03 · Programs */}
         <section
           id="ch-programs"
-          data-sc-act="pan"
-          data-sc-span="2.0"
+          data-sc-act="flow"
           aria-labelledby="programs-heading"
         >
-          <div data-sc-stage>
-            <div
-              className="sc-program-rail"
-              data-sc-pan="0.08"
-              style={{ height: "100%", alignItems: "center" }}
-            >
-              <div className="sc-program-rail__lead">
-                <header className="sc-intertitle" style={{ marginBottom: 8 }}>
-                  <span className="sc-intertitle__n">03</span>
-                  <span>Programs</span>
-                </header>
-                <h2 id="programs-heading" className="h2">
-                  Four programs
-                </h2>
-                <p
-                  style={{
-                    margin: 0,
-                    fontSize: 16,
-                    lineHeight: 1.55,
-                    color: "var(--text-body)",
-                    maxWidth: "36ch",
-                  }}
-                >
-                  Training, implementation help, stewardship, and convening.
-                  Choose a program, then continue.
-                </p>
-                <Link href="/our-work" className="linkish">
-                  Program details
-                </Link>
-              </div>
+          <div
+            className="page-wrap sc-programs"
+            style={{
+              paddingTop: "var(--section-y)",
+              paddingBottom: "var(--section-y)",
+            }}
+          >
+            <div className="sc-programs__lead">
+              <header className="sc-intertitle" style={{ marginBottom: 8 }}>
+                <span className="sc-intertitle__n">03</span>
+                <span>Programs</span>
+              </header>
+              <h2 id="programs-heading" className="h2">
+                Four programs
+              </h2>
+              <p
+                style={{
+                  margin: 0,
+                  fontSize: 16,
+                  lineHeight: 1.55,
+                  color: "var(--text-body)",
+                  maxWidth: "36ch",
+                }}
+              >
+                Training, implementation help, stewardship, and convening.
+                Choose a program, then continue.
+              </p>
+              <Link href="/our-work" className="linkish">
+                Program details
+              </Link>
+            </div>
+            <div className="sc-programs__grid">
               {PROGRAMS.map((p) => (
                 <Link
                   key={p.id}
-                  href="/our-work"
+                  href={`/our-work#${p.id}`}
                   className="sc-program-card"
                 >
                   <span
@@ -442,7 +439,6 @@ export function HomeScroll() {
             <span>Start</span>
           </header>
           <div
-            data-sc-in
             style={{
               display: "flex",
               flexWrap: "wrap",
@@ -473,8 +469,8 @@ export function HomeScroll() {
                 }}
               >
                 CLIF’s minimum Common ICU Data Elements (mCIDE) map each site’s
-                local terms to the same permissible values, so one analysis runs
-                the same way everywhere.
+                local terms to the same permissible values, so the same analysis
+                code can be shared and run across sites.
               </p>
               <a
                 href="https://clif-icu.com/data-dictionary"
@@ -486,8 +482,7 @@ export function HomeScroll() {
               </a>
             </div>
             <div
-              data-sc-reveal="left"
-              data-sc-reveal-at="0.1 0.55"
+              data-sc-in
               style={{
                 flex: "1 1 440px",
                 minWidth: 0,
@@ -525,11 +520,12 @@ export function HomeScroll() {
                 <span style={{ flex: "1 1 0" }}>site-local device_name</span>
                 <span style={{ flex: "1 1 0" }}>device_category</span>
               </div>
-              {MAPPINGS.map((m) => (
+              {MAPPINGS.map((m, i) => (
                 <div
                   key={m.local}
                   className="sc-crosswalk-row"
                   style={{
+                    ["--i" as string]: i,
                     display: "flex",
                     gap: 16,
                     padding: "11px 20px",
@@ -568,7 +564,6 @@ export function HomeScroll() {
             <div
               className="page-wrap"
               data-sc-in
-              data-sc-stagger="60"
               style={{
                 paddingTop: "clamp(56px,7vw,88px)",
                 paddingBottom: "clamp(56px,7vw,88px)",
@@ -618,6 +613,7 @@ export function HomeScroll() {
                     href={p.url}
                     target="_blank"
                     rel="noopener noreferrer"
+                    className="sc-row-link"
                     style={{
                       display: "flex",
                       flexWrap: "wrap",
@@ -635,11 +631,13 @@ export function HomeScroll() {
                         fontFamily: "var(--font-mono)",
                         fontSize: 13,
                         color: "var(--text-muted)",
+                        fontVariantNumeric: "tabular-nums",
                       }}
                     >
                       {p.year}
                     </span>
                     <span
+                      className="sc-row-link__t"
                       style={{
                         flex: "1 1 360px",
                         fontSize: 19,
@@ -664,7 +662,7 @@ export function HomeScroll() {
             </div>
           </div>
 
-          <div data-sc-in data-sc-stagger="50" style={{ display: "grid", gap: 36 }}>
+          <div style={{ display: "grid", gap: 36 }}>
             <div style={{ display: "grid", gap: 14 }}>
               <h2
                 style={{
@@ -692,6 +690,7 @@ export function HomeScroll() {
                   {...(p.href.startsWith("http")
                     ? { target: "_blank", rel: "noopener noreferrer" }
                     : {})}
+                  className="sc-row-link"
                   style={{
                     display: "grid",
                     gap: 10,
@@ -706,6 +705,7 @@ export function HomeScroll() {
                     {p.n}
                   </span>
                   <span
+                    className="sc-row-link__t"
                     style={{
                       fontFamily: "var(--font-display)",
                       fontSize: 24,
@@ -725,11 +725,11 @@ export function HomeScroll() {
             </div>
           </div>
 
-          <div className="sc-colophon" data-sc-in>
+          <div className="sc-colophon">
             <p style={{ margin: 0, fontSize: 15, lineHeight: 1.55, color: "var(--text-muted)" }}>
-              CLIF Foundation · Illinois nonprofit · scaling CLIF adoption beyond
-              research · 501(c)(3) application pending. Research credited to the
-              CLIF Consortium.
+              CLIF Foundation · Illinois nonprofit · helping more
+              organizations use CLIF · {IRS_STATUS_SHORT}. Research credited to
+              the CLIF Consortium.
             </p>
             <p style={{ margin: 0, fontSize: 18, lineHeight: 1.5 }}>
               Give online:{" "}

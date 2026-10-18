@@ -12,6 +12,7 @@ export function KeyValueList({
         fontFamily: "var(--font-mono)",
         fontSize: "var(--type-mono)",
         lineHeight: 1.45,
+        fontVariantNumeric: "tabular-nums",
       }}
     >
       {rows.map((r, i) => (

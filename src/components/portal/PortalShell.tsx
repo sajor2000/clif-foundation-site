@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Suspense, useEffect, useRef, type ReactNode } from "react";
+import { Suspense, useEffect, useId, useRef, type ReactNode } from "react";
 import { UserButton } from "@clerk/nextjs";
 import { useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
@@ -113,6 +113,8 @@ export function PortalShell({
   /** Rendered under the header; omitted until the visitor is a signed-in member. */
   nav?: ReactNode;
 }) {
+  // Unique per page instance (Next keeps visited pages mounted but hidden).
+  const mainId = useId();
   return (
     <div
       style={{
@@ -122,7 +124,7 @@ export function PortalShell({
         fontFamily: "var(--font-sans)",
       }}
     >
-      <a className="skip-link" href="#portal-main">
+      <a className="skip-link" href={`#${mainId}`}>
         Skip to content
       </a>
       <header
@@ -176,8 +178,8 @@ export function PortalShell({
       </header>
       {nav ? <Suspense fallback={null}>{nav}</Suspense> : null}
       <main
-        id="portal-main"
-        className="page-wrap"
+        id={mainId}
+        className="portal-main page-wrap"
         tabIndex={-1}
         style={{ paddingTop: 36, paddingBottom: 80, outline: "none" }}
       >

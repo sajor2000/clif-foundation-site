@@ -1,5 +1,7 @@
+import { IRS_STATUS_SHORT } from "@/lib/legal";
+
 export function ContextBar({
-  text = "An Illinois nonprofit scaling CLIF adoption beyond research · 501(c)(3) application pending",
+  text = `An Illinois nonprofit helping more organizations use CLIF · ${IRS_STATUS_SHORT}`,
   linkLabel = "Research is conducted by the CLIF Consortium ↗",
   href = "https://clif-icu.com/",
 }: {

@@ -139,7 +139,10 @@
 (function (global) {
   'use strict';
 
-  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // Re-read at every mount(), so a host that remounts on the media query's
+  // change event follows the OS setting without a reload.
+  var reduceMQ = matchMedia('(prefers-reduced-motion: reduce)');
+  var reduce = reduceMQ.matches;
   var fineMQ = matchMedia('(hover: hover) and (pointer: fine)');
   var smallMQ = matchMedia('(max-width: 860px)');
   var coarse = matchMedia('(hover: none) and (pointer: coarse)').matches;
@@ -282,6 +285,8 @@
   function mount(root, opts) {
     root = typeof root === 'string' ? document.querySelector(root) : (root || document);
     opts = opts || {};
+    reduce = reduceMQ.matches;
+    global.ScrollCraft.reduce = reduce;
 
     // Teardown for client-side routers (issue #6). mount() registers window
     // listeners, starts two self-rescheduling rAF loops, and pushes onto
@@ -294,6 +299,12 @@
     var scListeners = [];
     var scDead = false;
     var scTickFrame = 0, scPointerFrame = 0;
+    // Scrollable height, measured on layout and when the page resizes rather
+    // than read on every scroll frame.
+    var docMax = 1, docRO = null;
+    function measureDoc() {
+      docMax = Math.max((document.documentElement.scrollHeight || 0) - innerHeight, 1);
+    }
     function on(type, fn, o) {
       addEventListener(type, fn, o);
       scListeners.push([type, fn, o]);
@@ -507,24 +518,48 @@
     // every observed target, and unobserve only runs on first intersection, so a
     // never-revealed element in a removed subtree is retained for the life of the
     // tab, once per re-mount.
-    var io = null, cio = null;
-    if ('IntersectionObserver' in window) {
+    var io = null, cio = null, onEnd = null;
+    function revealIn(el) {
+      el.classList.add('sc-in');
+      var stagger = parseFloat(el.getAttribute('data-sc-stagger'));
+      if (!isNaN(stagger)) {
+        Array.prototype.forEach.call(el.children, function (kid, i) {
+          kid.style.transitionDelay = (i * stagger) + 'ms';
+          kid.classList.add('sc-in');
+        });
+      }
+      if (io) io.unobserve(el);
+    }
+    if (reduce) {
+      // Reduced motion: no entrance effects, so show every section at once
+      // rather than waiting for it to cross the reveal line.
+      Array.prototype.forEach.call(root.querySelectorAll('[data-sc-in]'), revealIn);
+    } else if ('IntersectionObserver' in window) {
       io = new IntersectionObserver(function (entries) {
         entries.forEach(function (e) {
-          if (!e.isIntersecting) return;
-          var el = e.target;
-          el.classList.add('sc-in');
-          var stagger = parseFloat(el.getAttribute('data-sc-stagger'));
-          if (!isNaN(stagger)) {
-            Array.prototype.forEach.call(el.children, function (kid, i) {
-              kid.style.transitionDelay = (i * stagger) + 'ms';
-              kid.classList.add('sc-in');
-            });
-          }
-          io.unobserve(el);
+          if (e.isIntersecting) revealIn(e.target);
         });
       }, { rootMargin: '0px 0px -12% 0px', threshold: 0.01 });
       Array.prototype.forEach.call(root.querySelectorAll('[data-sc-in]'), function (el) { io.observe(el); });
+      // The -12% bottom margin can never be met by content on the last screen,
+      // because the page cannot scroll further. At the end of the page, reveal
+      // whatever is still waiting.
+      onEnd = function () {
+        var d = document.documentElement;
+        if (window.innerHeight + window.scrollY < d.scrollHeight - 4) return;
+        var left = root.querySelectorAll('[data-sc-in]:not(.sc-in)');
+        Array.prototype.forEach.call(left, revealIn);
+        stopEnd();
+      };
+      var stopEnd = function () {
+        if (!onEnd) return;
+        window.removeEventListener('scroll', onEnd);
+        window.removeEventListener('resize', onEnd);
+        onEnd = null;
+      };
+      window.addEventListener('scroll', onEnd, { passive: true });
+      window.addEventListener('resize', onEnd, { passive: true });
+      onEnd();
     } else {
       Array.prototype.forEach.call(root.querySelectorAll('[data-sc-in]'), function (el) { el.classList.add('sc-in'); });
     }
@@ -642,6 +677,7 @@
       });
 
       needsLayout = false;
+      measureDoc();
       read();
     }
 
@@ -669,6 +705,7 @@
           // the first request (visible as ERR_ABORTED on the blob URL).
           V.el.addEventListener('loadedmetadata', function () {
             V.ready = true;
+            wake();
             // Force one seek even when the target is already 0. The reveal is
             // gated on a 'seeked' event, and the raf loop only seeks when the
             // time actually needs to change, so a clip sitting at the very top
@@ -849,7 +886,7 @@
       if (scDead) return;
       y = scrollY || pageYOffset;
       var driftA = null, driftB = null, driftT = 0;
-      var maxY = Math.max((document.documentElement.scrollHeight || 0) - vh, 1);
+      var maxY = docMax;
 
       for (var i = 0; i < acts.length; i++) {
         var a = acts[i];
@@ -883,7 +920,15 @@
           a.vp = a.dwell ? dwell(vraw, a.dwell) : vraw;
         }
         a.live = (y > a.top - vh * 1.25) && (y < a.top + a.height + vh * 1.25);
-        a.el.style.setProperty('--sc-p', a.p.toFixed(4));
+        // Under reduced motion the figure is static and complete: publish full
+        // progress so progress-driven art (connectors, aggregates) is drawn.
+        // Write only for acts near the viewport and only on change: every write
+        // restyles the act's subtree, and off-screen acts are not seen.
+        var pOut = (reduce ? 1 : a.p).toFixed(3);
+        if ((a.live || a.pOut === undefined) && pOut !== a.pOut) {
+          a.el.style.setProperty('--sc-p', pOut);
+          a.pOut = pOut;
+        }
 
         // Fetch earlier than we drive. A 1080p clip is megabytes, and a reader
         // who scrolls briskly will otherwise arrive at a stage that is still
@@ -939,6 +984,14 @@
             else if (a.p <= outStart) vis = 1;       // the plateau
             else vis = smooth(1 - (a.p - outStart) / Math.max(q.to - outStart, 0.001));
           }
+          // An opening cue (from 0, no exit) is part of the act's resting
+          // frame: show it as soon as the act is live, so a stage never slides
+          // into view blank before the pin engages. Under reduced motion every
+          // cue that never exits holds at full opacity; cues with an exit window
+          // keep their sequence so captions meant to replace each other don't
+          // stack.
+          var holds = q.to === null || (q.to >= 1 && q.rOut === 0); // never exits
+          if ((reduce && holds) || (q.to === null && q.from === 0)) vis = 1;
           vis = clamp01(vis);
 
           if (q.kinetic) {
@@ -1013,17 +1066,26 @@
       }
 
       if (progressBar) {
-        var max = Math.max(document.body.scrollHeight - vh, 1);
-        progressBar.style.transform = 'scaleX(' + clamp01(y / max).toFixed(4) + ')';
+        progressBar.style.transform = 'scaleX(' + clamp01(y / docMax).toFixed(4) + ')';
       }
+      if (playheads.length) wake();
     }
 
     // ---- video seek loop --------------------------------------------------
     // Split from read() on purpose: seeking is asynchronous and rate-limited by
     // the decoder, while read() must stay cheap enough to run on every scroll
     // event. The lerp here is also what turns a jittery wheel into a glide.
+    // The seek loop runs only while a clip still has somewhere to go, and never
+    // in a hidden tab. read() and a clip finishing its load wake it.
+    function wake() {
+      if (scDead || scTickFrame || document.hidden) return;
+      scTickFrame = requestAnimationFrame(tick);
+    }
+    function onVisibility() { if (!document.hidden) wake(); }
     function tick() {
-      if (scDead) return;
+      scTickFrame = 0;
+      if (scDead || document.hidden) return;
+      var work = false;
       // Deadband. A phone decoder cannot service a seek every frame, so asking
       // for one costs more than it shows; 20ms of clip is under a frame of
       // footage anyway.
@@ -1043,17 +1105,19 @@
             V.stuckAt = nw;
             try { V.el.currentTime = V.el.currentTime + 0.001; } catch (e) {}
           }
+          work = true;
           continue;
         }
         V.stuckAt = 0;
         // An offscreen clip that has already arrived stops costing anything.
-        if (!V.live && Math.abs(V.cur - V.target) < 0.002) continue;
+        if (Math.abs(V.cur - V.target) < 0.002) continue;
+        work = true;
         V.cur += (V.target - V.cur) * (reduce ? 1 : V.lerp);
         var dur = V.el.duration || 1;
         var t = clamp(V.cur, 0, 0.999) * dur;
         if (Math.abs(V.el.currentTime - t) > eps) { try { V.el.currentTime = t; } catch (e) {} }
       }
-      scTickFrame = requestAnimationFrame(tick);
+      if (work) wake();
     }
 
     // iOS will not paint a muted video that has never been handed a user
@@ -1216,7 +1280,7 @@
       // Ignore URL-bar-only height changes on phones. Relaying out on those
       // makes the page jump under the reader's thumb for no reason.
       if (scDead) return;
-      if (innerWidth === lastW && isMobile()) { vh = innerHeight; return; }
+      if (innerWidth === lastW && isMobile()) { vh = innerHeight; measureDoc(); return; }
       lastW = innerWidth;
       layout();
     }, { passive: true });
@@ -1231,8 +1295,13 @@
     }
 
     layout();
+    if ('ResizeObserver' in window) {
+      docRO = new ResizeObserver(measureDoc);
+      docRO.observe(document.body);
+    }
+    document.addEventListener('visibilitychange', onVisibility);
     initPointer();
-    scTickFrame = requestAnimationFrame(tick);
+    wake();
     document.documentElement.classList.add('sc-ready');
 
     var api = { layout: layout, read: read, acts: acts, worlds: worlds, clips: playheads, lerp: LERP };
@@ -1246,9 +1315,16 @@
       }
       scListeners.length = 0;
       if (scTickFrame) { cancelAnimationFrame(scTickFrame); scTickFrame = 0; }
+      if (docRO) { docRO.disconnect(); docRO = null; }
+      document.removeEventListener('visibilitychange', onVisibility);
       if (scPointerFrame) { cancelAnimationFrame(scPointerFrame); scPointerFrame = 0; }
       // Both observers, or every element they still watch stays reachable.
       if (io) { io.disconnect(); io = null; }
+      if (onEnd) {
+        window.removeEventListener('scroll', onEnd);
+        window.removeEventListener('resize', onEnd);
+        onEnd = null;
+      }
       if (cio) { cio.disconnect(); cio = null; }
       // A blob URL is a document-lifetime reference to a whole decoded clip, so
       // an unreleased one is the largest thing a re-mount can leak. Detaching

@@ -10,19 +10,20 @@ test("federation lattice text is at least 11px and fits on a phone", async () =>
   await scrollIntoAct(page, "ch-federation", 0.97);
   const { tooSmall, overflowing } = await page.evaluate(() => {
     const fed = document.querySelector(".fed");
-    const textEls = [...fed.querySelectorAll("*")].filter((el) =>
-      [...el.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim()),
+    // Measure what is rendered: on phones the cards hide their body and keep
+    // the word "Hospital" for screen readers only.
+    const textEls = [...fed.querySelectorAll("*")].filter(
+      (el) =>
+        el.getClientRects().length &&
+        getComputedStyle(el).clipPath !== "inset(50%)" &&
+        [...el.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim()),
     );
     return {
       tooSmall: textEls
-        .map((el) => {
-          // Cards collapse their long text to 0px and show a short ::after
-          // label on phones; measure what is actually rendered.
-          let px = parseFloat(getComputedStyle(el).fontSize);
-          if (px === 0)
-            px = parseFloat(getComputedStyle(el, "::after").fontSize);
-          return { text: el.textContent.trim().slice(0, 30), px };
-        })
+        .map((el) => ({
+          text: el.textContent.trim().slice(0, 30),
+          px: parseFloat(getComputedStyle(el).fontSize),
+        }))
         .filter((t) => t.px < 11),
       overflowing: textEls
         .filter((el) => el.scrollWidth > el.clientWidth + 1)

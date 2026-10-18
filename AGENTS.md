@@ -11,3 +11,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 ## Documented Solutions
 
 `docs/solutions/` — documented solutions and infrastructure knowledge (e.g. domain DNS and email on Vercel DNS + Hostinger Mail), organized by category with YAML frontmatter (`module`, `tags`, `problem_type`). Relevant when changing DNS, email, deployment, or other documented areas.
+
+## Site checks
+
+`npm run check:site` runs the browser checks in `scripts/checks/` (keyboard menu, focus, axe, reduced motion) against a running production build: `npm run build && npx next start -p 43139` first, or set `SITE_URL`. Set `CHROME_PATH` off macOS. It exits non-zero on any failure. `npm run test:e2e` starts its own server.

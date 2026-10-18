@@ -11,6 +11,7 @@
     "start": "next start --hostname 0.0.0.0 --port 43127",
     "lint": "eslint",
     "test:e2e": "node --test --test-concurrency=1 tests/e2e/*.test.mjs",
+    "check:site": "node scripts/checks/webcheck.mjs && node scripts/checks/review-checks.mjs && node scripts/checks/webaxe.mjs && node scripts/checks/r01.mjs",
     "test:unit": "node --experimental-strip-types --test tests/unit/*.test.mjs",
     "convex:dev": "npx convex dev",
     "test:convex": "vitest run"
