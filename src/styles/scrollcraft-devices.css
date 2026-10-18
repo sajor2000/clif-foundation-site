@@ -578,6 +578,23 @@
   outline-offset: 3px;
 }
 
+/* Publication and path rows: the title takes the link colour and an
+   underline on hover; no movement. */
+.sc-row-link__t {
+  text-decoration: underline 1px transparent;
+  text-underline-offset: 0.2em;
+  transition:
+    color var(--sc-d-hover) var(--ease-standard),
+    text-decoration-color var(--sc-d-hover) var(--ease-standard);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .sc-row-link:hover .sc-row-link__t {
+    color: var(--link);
+    text-decoration-color: currentColor;
+  }
+}
+
 /* ICU stay: a time cursor sweeps 0–72h while the figure crosses the middle
    of the screen; each record lights as the cursor reaches its start. With no
    script or reduced motion --sc-p is absent or 1, so the figure is complete. */

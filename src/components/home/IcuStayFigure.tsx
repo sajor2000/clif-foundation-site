@@ -186,8 +186,6 @@ export function IcuStayFigure() {
         <div
           style={{
             minWidth: 640,
-            width: "max-content",
-            maxWidth: "none",
             position: "relative",
           }}
         >

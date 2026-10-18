@@ -613,6 +613,7 @@ export function HomeScroll() {
                     href={p.url}
                     target="_blank"
                     rel="noopener noreferrer"
+                    className="sc-row-link"
                     style={{
                       display: "flex",
                       flexWrap: "wrap",
@@ -635,6 +636,7 @@ export function HomeScroll() {
                       {p.year}
                     </span>
                     <span
+                      className="sc-row-link__t"
                       style={{
                         flex: "1 1 360px",
                         fontSize: 19,
@@ -687,6 +689,7 @@ export function HomeScroll() {
                   {...(p.href.startsWith("http")
                     ? { target: "_blank", rel: "noopener noreferrer" }
                     : {})}
+                  className="sc-row-link"
                   style={{
                     display: "grid",
                     gap: 10,
@@ -701,6 +704,7 @@ export function HomeScroll() {
                     {p.n}
                   </span>
                   <span
+                    className="sc-row-link__t"
                     style={{
                       fontFamily: "var(--font-display)",
                       fontSize: 24,

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, type CSSProperties, type ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 
 const SIZES = {
   sm: "var(--control-sm)",
@@ -37,34 +37,9 @@ export function Button({
   "aria-pressed"?: boolean;
   "aria-label"?: string;
 }) {
-  const [hover, setHover] = useState(false);
-  const v = {
-    primary: {
-      background: hover
-        ? "var(--action-primary-hover)"
-        : "var(--action-primary-bg)",
-      color: "var(--action-primary-fg)",
-      border: "1px solid transparent",
-    },
-    secondary: {
-      background: hover ? "var(--action-secondary-hover)" : "transparent",
-      color: "var(--text-primary)",
-      border: "1px solid var(--action-secondary-border)",
-    },
-    ghost: {
-      background: hover ? "var(--bg-hover)" : "transparent",
-      color: "var(--text-primary)",
-      border: "1px solid transparent",
-    },
-    inverse: {
-      background: hover ? "var(--accent)" : "var(--text-inverse)",
-      color: "var(--bg-inverse)",
-      border: "1px solid transparent",
-    },
-  }[variant];
-
+  // Colours, hover and press live in globals.css (.btn--*): CSS hover is
+  // gated to real pointers, so it never sticks after a tap.
   const s: CSSProperties = {
-    ...v,
     height: SIZES[size],
     padding: size === "sm" ? "0 14px" : "0 22px",
     display: fullWidth ? "flex" : "inline-flex",
@@ -81,18 +56,13 @@ export function Button({
     cursor: disabled ? "not-allowed" : "pointer",
     whiteSpace: "nowrap",
     opacity: disabled ? 0.6 : 1,
-    transition: "background var(--duration-fast) var(--ease-standard)",
     ...style,
   };
-
-  const handlers = {
-    onMouseEnter: () => setHover(true),
-    onMouseLeave: () => setHover(false),
-  };
+  const className = `btn btn--${variant}`;
 
   if (href) {
     return (
-      <Link href={href} style={s} aria-label={ariaLabel} {...handlers}>
+      <Link href={href} className={className} style={s} aria-label={ariaLabel}>
         {children}
       </Link>
     );
@@ -101,12 +71,12 @@ export function Button({
   return (
     <button
       type={type}
+      className={className}
       style={s}
       onClick={onClick}
       disabled={disabled}
       aria-pressed={ariaPressed}
       aria-label={ariaLabel}
-      {...handlers}
     >
       {children}
     </button>
