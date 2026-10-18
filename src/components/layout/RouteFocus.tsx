@@ -8,17 +8,17 @@ import { useEffect } from "react";
 // which runs again with the same pathname.
 let lastPathname: string | null = null;
 
-/** Moves keyboard focus to #main after in-site navigation. */
-export function RouteFocus() {
+/** Moves keyboard focus to this page's main landmark after in-site navigation. */
+export function RouteFocus({ mainId }: { mainId: string }) {
   const pathname = usePathname();
 
   useEffect(() => {
     const previous = lastPathname;
     lastPathname = pathname;
     if (previous !== null && previous !== pathname) {
-      document.getElementById("main")?.focus({ preventScroll: true });
+      document.getElementById(mainId)?.focus({ preventScroll: true });
     }
-  }, [pathname]);
+  }, [pathname, mainId]);
 
   return null;
 }

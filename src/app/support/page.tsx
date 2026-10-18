@@ -12,12 +12,12 @@ import { GivebutterScript } from "@/components/support/GivebutterScript";
 import { InquiryForm } from "@/components/support/InquiryForm";
 import { CONTACT_EMAIL, GIFT_PROGRAMS, SUPPORT_PATHS } from "@/lib/content";
 import { givebutterEmbed } from "@/lib/givebutter";
-import { EIN, GIVING_TAX_NOTE, IRS_STATUS, LEGAL_NAME } from "@/lib/legal";
+import { EIN, GIVING_TAX_NOTE, IRS_STATUS, IRS_STATUS_SHORT, LEGAL_NAME } from "@/lib/legal";
 
 export const metadata: Metadata = pageMetadata({
   title: "Support",
   description:
-    "Support CLIF Foundation with a secure online gift through Givebutter, or email an inquiry. Illinois nonprofit corporation; 501(c)(3) application pending with the IRS.",
+    `Support CLIF Foundation with a secure online gift through Givebutter, or email an inquiry. Illinois nonprofit corporation; ${IRS_STATUS_SHORT}.`,
   path: "/support",
 });
 

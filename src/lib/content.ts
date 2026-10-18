@@ -1,4 +1,4 @@
-import { EIN, IRS_STATUS_SHORT, LEGAL_NAME } from "@/lib/legal";
+import { EIN, IRS_STATUS, IRS_STATUS_SHORT, LEGAL_NAME } from "@/lib/legal";
 export const CONTACT_EMAIL = "info@clificufoundation.org";
 export const CONSORTIUM_URL = "https://clif-icu.com/";
 export const GITHUB_URL =
@@ -342,5 +342,4 @@ export const NEEDS = [
   },
 ] as const;
 
-export const FOOTER_NOTE =
-  "An Illinois nonprofit corporation scaling adoption of the Common Longitudinal ICU data Format beyond observational research. Application for 501(c)(3) recognition is pending. Research is credited to the CLIF Consortium and its investigators.";
+export const FOOTER_NOTE = `An Illinois nonprofit corporation helping more organizations use the Common Longitudinal ICU data Format (CLIF). ${IRS_STATUS} Research is credited to the CLIF Consortium and its investigators.`;

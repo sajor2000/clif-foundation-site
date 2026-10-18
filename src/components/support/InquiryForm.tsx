@@ -123,12 +123,10 @@ export function InquiryForm() {
           ))}
         </select>
       </label>
-      <label style={{ display: "grid", gap: 6, fontSize: 14 }}>
+      <label htmlFor="inquiry-message" style={{ display: "grid", gap: 6, fontSize: 14 }}>
         Message (optional)
-        <span id="inquiry-message-hint" style={{ color: "var(--text-muted)", fontSize: 13 }}>
-          Do not include patient information.
-        </span>
         <textarea
+          id="inquiry-message"
           name="message"
           aria-describedby="inquiry-message-hint"
           autoComplete="off"
@@ -138,6 +136,9 @@ export function InquiryForm() {
           style={{ ...inputStyle, height: "auto", padding: 12 }}
         />
       </label>
+      <p id="inquiry-message-hint" style={{ margin: "-8px 0 0", color: "var(--text-muted)", fontSize: 13 }}>
+        Do not include patient information.
+      </p>
       {error ? (
         <p role="alert" style={{ margin: 0, color: "var(--status-error)", fontSize: 14 }}>
           {error}

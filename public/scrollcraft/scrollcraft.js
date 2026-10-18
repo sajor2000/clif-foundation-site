@@ -532,9 +532,18 @@
       onEnd = function () {
         var d = document.documentElement;
         if (window.innerHeight + window.scrollY < d.scrollHeight - 4) return;
-        Array.prototype.forEach.call(root.querySelectorAll('[data-sc-in]:not(.sc-in)'), revealIn);
+        var left = root.querySelectorAll('[data-sc-in]:not(.sc-in)');
+        Array.prototype.forEach.call(left, revealIn);
+        stopEnd();
+      };
+      var stopEnd = function () {
+        if (!onEnd) return;
+        window.removeEventListener('scroll', onEnd);
+        window.removeEventListener('resize', onEnd);
+        onEnd = null;
       };
       window.addEventListener('scroll', onEnd, { passive: true });
+      window.addEventListener('resize', onEnd, { passive: true });
       onEnd();
     } else {
       Array.prototype.forEach.call(root.querySelectorAll('[data-sc-in]'), function (el) { el.classList.add('sc-in'); });
@@ -955,8 +964,11 @@
           // An opening cue (from 0, no exit) is part of the act's resting
           // frame: show it as soon as the act is live, so a stage never slides
           // into view blank before the pin engages. Under reduced motion every
-          // cue holds at full opacity, so nothing depends on scroll position.
-          if (reduce || (q.to === null && q.from === 0)) vis = 1;
+          // cue that never exits holds at full opacity; cues with an exit window
+          // keep their sequence so captions meant to replace each other don't
+          // stack.
+          var holds = q.to === null || (q.to >= 1 && q.rOut === 0); // never exits
+          if ((reduce && holds) || (q.to === null && q.from === 0)) vis = 1;
           vis = clamp01(vis);
 
           if (q.kinetic) {
@@ -1267,7 +1279,11 @@
       if (scPointerFrame) { cancelAnimationFrame(scPointerFrame); scPointerFrame = 0; }
       // Both observers, or every element they still watch stays reachable.
       if (io) { io.disconnect(); io = null; }
-      if (onEnd) { window.removeEventListener('scroll', onEnd); onEnd = null; }
+      if (onEnd) {
+        window.removeEventListener('scroll', onEnd);
+        window.removeEventListener('resize', onEnd);
+        onEnd = null;
+      }
       if (cio) { cio.disconnect(); cio = null; }
       // A blob URL is a document-lifetime reference to a whole decoded clip, so
       // an unreleased one is the largest thing a re-mount can leak. Detaching

@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { RouteFocus } from "@/components/layout/RouteFocus";
+import { Main, MainIdProvider, SkipLink } from "@/components/layout/MainLandmark";
 import { ContextBar } from "@/components/navigation/ContextBar";
 import { SiteFooter } from "@/components/navigation/SiteFooter";
 import { SiteHeader } from "@/components/navigation/SiteHeader";
@@ -12,6 +12,7 @@ export function SiteShell({
   children: ReactNode;
 }) {
   return (
+    <MainIdProvider>
     <div
       style={{
         minHeight: "100vh",
@@ -24,16 +25,12 @@ export function SiteShell({
         flexDirection: "column",
       }}
     >
-      <a className="skip-link" href="#main">
-        Skip to content
-      </a>
+      <SkipLink />
       <ContextBar />
       <SiteHeader current={current} />
-      <main id="main" tabIndex={-1} style={{ outline: "none", flex: 1 }}>
-        <RouteFocus />
-        {children}
-      </main>
+      <Main>{children}</Main>
       <SiteFooter />
     </div>
+    </MainIdProvider>
   );
 }

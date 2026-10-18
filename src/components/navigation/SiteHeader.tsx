@@ -1,33 +1,54 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import { Lockup } from "@/components/brand/Lockup";
 import { NAV_ITEMS } from "@/lib/content";
 
 export function SiteHeader({ current }: { current?: string }) {
-  const pathname = usePathname();
   const buttonRef = useRef<HTMLButtonElement>(null);
-  // The menu is open only for the page it was opened on, so any route change closes it.
-  const [openOn, setOpenOn] = useState<string | null>(null);
-  const open = openOn === pathname;
+  const [open, setOpen] = useState(false);
+  // Next keeps a visited page mounted but hidden (React <Activity>), so ids
+  // must be unique per page instance, not fixed strings.
+  const menuId = useId();
+  const themeToggleId = useId();
+  const panelRef = useRef<HTMLElement>(null);
+  const desktopNavRef = useRef<HTMLElement>(null);
+  const themeToggleRef = useRef<HTMLInputElement>(null);
+
+  // Close the menu when Activity hides this page, so it is never open when the
+  // reader comes Back (pattern from Next's "Preserving UI state" guide).
+  useLayoutEffect(() => {
+    return () => setOpen(false);
+  }, []);
 
   useEffect(() => {
+    if (!open) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && openOn !== null) {
-        setOpenOn(null);
+      if (e.key === "Escape") {
+        setOpen(false);
         buttonRef.current?.focus();
       }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [openOn]);
+  }, [open]);
 
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 999px)");
     const onChange = () => {
-      if (!mq.matches) setOpenOn(null);
+      if (mq.matches) return;
+      // Widening to desktop hides the panel; keep focus on the equivalent
+      // desktop link instead of dropping it to the document body.
+      const focused = document.activeElement;
+      if (focused && panelRef.current?.contains(focused)) {
+        const href = focused.getAttribute("href");
+        const twin = href
+          ? desktopNavRef.current?.querySelector<HTMLElement>(`a[href="${href}"]`)
+          : null;
+        (twin ?? desktopNavRef.current?.querySelector<HTMLElement>("a"))?.focus();
+      }
+      setOpen(false);
     };
     mq.addEventListener("change", onChange);
     return () => mq.removeEventListener("change", onChange);
@@ -58,7 +79,7 @@ export function SiteHeader({ current }: { current?: string }) {
         <span className="site-header-brand">
           <Lockup height={34} priority />
         </span>
-        <nav className="site-nav-desktop" aria-label="Primary">
+        <nav ref={desktopNavRef} className="site-nav-desktop" aria-label="Primary">
           {NAV_ITEMS.map((item) => (
             <Link
               key={item.id}
@@ -109,13 +130,14 @@ export function SiteHeader({ current }: { current?: string }) {
           }}
         >
           <input
-            id="clif-theme-toggle"
+            ref={themeToggleRef}
+            id={themeToggleId}
             type="checkbox"
             className="clif-theme-toggle"
             aria-label="Toggle dark mode"
           />
           <label
-            htmlFor="clif-theme-toggle"
+            htmlFor={themeToggleId}
             className="clif-theme-btn"
             style={{
               height: "var(--control-md)",
@@ -150,9 +172,9 @@ export function SiteHeader({ current }: { current?: string }) {
             ref={buttonRef}
             type="button"
             className="site-menu-btn"
-            aria-controls="site-menu"
+            aria-controls={menuId}
             aria-expanded={open}
-            onClick={() => setOpenOn(open ? null : pathname)}
+            onClick={() => setOpen((v) => !v)}
             style={{
               height: "var(--control-md)",
               padding: "0 16px",
@@ -168,11 +190,26 @@ export function SiteHeader({ current }: { current?: string }) {
           </button>
         </div>
       </div>
-      <nav id="site-menu" className="site-menu-panel" aria-label="Primary" hidden={!open}>
+      {/* Without JavaScript the button cannot toggle, so show the links instead. */}
+      <noscript>
+        <style>{`@media (max-width: 999px) { .site-menu-panel { display: grid !important; } .site-menu-btn { display: none !important; } }`}</style>
+      </noscript>
+      <nav
+        ref={panelRef}
+        id={menuId}
+        className="site-menu-panel"
+        aria-label="Primary"
+        data-open={open}
+        onClick={(e) => {
+          // Close on any link, including one to the page already shown.
+          if ((e.target as HTMLElement).closest("a")) setOpen(false);
+        }}
+      >
         {NAV_ITEMS.map((item) => (
           <Link
             key={item.id}
             href={item.href}
+            onNavigate={() => setOpen(false)}
             aria-current={current === item.id ? "page" : undefined}
             style={{
               minHeight: 56,
@@ -201,6 +238,7 @@ export function SiteHeader({ current }: { current?: string }) {
         ))}
         <Link
           href="/support"
+          onNavigate={() => setOpen(false)}
           className="site-nav-cta"
           style={{
             marginTop: 20,
@@ -219,7 +257,7 @@ export function SiteHeader({ current }: { current?: string }) {
         <button
           type="button"
           className="site-menu-theme"
-          onClick={() => document.getElementById("clif-theme-toggle")?.click()}
+          onClick={() => themeToggleRef.current?.click()}
         >
           <span>Theme</span>
           <span className="clif-theme-label-light">Light</span>

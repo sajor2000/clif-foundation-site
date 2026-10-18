@@ -145,8 +145,9 @@ html[data-theme="dark"] .clif-theme-label-dark {
     display: inline-flex;
   }
 
-  /* The open panel exists only below the desktop breakpoint. */
-  .site-menu-panel:not([hidden]) {
+  /* The open panel exists only below the desktop breakpoint. Closed, it is
+     display:none, so its links are out of the tab order and the a11y tree. */
+  .site-menu-panel[data-open="true"] {
     display: grid;
   }
 
@@ -396,8 +397,8 @@ input[type="file"]::file-selector-button:hover {
 
 /* Portal checkboxes and radios: larger, in the accent, for touch and theme.
    Scoped to the portal: the public header uses hidden checkboxes for toggles. */
-#portal-main input[type="checkbox"],
-#portal-main input[type="radio"] {
+.portal-main input[type="checkbox"],
+.portal-main input[type="radio"] {
   width: 20px;
   height: 20px;
   accent-color: var(--accent);
@@ -430,11 +431,11 @@ input[type="file"]::file-selector-button:hover {
 }
 .board-roster thead th:first-child { width: 26%; }
 .board-roster thead th:last-child { width: 40%; }
-.board-roster__seat {
+.board-roster .board-roster__seat {
   font-size: 18px;
   font-weight: 500;
 }
-.board-roster__affiliation {
+.board-roster .board-roster__affiliation {
   color: var(--text-muted);
 }
 @media (max-width: 560px) {
@@ -466,17 +467,17 @@ input[type="file"]::file-selector-button:hover {
     border: 0;
     font-size: 15px;
   }
-  .board-roster__name {
+  .board-roster .board-roster__name {
     grid-column: 1 / -1;
     order: -1;
     font-size: 17px;
     font-weight: 500;
   }
-  .board-roster__seat {
+  .board-roster .board-roster__seat {
     font-size: 15px;
     font-weight: 500;
   }
-  .board-roster__seat::after {
+  .board-roster .board-roster__seat::after {
     content: " ·";
     color: var(--text-muted);
   }
