@@ -9,7 +9,8 @@ import { Button } from "@/components/core/Button";
 import { pageTitle, panelStyle, sectionTitle } from "@/components/portal/portal-styles";
 
 export function ReportingHub() {
-  const [taxYear, setTaxYear] = useState(new Date().getFullYear());
+  // CPA paperwork is usually for the return being prepared: the prior calendar year.
+  const [taxYear, setTaxYear] = useState(new Date().getFullYear() - 1);
   const [zipping, setZipping] = useState(false);
   const [zipError, setZipError] = useState<string | null>(null);
   const pack = useQuery(api.reporting.getReportingPack, { taxYear });

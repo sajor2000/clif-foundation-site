@@ -222,9 +222,15 @@ export function MeetingsView({ meetingId }: { meetingId?: Id<"meetings"> } = {})
                 >
                   Publish for review
                 </Button>
-                <Button type="button" onClick={() => saveMinutes("approved")}>
-                  Approve minutes
-                </Button>
+                {detail.minutes?.status === "published_for_review" ? (
+                  <Button
+                    type="button"
+                    onClick={() => saveMinutes("approved")}
+                    disabled={detail.meeting.status !== "held"}
+                  >
+                    Approve minutes
+                  </Button>
+                ) : null}
               </>
             )}
           </div>

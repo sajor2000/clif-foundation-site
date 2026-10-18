@@ -1,6 +1,8 @@
 import { v } from "convex/values";
 import { query } from "./_generated/server";
 import { requireBoardIdentity } from "./lib/auth";
+import { coiCompletion } from "./lib/compliance";
+import { loadDirectorEmails } from "./lib/directors";
 
 const POLICY_TYPES = [
   "conflict_of_interest",
@@ -10,11 +12,17 @@ const POLICY_TYPES = [
 ] as const;
 
 export const getDashboard = query({
-  args: { year: v.number() },
+  args: {
+    /** Calendar year for COI disclosures. */
+    year: v.number(),
+    /** Form 990 tax year under review; defaults to the year before `year`. */
+    taxYear: v.optional(v.number()),
+  },
   returns: v.object({
     coi: v.object({
       submitted: v.number(),
       eligible: v.number(),
+      missing: v.array(v.string()),
       complete: v.boolean(),
     }),
     policies: v.object({
@@ -35,10 +43,15 @@ export const getDashboard = query({
   }),
   handler: async (ctx, args) => {
     await requireBoardIdentity(ctx);
-    const members = await ctx.db.query("boardMembers").take(200);
-    const eligible = members.length > 0 ? members.length : 1;
-    const disclosures = await ctx.db.query("coiDisclosures").take(500);
-    const submitted = disclosures.filter((d) => d.year === args.year).length;
+    const disclosures = await ctx.db
+      .query("coiDisclosures")
+      .withIndex("by_year_member", (q) => q.eq("year", args.year))
+      .take(500);
+    const coi = coiCompletion(
+      await loadDirectorEmails(ctx),
+      disclosures.map((d) => d.memberEmail),
+    );
+    const taxYear = args.taxYear ?? args.year - 1;
 
     const policies = await ctx.db.query("policies").take(100);
     const adoptedTypes = new Set(policies.map((p) => p.policyType));
@@ -47,7 +60,7 @@ export const getDashboard = query({
 
     const review = await ctx.db
       .query("form990Reviews")
-      .withIndex("by_tax_year", (q) => q.eq("taxYear", args.year))
+      .withIndex("by_tax_year", (q) => q.eq("taxYear", taxYear))
       .unique();
 
     const held = await ctx.db
@@ -59,6 +72,7 @@ export const getDashboard = query({
       const minutes = await ctx.db
         .query("minutes")
         .withIndex("by_meeting", (q) => q.eq("meetingId", m._id))
+        .order("desc") // latest version: a revised, unapproved v2 is a gap
         .first();
       if (!minutes || minutes.status !== "approved") {
         minutesGaps.push({
@@ -70,14 +84,10 @@ export const getDashboard = query({
     }
 
     return {
-      coi: {
-        submitted,
-        eligible,
-        complete: submitted >= eligible,
-      },
+      coi,
       policies: { adopted, missing },
       form990: {
-        taxYear: args.year,
+        taxYear,
         boardReviewedBeforeFiled: review?.boardReviewedBeforeFiled ?? false,
       },
       minutesGaps,
@@ -102,17 +112,13 @@ export const listAuditEvents = query({
     await requireBoardIdentity(ctx);
     const events = await ctx.db
       .query("auditEvents")
-      .withIndex("by_created")
-      .order("desc")
-      .take(200);
-    return events
-      .filter((e) => {
-        if (args.since !== undefined && e.createdAt < args.since) return false;
-        if (args.until !== undefined && e.createdAt > args.until) return false;
-        return true;
+      .withIndex("by_created", (q) => {
+        const from = args.since !== undefined ? q.gte("createdAt", args.since) : q;
+        return args.until !== undefined ? from.lte("createdAt", args.until) : from;
       })
-      .slice(0, 100)
-      .map((e) => ({
+      .order("desc")
+      .take(100);
+    return events.map((e) => ({
         kind: e.kind,
         summary: e.summary,
         createdAt: e.createdAt,
