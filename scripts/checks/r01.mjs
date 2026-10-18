@@ -5,7 +5,7 @@ const S = (process.argv[3] ?? tmpdir());
 const b = await chromium.launch({ executablePath: process.env.CHROME_PATH ?? "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" });
 for (const motion of ["no-preference", "reduce"]) {
   const p = await b.newPage({ viewport: { width: 1280, height: 720 }, reducedMotion: motion });
-  await p.goto("http://127.0.0.1:43139/", { waitUntil: "load" }); await p.waitForTimeout(1500);
+  await p.goto((process.env.SITE_URL ?? "http://127.0.0.1:43139") + "/", { waitUntil: "load" }); await p.waitForTimeout(1500);
   const H = await p.evaluate(() => document.documentElement.scrollHeight);
   let worst = [];
   for (let y = 0; y < H; y += 360) {
