@@ -909,7 +909,13 @@
         a.live = (y > a.top - vh * 1.25) && (y < a.top + a.height + vh * 1.25);
         // Under reduced motion the figure is static and complete: publish full
         // progress so progress-driven art (connectors, aggregates) is drawn.
-        a.el.style.setProperty('--sc-p', (reduce ? 1 : a.p).toFixed(4));
+        // Write only for acts near the viewport and only on change: every write
+        // restyles the act's subtree, and off-screen acts are not seen.
+        var pOut = (reduce ? 1 : a.p).toFixed(3);
+        if ((a.live || a.pOut === undefined) && pOut !== a.pOut) {
+          a.el.style.setProperty('--sc-p', pOut);
+          a.pOut = pOut;
+        }
 
         // Fetch earlier than we drive. A 1080p clip is megabytes, and a reader
         // who scrolls briskly will otherwise arrive at a stage that is still

@@ -11,6 +11,8 @@ type Mark = {
   radius: string;
   pad: string;
   label: string;
+  /** Start hour as a fraction of the stay, for the scroll time cursor. */
+  h: number;
 };
 
 const H = 72;
@@ -27,6 +29,7 @@ const seg = (a: number, b: number, label: string, hi = false): Mark => ({
   radius: "2px",
   pad: "8px",
   label,
+  h: a / H,
 });
 
 const out = (a: number, b: number, label: string): Mark => ({
@@ -47,6 +50,7 @@ const dot = (h: number): Mark => ({
   radius: "50%",
   pad: "0",
   label: "",
+  h: h / H,
 });
 
 const tick = (h: number): Mark => ({
@@ -60,6 +64,7 @@ const tick = (h: number): Mark => ({
   radius: "0",
   pad: "0",
   label: "",
+  h: h / H,
 });
 
 const vit: Mark[] = [];
@@ -178,7 +183,15 @@ export function IcuStayFigure() {
         role="region"
         aria-label="ICU stay schematic timeline. Scroll horizontally on small screens."
       >
-        <div style={{ minWidth: 640, width: "max-content", maxWidth: "none" }}>
+        <div
+          style={{
+            minWidth: 640,
+            width: "max-content",
+            maxWidth: "none",
+            position: "relative",
+          }}
+        >
+        <span className="icu-cursor" aria-hidden="true" />
         <div
           style={{
             display: "flex",
@@ -245,8 +258,10 @@ export function IcuStayFigure() {
               {r.marks.map((m, i) => (
                 <span
                   key={`${r.table}-${i}`}
+                  className="icu-mark"
                   title={m.label || undefined}
                   style={{
+                    ["--h" as string]: m.h.toFixed(4),
                     position: "absolute",
                     top: m.top,
                     left: m.left,

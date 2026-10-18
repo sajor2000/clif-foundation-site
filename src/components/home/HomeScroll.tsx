@@ -37,8 +37,6 @@ export function HomeScroll() {
           aria-labelledby="home-title"
         >
           <div
-            data-sc-in
-            data-sc-stagger="70"
             style={{
               display: "flex",
               flexWrap: "wrap",
@@ -93,7 +91,6 @@ export function HomeScroll() {
 
           <div
             data-sc-in
-            data-sc-stagger="60"
             className="sc-chapter-cut"
             style={{
               marginTop: "clamp(56px,7vw,96px)",
@@ -200,10 +197,10 @@ export function HomeScroll() {
                   <h2
                     id="fig-fed"
                     className="h2"
-                    data-sc-cue="0"
                     style={{ color: "var(--text-inverse)", margin: 0 }}
                   >
-                    Data stays at each hospital. Code travels.
+                    <span data-sc-cue="0">Data stays at each hospital.</span>{" "}
+                    <span data-sc-cue="0.1 1 0.16 0">Code travels.</span>
                   </h2>
                 </div>
                 <p
@@ -251,8 +248,6 @@ export function HomeScroll() {
             <span>Tables</span>
           </header>
           <div
-            data-sc-in
-            data-sc-stagger="70"
             style={{
               display: "flex",
               flexWrap: "wrap",
@@ -281,11 +276,11 @@ export function HomeScroll() {
             </p>
           </div>
 
-          <div data-sc-reveal="up" data-sc-reveal-at="0.12 0.55">
+          <div data-sc-act="flow" className="icu-scrub">
             <IcuStayFigure />
           </div>
 
-          <div data-sc-in data-sc-stagger="50">
+          <div>
             <h3
               style={{
                 margin: "0 0 20px",
@@ -348,43 +343,44 @@ export function HomeScroll() {
           </div>
         </section>
 
-        {/* 03 · Programs pan */}
+        {/* 03 · Programs */}
         <section
           id="ch-programs"
-          data-sc-act="pan"
-          data-sc-span="2.0"
+          data-sc-act="flow"
           aria-labelledby="programs-heading"
         >
-          <div data-sc-stage>
-            <div
-              className="sc-program-rail"
-              data-sc-pan="0.08"
-              style={{ height: "100%", alignItems: "center" }}
-            >
-              <div className="sc-program-rail__lead">
-                <header className="sc-intertitle" style={{ marginBottom: 8 }}>
-                  <span className="sc-intertitle__n">03</span>
-                  <span>Programs</span>
-                </header>
-                <h2 id="programs-heading" className="h2">
-                  Four programs
-                </h2>
-                <p
-                  style={{
-                    margin: 0,
-                    fontSize: 16,
-                    lineHeight: 1.55,
-                    color: "var(--text-body)",
-                    maxWidth: "36ch",
-                  }}
-                >
-                  Training, implementation help, stewardship, and convening.
-                  Choose a program, then continue.
-                </p>
-                <Link href="/our-work" className="linkish">
-                  Program details
-                </Link>
-              </div>
+          <div
+            className="page-wrap sc-programs"
+            style={{
+              paddingTop: "var(--section-y)",
+              paddingBottom: "var(--section-y)",
+            }}
+          >
+            <div className="sc-programs__lead">
+              <header className="sc-intertitle" style={{ marginBottom: 8 }}>
+                <span className="sc-intertitle__n">03</span>
+                <span>Programs</span>
+              </header>
+              <h2 id="programs-heading" className="h2">
+                Four programs
+              </h2>
+              <p
+                style={{
+                  margin: 0,
+                  fontSize: 16,
+                  lineHeight: 1.55,
+                  color: "var(--text-body)",
+                  maxWidth: "36ch",
+                }}
+              >
+                Training, implementation help, stewardship, and convening.
+                Choose a program, then continue.
+              </p>
+              <Link href="/our-work" className="linkish">
+                Program details
+              </Link>
+            </div>
+            <div className="sc-programs__grid">
               {PROGRAMS.map((p) => (
                 <Link
                   key={p.id}
@@ -443,7 +439,6 @@ export function HomeScroll() {
             <span>Start</span>
           </header>
           <div
-            data-sc-in
             style={{
               display: "flex",
               flexWrap: "wrap",
@@ -487,8 +482,7 @@ export function HomeScroll() {
               </a>
             </div>
             <div
-              data-sc-reveal="left"
-              data-sc-reveal-at="0.1 0.55"
+              data-sc-in
               style={{
                 flex: "1 1 440px",
                 minWidth: 0,
@@ -526,11 +520,12 @@ export function HomeScroll() {
                 <span style={{ flex: "1 1 0" }}>site-local device_name</span>
                 <span style={{ flex: "1 1 0" }}>device_category</span>
               </div>
-              {MAPPINGS.map((m) => (
+              {MAPPINGS.map((m, i) => (
                 <div
                   key={m.local}
                   className="sc-crosswalk-row"
                   style={{
+                    ["--i" as string]: i,
                     display: "flex",
                     gap: 16,
                     padding: "11px 20px",
@@ -569,7 +564,6 @@ export function HomeScroll() {
             <div
               className="page-wrap"
               data-sc-in
-              data-sc-stagger="60"
               style={{
                 paddingTop: "clamp(56px,7vw,88px)",
                 paddingBottom: "clamp(56px,7vw,88px)",
@@ -665,7 +659,7 @@ export function HomeScroll() {
             </div>
           </div>
 
-          <div data-sc-in data-sc-stagger="50" style={{ display: "grid", gap: 36 }}>
+          <div style={{ display: "grid", gap: 36 }}>
             <div style={{ display: "grid", gap: 14 }}>
               <h2
                 style={{
@@ -726,7 +720,7 @@ export function HomeScroll() {
             </div>
           </div>
 
-          <div className="sc-colophon" data-sc-in>
+          <div className="sc-colophon">
             <p style={{ margin: 0, fontSize: 15, lineHeight: 1.55, color: "var(--text-muted)" }}>
               CLIF Foundation · Illinois nonprofit · helping more
               organizations use CLIF · {IRS_STATUS_SHORT}. Research credited to

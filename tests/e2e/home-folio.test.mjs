@@ -15,8 +15,9 @@ for (const id of ["ch-federation", "ch-programs"]) {
         const folio = document
           .querySelector(".sc-folio")
           .getBoundingClientRect();
+        // Pinned chapters have a stage; the programs chapter is a plain grid.
         const stage = document
-          .querySelector(`#${id} [data-sc-stage]`)
+          .querySelector(`#${id} [data-sc-stage], #${id} .page-wrap`)
           .getBoundingClientRect();
         return {
           folioRight: folio.right,
