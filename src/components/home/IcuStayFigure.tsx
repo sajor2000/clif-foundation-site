@@ -164,6 +164,9 @@ export function IcuStayFigure() {
         </span>
       }
     >
+      <p className="icu-scroll-hint" aria-hidden="true">
+        Swipe sideways to see all 72 hours
+      </p>
       <div
         style={{
           padding: "16px 20px 8px",

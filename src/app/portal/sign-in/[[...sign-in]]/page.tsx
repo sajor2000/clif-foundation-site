@@ -2,6 +2,7 @@
 
 import { SignIn } from "@clerk/nextjs";
 import Link from "next/link";
+import { Lockup } from "@/components/brand/Lockup";
 import { isClerkConfigured } from "@/lib/env";
 
 export default function PortalSignInPage() {
@@ -18,23 +19,27 @@ export default function PortalSignInPage() {
       }}
     >
       <div style={{ display: "grid", gap: 24, justifyItems: "center" }}>
-        <div style={{ textAlign: "center", display: "grid", gap: 8 }}>
+        <Lockup height={28} />
+        <div style={{ textAlign: "center", display: "grid", gap: 8, maxWidth: 400 }}>
           <h1
             style={{
               margin: 0,
               fontFamily: "var(--font-display)",
               fontWeight: 600,
-              fontSize: 32,
+              fontSize: "var(--type-display-m)",
+              letterSpacing: "-0.025em",
+              lineHeight: 1.06,
             }}
           >
             Board sign-in
           </h1>
-          <p style={{ margin: 0, color: "var(--text-muted)", fontSize: 15 }}>
-            CLIF Foundation portal · not linked from the public site
+          <p style={{ margin: 0, color: "var(--text-body)", fontSize: 16, lineHeight: 1.5 }}>
+            The private workspace for CLIF Foundation directors. New here? Sign up, then request
+            access from the board.
           </p>
         </div>
         {isClerkConfigured ? (
-          <SignIn />
+          <SignIn appearance={{ elements: { header: { display: "none" } } }} />
         ) : (
           <div
             style={{

@@ -5,12 +5,12 @@ import { useMutation, useQuery } from "convex/react";
 import { useState } from "react";
 import { api } from "../../../convex/_generated/api";
 import { Button } from "@/components/core/Button";
-import { panelStyle, pageTitle } from "@/components/portal/portal-styles";
+import { POLICY_TYPES } from "../../../convex/lib/vocab";
+import { panelStyle, pageTitle, sectionTitle } from "@/components/portal/portal-styles";
 
 export function PortalHome() {
   const year = new Date().getFullYear();
   const role = useQuery(api.board.myRole);
-  const bootstrap = useMutation(api.board.bootstrapAdmin);
   const canLoadBoard = role !== undefined && role !== null && role !== "bootstrap_eligible";
   const dashboard = useQuery(
     api.compliance.getDashboard,
@@ -26,85 +26,181 @@ export function PortalHome() {
         </p>
       </div>
 
-      {role === "bootstrap_eligible" ? (
-        <div style={panelStyle}>
-          <p style={{ margin: 0, fontWeight: 600 }}>First-time setup</p>
-          <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5 }}>
-            No board allowlist yet. Claim admin, then add director emails under Members. Public
-            board roster JSON has no emails—add them here.
-          </p>
-          <Button type="button" onClick={() => bootstrap({})}>
-            Claim admin for my account
-          </Button>
-        </div>
-      ) : null}
+      {role === "bootstrap_eligible" ? <ClaimAdminPanel /> : null}
 
       {role === null ? <RequestAccessPanel /> : null}
 
-      <div
-        style={{
-          display: "grid",
-          gap: 16,
-          gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
-        }}
-      >
-        <JobCard
-          href="/portal/reporting"
-          title="1. Get paperwork"
-          body="Download tax, policy, financial files and approved minutes for CPA or Form 990 prep."
-          primary
-        />
-        <JobCard
-          href="/portal/meetings"
-          title="2. Do board work"
-          body="Record attendance, draft and approve minutes, and cast votes on motions."
-        />
-        <JobCard
-          href="/portal/compliance"
-          title="3. Stay compliant"
-          body="COI disclosures, policy checklist, Form 990 board review, and activity log."
-        />
-      </div>
+      {canLoadBoard ? (
+        <>
+          <ul style={hairlineList}>
+            <JobRow
+              href="/portal/reporting"
+              title="Get paperwork"
+              body="Tax, policy and financial files plus approved minutes, ready for your CPA or Form 990."
+            />
+            <JobRow
+              href="/portal/meetings"
+              title="Do board work"
+              body="Record attendance, draft and approve minutes, and vote on motions."
+            />
+            <JobRow
+              href="/portal/compliance"
+              title="Stay compliant"
+              body="Conflict of interest disclosures, the policy checklist, Form 990 review and the activity log."
+            />
+          </ul>
 
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 16, fontSize: 14 }}>
-        <Link href="/portal/documents" style={{ color: "var(--link)" }}>
-          Upload documents
-        </Link>
-        <Link href="/portal/votes" style={{ color: "var(--link)" }}>
-          Open votes
-        </Link>
-        <Link href="/portal/coi" style={{ color: "var(--link)" }}>
-          Annual COI
-        </Link>
-        {role === "admin" ? (
-          <Link href="/portal/members" style={{ color: "var(--link)" }}>
-            Members allowlist
-          </Link>
-        ) : null}
-      </div>
+          <nav aria-label="Shortcuts" style={{ display: "flex", flexWrap: "wrap", columnGap: 20 }}>
+            {[
+              { href: "/portal/documents", label: "Upload documents" },
+              { href: "/portal/votes", label: "Open votes" },
+              { href: "/portal/coi", label: "Annual COI" },
+              ...(role === "admin" ? [{ href: "/portal/members", label: "Members" }] : []),
+            ].map((l) => (
+              <Link key={l.href} href={l.href} style={shortcut}>
+                {l.label}
+              </Link>
+            ))}
+          </nav>
+        </>
+      ) : null}
 
       {dashboard ? (
-        <div style={panelStyle}>
-          <p style={{ margin: 0, fontWeight: 600 }}>{year} at a glance</p>
-          <ul style={{ margin: 0, paddingLeft: 18, lineHeight: 1.6, fontSize: 14 }}>
-            <li>
-              COI: {dashboard.coi.submitted} / {dashboard.coi.eligible}
-              {dashboard.coi.complete ? " · complete" : " · incomplete"}
-            </li>
-            <li>
-              Form 990 review:{" "}
-              {dashboard.form990.boardReviewedBeforeFiled ? "recorded" : "not recorded"}
-            </li>
-            <li>
-              Policies missing:{" "}
-              {dashboard.policies.missing.length
-                ? dashboard.policies.missing.join(", ")
-                : "none"}
-            </li>
-            <li>Meetings without approved minutes: {dashboard.minutesGaps.length}</li>
-          </ul>
-        </div>
+        <section aria-labelledby="glance-heading" style={{ display: "grid", gap: 12, maxWidth: 680 }}>
+          <h2 id="glance-heading" style={{ ...sectionTitle, fontSize: 20 }}>
+            {year} at a glance
+          </h2>
+          <dl style={{ ...hairlineList, margin: 0 }}>
+            <GlanceRow
+              term="Conflict of interest disclosures"
+              value={`${dashboard.coi.submitted} of ${dashboard.coi.eligible} ${dashboard.coi.eligible === 1 ? "director" : "directors"}${dashboard.coi.complete ? " · complete" : ""}`}
+            />
+            <GlanceRow
+              term={`Form 990 review (tax year ${dashboard.form990.taxYear})`}
+              value={dashboard.form990.boardReviewedBeforeFiled ? "Recorded" : "Not recorded"}
+            />
+            <GlanceRow
+              term="Policies still to register"
+              value={
+                dashboard.policies.missing.length
+                  ? dashboard.policies.missing.map(policyLabel).join(", ")
+                  : "None"
+              }
+            />
+            <GlanceRow
+              term="Held meetings without approved minutes"
+              value={String(dashboard.minutesGaps.length)}
+            />
+          </dl>
+        </section>
       ) : null}
+    </div>
+  );
+}
+
+const hairlineList = {
+  margin: 0,
+  padding: 0,
+  listStyle: "none",
+  borderTop: "1px solid var(--border-strong)",
+  maxWidth: 880,
+} as const;
+
+const shortcut = {
+  color: "var(--link)",
+  fontSize: 15,
+  display: "inline-flex",
+  alignItems: "center",
+  minHeight: "var(--control-md)",
+} as const;
+
+const policyLabel = (value: string) =>
+  POLICY_TYPES.find((p) => p.value === value)?.label ?? value;
+
+function JobRow({ href, title, body }: { href: string; title: string; body: string }) {
+  return (
+    <li style={{ borderBottom: "1px solid var(--border)" }}>
+      <Link
+        href={href}
+        className="portal-job-row"
+        style={{
+          display: "grid",
+          gridTemplateColumns: "minmax(0, 1fr) auto",
+          gap: "4px 24px",
+          alignItems: "center",
+          padding: "20px 12px",
+          textDecoration: "none",
+          color: "inherit",
+          minHeight: "var(--control-md)",
+        }}
+      >
+        <span style={{ fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 22, letterSpacing: "-0.015em" }}>
+          {title}
+        </span>
+        <span aria-hidden="true" style={{ gridRow: "1 / span 2", gridColumn: 2, color: "var(--link)", fontSize: 20 }}>
+          →
+        </span>
+        <span style={{ fontSize: 15, lineHeight: 1.5, color: "var(--text-body)", maxWidth: "62ch" }}>
+          {body}
+        </span>
+      </Link>
+    </li>
+  );
+}
+
+function GlanceRow({ term, value }: { term: string; value: string }) {
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexWrap: "wrap",
+        justifyContent: "space-between",
+        gap: "4px 16px",
+        padding: "12px 0",
+        borderBottom: "1px solid var(--border)",
+        fontSize: 15,
+      }}
+    >
+      <dt style={{ color: "var(--text-body)", flex: "1 1 14rem" }}>{term}</dt>
+      <dd style={{ margin: 0, fontWeight: 500, fontVariantNumeric: "tabular-nums" }}>
+        {value}
+      </dd>
+    </div>
+  );
+}
+
+function ClaimAdminPanel() {
+  const bootstrap = useMutation(api.board.bootstrapAdmin);
+  const [error, setError] = useState<string | null>(null);
+  const [claiming, setClaiming] = useState(false);
+
+  async function onClaim() {
+    setError(null);
+    setClaiming(true);
+    try {
+      await bootstrap({});
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Could not claim admin");
+    } finally {
+      setClaiming(false);
+    }
+  }
+
+  return (
+    <div style={{ ...panelStyle, maxWidth: 640 }}>
+      <p style={{ margin: 0, fontWeight: 600 }}>First-time setup</p>
+      <p style={{ margin: 0, fontSize: 15, lineHeight: 1.5 }}>
+        The board has no members yet. Claim admin for this account, then approve directors as they
+        request access under Members.
+      </p>
+      {error ? (
+        <p role="alert" style={{ margin: 0, color: "var(--status-error)", fontSize: 14 }}>
+          {error}
+        </p>
+      ) : null}
+      <Button type="button" onClick={onClaim} disabled={claiming}>
+        {claiming ? "Claiming…" : "Claim admin for my account"}
+      </Button>
     </div>
   );
 }
@@ -162,33 +258,3 @@ function RequestAccessPanel() {
   );
 }
 
-function JobCard({
-  href,
-  title,
-  body,
-  primary,
-}: {
-  href: string;
-  title: string;
-  body: string;
-  primary?: boolean;
-}) {
-  return (
-    <Link
-      href={href}
-      style={{
-        ...panelStyle,
-        textDecoration: "none",
-        color: "inherit",
-        borderColor: primary ? "var(--accent)" : "var(--border-strong)",
-        minHeight: 140,
-      }}
-    >
-      <p style={{ margin: 0, fontWeight: 600, fontSize: 18 }}>{title}</p>
-      <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5, color: "var(--text-body)" }}>
-        {body}
-      </p>
-      <span style={{ fontSize: 14, color: "var(--link)", fontWeight: 500 }}>Open →</span>
-    </Link>
-  );
-}

@@ -83,7 +83,7 @@ export function MinutesItems({
             <fieldset style={{ border: 0, padding: 0, margin: 0, display: "grid", gap: 6 }}>
               <legend style={{ fontSize: 14, marginBottom: 6 }}>Recused for a conflict of interest</legend>
               {directors.map((d) => (
-                <label key={d.email} style={{ display: "flex", gap: 8, alignItems: "center", fontSize: 14, minHeight: 32 }}>
+                <label key={d.email} style={{ display: "flex", gap: 8, alignItems: "center", fontSize: 14, minHeight: 44 }}>
                   <input
                     type="checkbox"
                     checked={recused.includes(d.email)}

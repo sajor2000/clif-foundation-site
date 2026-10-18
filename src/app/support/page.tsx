@@ -8,6 +8,7 @@ import {
   GivebutterGift,
   GivebutterNotConfigured,
 } from "@/components/support/GivebutterGift";
+import { GivebutterScript } from "@/components/support/GivebutterScript";
 import { InquiryForm } from "@/components/support/InquiryForm";
 import { CONTACT_EMAIL, GIFT_PROGRAMS, SUPPORT_PATHS } from "@/lib/content";
 import { givebutterEmbed } from "@/lib/givebutter";
@@ -24,6 +25,7 @@ export default function SupportPage() {
 
   return (
     <SiteShell current="support">
+      <GivebutterScript />
       <section
         className="page-wrap"
         style={{
