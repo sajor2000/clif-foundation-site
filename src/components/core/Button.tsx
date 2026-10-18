@@ -24,6 +24,8 @@ export function Button({
   disabled,
   "aria-pressed": ariaPressed,
   "aria-label": ariaLabel,
+  "aria-describedby": ariaDescribedBy,
+  pending = false,
 }: {
   variant?: Variant;
   size?: Size;
@@ -36,9 +38,13 @@ export function Button({
   disabled?: boolean;
   "aria-pressed"?: boolean;
   "aria-label"?: string;
+  "aria-describedby"?: string;
+  /** Action in flight: disabled and announced busy until it settles. */
+  pending?: boolean;
 }) {
   // Colours, hover and press live in globals.css (.btn--*): CSS hover is
   // gated to real pointers, so it never sticks after a tap.
+  const inactive = disabled || pending;
   const s: CSSProperties = {
     height: SIZES[size],
     padding: size === "sm" ? "0 14px" : "0 22px",
@@ -53,9 +59,9 @@ export function Button({
     fontSize: size === "lg" ? 16 : 15,
     lineHeight: 1,
     textDecoration: "none",
-    cursor: disabled ? "not-allowed" : "pointer",
+    cursor: pending ? "progress" : disabled ? "not-allowed" : "pointer",
     whiteSpace: "nowrap",
-    opacity: disabled ? 0.6 : 1,
+    opacity: inactive ? 0.6 : 1,
     ...style,
   };
   const className = `btn btn--${variant}`;
@@ -74,9 +80,11 @@ export function Button({
       className={className}
       style={s}
       onClick={onClick}
-      disabled={disabled}
+      disabled={inactive}
+      aria-busy={pending || undefined}
       aria-pressed={ariaPressed}
       aria-label={ariaLabel}
+      aria-describedby={ariaDescribedBy}
     >
       {children}
     </button>

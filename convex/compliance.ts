@@ -97,6 +97,7 @@ export const listAuditEvents = query({
   },
   returns: v.array(
     v.object({
+      id: v.id("auditEvents"),
       kind: v.string(),
       summary: v.string(),
       createdAt: v.number(),
@@ -114,6 +115,7 @@ export const listAuditEvents = query({
       .order("desc")
       .take(100);
     return events.map((e) => ({
+        id: e._id,
         kind: e.kind,
         summary: e.summary,
         createdAt: e.createdAt,

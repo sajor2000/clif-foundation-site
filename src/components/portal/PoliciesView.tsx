@@ -5,6 +5,8 @@ import { useState } from "react";
 import { api } from "../../../convex/_generated/api";
 import { POLICY_TYPES, type PolicyType } from "../../../convex/lib/vocab";
 import { Button } from "@/components/core/Button";
+import { FormStatus } from "@/components/portal/FormStatus";
+import { useAction } from "@/components/portal/useAction";
 import { inputStyle, pageTitle, panelStyle } from "@/components/portal/portal-styles";
 
 export function PoliciesView() {
@@ -15,26 +17,25 @@ export function PoliciesView() {
   const closedMotions = useQuery(api.motions.listMotions, { status: "closed" });
   const passed = (closedMotions ?? []).filter((m) => m.tally.passed).map((m) => m.motion);
   const [motionId, setMotionId] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const action = useAction("Policy registered.");
   const [policyType, setPolicyType] = useState<PolicyType>(POLICY_TYPES[0].value);
   const [title, setTitle] = useState("");
   const [version, setVersion] = useState(1);
   const [instructions, setInstructions] = useState("");
 
   async function onRegister() {
-    setError(null);
-    try {
-      await register({
+    const id = await action.run(() =>
+      register({
         policyType,
         title,
         version,
         reportingInstructions: instructions || undefined,
         motionId: passed.find((m) => m._id === motionId)?._id,
-      });
+      }),
+    );
+    if (id) {
       setTitle("");
       setMotionId("");
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Could not register the policy");
     }
   }
 
@@ -105,27 +106,29 @@ export function PoliciesView() {
             ))}
           </select>
         </label>
-        {error ? (
-          <p role="alert" style={{ margin: 0, color: "var(--status-error)", fontSize: 14 }}>
-            {error}
-          </p>
-        ) : null}
-        <Button type="button" onClick={onRegister} disabled={!title.trim()}>
-          Register
+        <FormStatus error={action.error} status={action.status} />
+        <Button type="button" onClick={onRegister} disabled={!title.trim()} pending={action.pending}>
+          {action.pending ? "Registering…" : "Register"}
         </Button>
       </div>
       ) : null}
 
       <ul style={{ margin: 0, padding: 0, listStyle: "none" }}>
         {!policies ? (
-          <li>Loading…</li>
+          <li style={{ color: "var(--text-muted)" }}>Loading policies…</li>
+        ) : policies.length === 0 ? (
+          <li style={{ color: "var(--text-muted)" }}>
+            No policies registered yet.
+            {isOfficer ? " Register each adopted policy above and link the motion that adopted it." : ""}
+          </li>
         ) : (
           policies.map((p) => (
             <li
               key={p._id}
               style={{ padding: "14px 0", borderBottom: "1px solid var(--border)" }}
             >
-              <strong>{p.title}</strong> · v{p.version} · {p.policyType}
+              <strong>{p.title}</strong> · v{p.version} ·{" "}
+              {POLICY_TYPES.find((t) => t.value === p.policyType)?.label ?? p.policyType}
               {p.adoptedAt ? (
                 <span style={{ color: "var(--text-muted)", fontSize: 13 }}>
                   {" "}

@@ -8,7 +8,9 @@ import { api } from "../../../convex/_generated/api";
 import type { Doc, Id } from "../../../convex/_generated/dataModel";
 import { ACCEPTED_UPLOAD_TYPES } from "../../../convex/lib/uploads";
 import { Button } from "@/components/core/Button";
+import { FormStatus } from "@/components/portal/FormStatus";
 import { sectionTitle } from "@/components/portal/portal-styles";
+import { useAction } from "@/components/portal/useAction";
 import {
   formatUploadError,
   uploadDocumentProgram,
@@ -43,8 +45,10 @@ export function MinutesApproval({
   const attachFile = useMutation(api.meetings.attachMinutesFile);
   const sendForApproval = useMutation(api.meetings.sendMinutesForApproval);
   const [file, setFile] = useState<File | null>(null);
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  // Bumped after an upload to clear the file picker.
+  const [fileKey, setFileKey] = useState(0);
+  const attach = useAction("Uploaded and attached.");
+  const send = useAction("Sent to the board for a vote.");
 
   const editable = !minutes || minutes.status === "draft";
   const held = meeting.status === "held";
@@ -52,54 +56,40 @@ export function MinutesApproval({
 
   async function onAttach() {
     if (!file) return;
-    setError(null);
-    setBusy(true);
-    const exit = await Effect.runPromiseExit(
-      uploadDocumentProgram(
-        { title: `Minutes: ${meeting.title}`, category: "meeting", file },
-        {
-          generateUploadUrl,
-          saveDocument: (args) =>
-            saveDocument({
-              storageId: args.storageId as Id<"_storage">,
-              title: args.title,
-              category: "meeting",
-              contentType: args.contentType,
-              retentionClass: "permanent",
-            }),
-        },
-      ),
-    );
-    if (Exit.isSuccess(exit)) {
-      try {
-        await attachFile({
-          meetingId: meeting._id,
-          documentId: exit.value.documentId as Id<"documents">,
-        });
-        setFile(null);
-      } catch (e) {
-        setError(e instanceof Error ? e.message : "Could not attach the file");
-      }
-    } else {
-      const squashed = Cause.squash(exit.cause);
-      setError(
-        squashed && typeof squashed === "object" && "_tag" in squashed
-          ? formatUploadError(squashed as UploadDocumentError)
-          : "Upload failed",
+    const ok = await attach.run(async () => {
+      const exit = await Effect.runPromiseExit(
+        uploadDocumentProgram(
+          { title: `Minutes: ${meeting.title}`, category: "meeting", file },
+          {
+            generateUploadUrl,
+            saveDocument: (args) =>
+              saveDocument({
+                storageId: args.storageId as Id<"_storage">,
+                title: args.title,
+                category: "meeting",
+                contentType: args.contentType,
+                retentionClass: "permanent",
+              }),
+          },
+        ),
       );
-    }
-    setBusy(false);
-  }
-
-  async function onSend() {
-    setError(null);
-    setBusy(true);
-    try {
-      await sendForApproval({ meetingId: meeting._id });
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Could not send the minutes for approval");
-    } finally {
-      setBusy(false);
+      if (Exit.isFailure(exit)) {
+        const squashed = Cause.squash(exit.cause);
+        throw new Error(
+          squashed && typeof squashed === "object" && "_tag" in squashed
+            ? formatUploadError(squashed as UploadDocumentError)
+            : "Upload failed",
+        );
+      }
+      await attachFile({
+        meetingId: meeting._id,
+        documentId: exit.value.documentId as Id<"documents">,
+      });
+      return true;
+    });
+    if (ok) {
+      setFile(null);
+      setFileKey((k) => k + 1);
     }
   }
 
@@ -116,8 +106,8 @@ export function MinutesApproval({
       {minutesFile ? (
         <p style={{ margin: 0, fontSize: 15 }}>
           {minutesFile.url ? (
-            <a href={minutesFile.url} target="_blank" rel="noopener noreferrer" style={{ color: "var(--link)" }}>
-              {minutesFile.title} ↗
+            <a href={minutesFile.url} target="_blank" rel="noopener noreferrer" className="portal-row-link" style={{ color: "var(--link)" }}>
+              {minutesFile.title}
             </a>
           ) : (
             minutesFile.title
@@ -127,7 +117,7 @@ export function MinutesApproval({
 
       {approvalMotion ? (
         <Link href={`/portal/votes/${approvalMotion.id}`} style={{ color: "var(--link)", fontSize: 15, display: "inline-flex", alignItems: "center", minHeight: "var(--control-md)" }}>
-          {approvalMotion.status === "open" ? "Read the minutes and vote →" : "View the vote →"}
+          {approvalMotion.status === "open" ? "Read the minutes and vote" : "View the vote"}
         </Link>
       ) : null}
 
@@ -136,17 +126,23 @@ export function MinutesApproval({
           <label style={{ display: "grid", gap: 6, fontSize: 14 }}>
             {minutesFile ? "Replace the minutes file (PDF or Word)" : "Minutes file (PDF or Word)"}
             <input
+              key={fileKey}
               type="file"
               accept={ACCEPTED_UPLOAD_TYPES}
               onChange={(e) => setFile(e.target.files?.[0] ?? null)}
             />
           </label>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-            <Button type="button" variant="secondary" onClick={onAttach} disabled={!file || busy}>
-              {busy && file ? "Uploading…" : "Attach file"}
+            <Button type="button" variant="secondary" onClick={onAttach} disabled={!file || send.pending} pending={attach.pending}>
+              {attach.pending ? "Uploading…" : "Attach file"}
             </Button>
-            <Button type="button" onClick={onSend} disabled={!held || !hasContent || busy}>
-              Send to board for approval
+            <Button
+              type="button"
+              onClick={() => send.run(() => sendForApproval({ meetingId: meeting._id }))}
+              disabled={!held || !hasContent || attach.pending}
+              pending={send.pending}
+            >
+              {send.pending ? "Sending…" : "Send to board for approval"}
             </Button>
           </div>
           {!held ? (
@@ -161,11 +157,7 @@ export function MinutesApproval({
         </div>
       ) : null}
 
-      {error ? (
-        <p role="alert" style={{ margin: 0, color: "var(--status-error)", fontSize: 14 }}>
-          {error}
-        </p>
-      ) : null}
+      <FormStatus error={attach.error ?? send.error} status={attach.status ?? send.status} />
     </section>
   );
 }

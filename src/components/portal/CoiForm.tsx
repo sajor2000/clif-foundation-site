@@ -4,7 +4,9 @@ import { useMutation, useQuery } from "convex/react";
 import { useState } from "react";
 import { api } from "../../../convex/_generated/api";
 import { Button } from "@/components/core/Button";
+import { FormStatus } from "@/components/portal/FormStatus";
 import { inputStyle, pageTitle, panelStyle } from "@/components/portal/portal-styles";
+import { useAction } from "@/components/portal/useAction";
 
 export function CoiForm() {
   const year = new Date().getFullYear();
@@ -12,27 +14,19 @@ export function CoiForm() {
   const submit = useMutation(api.coi.submitDisclosure);
   const [draftConflict, setDraftConflict] = useState<boolean | null>(null);
   const [draftDetails, setDraftDetails] = useState<string | null>(null);
-  const [saved, setSaved] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const action = useAction("Disclosure saved.");
 
   const hasConflict = draftConflict ?? existing?.hasConflict ?? false;
   const details = draftDetails ?? existing?.details ?? "";
 
   async function onSubmit() {
-    if (isSubmitting) return;
-    setError(null);
-    setSaved(false);
-    setIsSubmitting(true);
-    try {
+    const ok = await action.run(async () => {
       await submit({ year, hasConflict, details: details || undefined });
-      setSaved(true);
+      return true;
+    });
+    if (ok) {
       setDraftConflict(null);
       setDraftDetails(null);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Failed to save disclosure");
-    } finally {
-      setIsSubmitting(false);
     }
   }
 
@@ -43,11 +37,14 @@ export function CoiForm() {
         Complete once per calendar year. Your answers support Form 990 Part VI conflict-of-interest
         disclosures.
       </p>
-      {existing ? (
-        <p style={{ fontSize: 14, color: "var(--text-muted)" }}>
-          Last submitted {new Date(existing.submittedAt).toLocaleString()}.
-        </p>
-      ) : null}
+      {/* Always one line, so the form doesn't jump when the query resolves. */}
+      <p style={{ margin: 0, fontSize: 14, color: "var(--text-muted)", minHeight: "1.5em" }}>
+        {existing === undefined
+          ? "Checking your disclosure…"
+          : existing
+            ? `Last submitted ${new Date(existing.submittedAt).toLocaleString()}.`
+            : `Not yet submitted for ${year}.`}
+      </p>
       <div style={panelStyle}>
         <label
           style={{
@@ -74,19 +71,10 @@ export function CoiForm() {
             style={{ ...inputStyle, height: "auto", padding: 12 }}
           />
         </label>
-        {error ? (
-          <p role="alert" style={{ margin: 0, color: "var(--status-error)", fontSize: 14 }}>
-            {error}
-          </p>
-        ) : null}
-        <Button type="button" onClick={onSubmit} disabled={isSubmitting}>
-          {isSubmitting ? "Saving…" : `Submit ${year} disclosure`}
+        <FormStatus error={action.error} status={action.status} />
+        <Button type="button" onClick={onSubmit} pending={action.pending}>
+          {action.pending ? "Saving…" : `Submit ${year} disclosure`}
         </Button>
-        {saved ? (
-          <p role="status" style={{ margin: 0, color: "var(--accent-text)", fontSize: 14 }}>
-            Saved.
-          </p>
-        ) : null}
       </div>
     </div>
   );

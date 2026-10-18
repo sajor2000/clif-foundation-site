@@ -57,6 +57,13 @@ function StatusPanel({
 const devHint = (hint: string, publicText: string) =>
   process.env.NODE_ENV === "production" ? publicText : `${publicText} (${hint})`;
 
+/** Every "still checking" state shows this same panel, so loading never flickers between messages. */
+const Loading = () => (
+  <div role="status" aria-busy="true">
+    <StatusPanel title="Opening the board portal…" body="Checking your board session." />
+  </div>
+);
+
 const UNAVAILABLE = "The board portal is not available right now. Please try again later.";
 
 export function PortalGate({ children }: { children: ReactNode }) {
@@ -86,7 +93,7 @@ export function PortalGate({ children }: { children: ReactNode }) {
     <Suspense
       fallback={
         <PortalShell>
-          <StatusPanel title="Loading portal…" body="Checking board session." />
+          <Loading />
         </PortalShell>
       }
     >
@@ -107,7 +114,7 @@ function SignedInGate({ children }: { children: ReactNode }) {
   if (!isLoaded) {
     return (
       <PortalShell>
-        <StatusPanel title="Loading portal…" body="Checking board session." />
+        <Loading />
       </PortalShell>
     );
   }
@@ -133,10 +140,7 @@ function SignedInGate({ children }: { children: ReactNode }) {
       }
     >
       <AuthLoading>
-        <StatusPanel
-          title="Connecting…"
-          body="Confirming your board session."
-        />
+        <Loading />
       </AuthLoading>
       <Unauthenticated>
         <StatusPanel
@@ -158,21 +162,6 @@ function SignedInGate({ children }: { children: ReactNode }) {
 /** Ensures useConvexAuth is authenticated before data children mount. */
 function ConvexReady({ children }: { children: ReactNode }) {
   const { isAuthenticated, isLoading } = useConvexAuth();
-  if (isLoading) {
-    return (
-      <StatusPanel
-        title="Connecting…"
-        body="Confirming your board session."
-      />
-    );
-  }
-  if (!isAuthenticated) {
-    return (
-      <StatusPanel
-        title="Session not ready"
-        body="Confirming your board session."
-      />
-    );
-  }
+  if (isLoading || !isAuthenticated) return <Loading />;
   return <>{children}</>;
 }

@@ -5,9 +5,11 @@ import { useMutation, useQuery } from "convex/react";
 import { useState } from "react";
 import { api } from "../../../convex/_generated/api";
 import { Button } from "@/components/core/Button";
+import { FormStatus } from "@/components/portal/FormStatus";
 import { MinutesApproval } from "@/components/portal/MinutesApproval";
 import { MinutesItems } from "@/components/portal/MinutesItems";
 import { inputStyle, pageTitle, panelStyle, sectionTitle } from "@/components/portal/portal-styles";
+import { useAction } from "@/components/portal/useAction";
 
 export function MeetingsView({ meetingId }: { meetingId?: string } = {}) {
   const [title, setTitle] = useState("");
@@ -28,7 +30,9 @@ export function MeetingsView({ meetingId }: { meetingId?: string } = {}) {
   const [draftMinutes, setDraftMinutes] = useState<string | null>(null);
   const [draftAttendees, setDraftAttendees] = useState<string | null>(null);
   const [draftMeetingId, setDraftMeetingId] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const createAction = useAction("Meeting created.");
+  const attendanceAction = useAction("Attendance saved; meeting marked held.");
+  const minutesAction = useAction("Minutes saved.");
 
   const detail = useQuery(
     api.meetings.getMeeting,
@@ -58,40 +62,32 @@ export function MeetingsView({ meetingId }: { meetingId?: string } = {}) {
 
   async function onCreate() {
     if (!title || !scheduledAt) return;
-    const id = await createMeeting({
-      title,
-      scheduledAt: new Date(scheduledAt).getTime(),
-    });
-    setPickedId(id);
-    setTitle("");
+    const id = await createAction.run(() =>
+      createMeeting({ title, scheduledAt: new Date(scheduledAt).getTime() }),
+    );
+    if (id) {
+      setPickedId(id);
+      setTitle("");
+      setScheduledAt("");
+    }
   }
 
   async function saveMinutes() {
     if (!detail) return;
-    setError(null);
-    try {
-      await upsertMinutes({
-        meetingId: detail.meeting._id,
-        body: minutesBody,
-      });
-      setDraftMinutes(null);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Failed to save minutes");
-    }
+    const ok = await minutesAction.run(async () => {
+      await upsertMinutes({ meetingId: detail.meeting._id, body: minutesBody });
+      return true;
+    });
+    if (ok) setDraftMinutes(null);
   }
 
   async function onRevise() {
     if (!detail) return;
-    setError(null);
-    try {
-      await reviseMinutes({
-        meetingId: detail.meeting._id,
-        body: minutesBody,
-      });
-      setDraftMinutes(null);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Failed to revise");
-    }
+    const ok = await minutesAction.run(async () => {
+      await reviseMinutes({ meetingId: detail.meeting._id, body: minutesBody });
+      return true;
+    }, "New draft version started.");
+    if (ok) setDraftMinutes(null);
   }
 
   async function saveAttendance() {
@@ -100,13 +96,16 @@ export function MeetingsView({ meetingId }: { meetingId?: string } = {}) {
       .split(/[,;\s]+/)
       .map((e) => e.trim())
       .filter(Boolean);
-    await updateAttendance({
-      meetingId: detail.meeting._id,
-      attendeeEmails: emails,
-      status: "held",
-      heldAt: Date.now(),
+    const ok = await attendanceAction.run(async () => {
+      await updateAttendance({
+        meetingId: detail.meeting._id,
+        attendeeEmails: emails,
+        status: "held",
+        heldAt: Date.now(),
+      });
+      return true;
     });
-    setDraftAttendees(null);
+    if (ok) setDraftAttendees(null);
   }
 
   return (
@@ -134,8 +133,9 @@ export function MeetingsView({ meetingId }: { meetingId?: string } = {}) {
               style={inputStyle}
             />
           </label>
-          <Button type="button" onClick={onCreate}>
-            Create meeting
+          <FormStatus error={createAction.error} status={createAction.status} />
+          <Button type="button" onClick={onCreate} disabled={!title.trim() || !scheduledAt} pending={createAction.pending}>
+            {createAction.pending ? "Creating…" : "Create meeting"}
           </Button>
         </div>
       ) : null}
@@ -144,16 +144,18 @@ export function MeetingsView({ meetingId }: { meetingId?: string } = {}) {
         <section style={{ display: "grid", gap: 12 }}>
           <h2 style={sectionTitle}>Meetings</h2>
           {!meetings ? (
-            <p>Loading…</p>
+            <p style={{ color: "var(--text-muted)" }}>Loading meetings…</p>
+          ) : meetings.length === 0 ? (
+            <p style={{ color: "var(--text-muted)" }}>
+              No meetings yet.{isOfficer ? " Schedule the first one above." : " Officers schedule meetings here."}
+            </p>
           ) : (
             <ul style={{ margin: 0, padding: 0, listStyle: "none" }}>
               {meetings.map((m) => (
-                <li
-                  key={m._id}
-                  style={{ borderBottom: "1px solid var(--border)", padding: "12px 0" }}
-                >
+                <li key={m._id} style={{ borderBottom: "1px solid var(--border)" }}>
                   <Link
                     href={`/portal/meetings/${m._id}`}
+                    className="portal-row-link"
                     style={{
                       color: "var(--link)",
                       fontWeight: selected === m._id ? 700 : 500,
@@ -194,8 +196,9 @@ export function MeetingsView({ meetingId }: { meetingId?: string } = {}) {
                   style={inputStyle}
                 />
               </label>
-              <Button type="button" variant="secondary" onClick={saveAttendance}>
-                Save attendance and mark held
+              <FormStatus error={attendanceAction.error} status={attendanceAction.status} />
+              <Button type="button" variant="secondary" onClick={saveAttendance} pending={attendanceAction.pending}>
+                {attendanceAction.pending ? "Saving…" : "Save attendance and mark held"}
               </Button>
             </>
           ) : null}
@@ -220,11 +223,11 @@ export function MeetingsView({ meetingId }: { meetingId?: string } = {}) {
               </label>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
                 {detail.minutes?.status === "approved" ? (
-                  <Button type="button" variant="secondary" onClick={onRevise}>
+                  <Button type="button" variant="secondary" onClick={onRevise} pending={minutesAction.pending}>
                     Revise (new version)
                   </Button>
                 ) : (
-                  <Button type="button" variant="secondary" onClick={() => saveMinutes()}>
+                  <Button type="button" variant="secondary" onClick={() => saveMinutes()} pending={minutesAction.pending}>
                     Save minutes text
                   </Button>
                 )}
@@ -235,11 +238,7 @@ export function MeetingsView({ meetingId }: { meetingId?: string } = {}) {
               {detail.minutes.body}
             </div>
           ) : null}
-          {error ? (
-            <p role="alert" style={{ margin: 0, color: "var(--status-error)", fontSize: 14 }}>
-              {error}
-            </p>
-          ) : null}
+          <FormStatus error={minutesAction.error} status={minutesAction.status} />
           {detail.minutes ? (
             <MinutesItems minutes={detail.minutes} items={detail.items} canEdit={isOfficer} />
           ) : (
