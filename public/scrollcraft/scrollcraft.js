@@ -529,7 +529,10 @@
     } else {
       Array.prototype.forEach.call(root.querySelectorAll('[data-sc-in]'), function (el) {
         el.classList.add('sc-in');
-        Array.prototype.forEach.call(el.children, function (kid) { kid.classList.add('sc-in'); });
+        // Staggered groups reveal their children too (same as the observer path).
+        if (el.hasAttribute('data-sc-stagger')) {
+          Array.prototype.forEach.call(el.children, function (kid) { kid.classList.add('sc-in'); });
+        }
       });
     }
 
