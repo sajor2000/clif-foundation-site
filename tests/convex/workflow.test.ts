@@ -69,3 +69,28 @@ describe("your to-dos", () => {
     expect(await as(t, "d1@x.org").query(api.todos.myTodos, {})).toEqual([]);
   });
 });
+
+describe("review fixes", () => {
+  it("agenda items are locked while minutes are out for a vote", async () => {
+    const t = backend();
+    await seedBoard(t, []);
+    const meetingId = await as(t, ADMIN).mutation(api.meetings.createMeeting, { title: "Q1", scheduledAt: Date.now() });
+    const minutesId = await as(t, ADMIN).mutation(api.meetings.upsertMinutes, { meetingId, body: "x" });
+    await as(t, ADMIN).mutation(api.meetings.updateAttendance, { meetingId, attendeeEmails: [ADMIN], status: "held" });
+    await as(t, ADMIN).mutation(api.meetings.sendMinutesForApproval, { meetingId });
+    await expect(
+      as(t, ADMIN).mutation(api.meetings.addMinutesItem, { minutesId, title: "Late item", sortOrder: 1 }),
+    ).rejects.toThrow(/out for a vote/);
+  });
+
+  it("updating a member without a title keeps their title", async () => {
+    const t = backend();
+    await seedBoard(t, []);
+    await as(t, ADMIN).mutation(api.board.upsertMember, { email: "sec@x.org", role: "admin", title: "Secretary" });
+    await as(t, ADMIN).mutation(api.board.upsertMember, { email: "sec@x.org", displayName: "Pat" });
+    await as(t, ADMIN).mutation(api.board.upsertMember, { email: "new@x.org" });
+    const members = await as(t, ADMIN).query(api.board.listMembers, {});
+    expect(members.find((m) => m.email === "sec@x.org")).toMatchObject({ title: "Secretary", role: "admin", displayName: "Pat" });
+    expect(members.find((m) => m.email === "new@x.org")).toMatchObject({ title: "Director", role: "member" });
+  });
+});

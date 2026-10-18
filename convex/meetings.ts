@@ -380,8 +380,12 @@ export const addMinutesItem = mutation({
     const { identity } = await requireOfficer(ctx);
     const minutes = await ctx.db.get(args.minutesId);
     if (!minutes) throw new Error("Minutes not found");
-    if (minutes.status === "approved") {
-      throw new Error("Cannot edit approved minutes");
+    if (minutes.status !== "draft") {
+      throw new Error(
+        minutes.status === "approved"
+          ? "Cannot edit approved minutes"
+          : "These minutes are out for a vote. Close the vote before editing them.",
+      );
     }
     if (!args.title.trim()) throw new Error("Item title is required");
     const directors = await loadDirectorEmails(ctx);

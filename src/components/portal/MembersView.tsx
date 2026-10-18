@@ -27,8 +27,10 @@ export function MembersView() {
   const [listError, setListError] = useState<string | null>(null);
   const [email, setEmail] = useState("");
   const [displayName, setDisplayName] = useState("");
-  const [memberRole, setMemberRole] = useState<BoardRole>("member");
-  const [memberTitle, setMemberTitle] = useState<string>("Director");
+  // "" = keep the member's current value when updating (new members default
+  // to director access with the Director title on the server).
+  const [memberRole, setMemberRole] = useState<BoardRole | "">("");
+  const [memberTitle, setMemberTitle] = useState<string>("");
   const [isDirector, setIsDirector] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
@@ -50,8 +52,8 @@ export function MembersView() {
     try {
       await upsert({
         email,
-        role: memberRole,
-        title: memberTitle,
+        role: memberRole || undefined,
+        title: memberTitle || undefined,
         displayName: displayName || undefined,
         isDirector,
       });
@@ -112,6 +114,7 @@ export function MembersView() {
         <label style={{ display: "grid", gap: 6, fontSize: 14 }}>
           Title
           <select value={memberTitle} onChange={(e) => setMemberTitle(e.target.value)} style={inputStyle}>
+            <option value="">Keep current (new members: Director)</option>
             {TITLES.map((t) => (
               <option key={t} value={t}>
                 {t}
@@ -123,9 +126,10 @@ export function MembersView() {
           Access
           <select
             value={memberRole}
-            onChange={(e) => setMemberRole(e.target.value as BoardRole)}
+            onChange={(e) => setMemberRole(e.target.value as BoardRole | "")}
             style={inputStyle}
           >
+            <option value="">Keep current (new members: Director)</option>
             {ACCESS_LEVELS.map((r) => (
               <option key={r.value} value={r.value}>
                 {r.label}

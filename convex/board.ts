@@ -101,7 +101,7 @@ export const upsertMember = mutation({
         email,
         role: args.role ?? "member",
         displayName: args.displayName,
-        title: args.title,
+        title: args.title ?? "Director",
         isDirector: args.isDirector ?? true,
       });
     }
