@@ -9,10 +9,10 @@ const SITES = [
 /** Scroll-driven federated-research figure. Progress from parent act `--sc-p`. */
 export function FederationLattice() {
   return (
-    <div className="fed" aria-label="Federated research: data stays at each site">
+    <div className="fed" aria-label="Federated research: patient data stays at each hospital">
       <div className="fed__analysis" data-sc-cue="0.06 1 0.22 0">
         <span className="fed__analysis-label">Shared analysis package</span>
-        <span className="fed__analysis-detail">sent to each site · runs locally</span>
+        <span className="fed__analysis-detail">sent to each hospital · runs there</span>
       </div>
 
       <div className="fed__sites">
@@ -24,15 +24,18 @@ export function FederationLattice() {
           >
             <div className="fed__card">
               <div className="fed__card-head">
-                <span>Site {site.id}</span>
+                <span>
+                  <span className="fed__card-word">Hospital </span>
+                  {site.id}
+                </span>
                 <span className="fed__dot" aria-hidden>
                   ●
                 </span>
               </div>
               <p className="fed__card-body">
-                EHR → CLIF tables
+                Health records → CLIF
                 <br />
-                local analysis run
+                Analysis runs locally
               </p>
             </div>
 
@@ -48,7 +51,7 @@ export function FederationLattice() {
       <div className="fed__aggregate" data-sc-cue="0.45 1 0.28 0">
         <span className="fed__aggregate-lead">Aggregate results only</span>
         <span className="fed__aggregate-trail">
-          No patient-level data leaves an institution
+          No patient-level data leaves a hospital
         </span>
       </div>
     </div>

@@ -218,10 +218,10 @@ export function HomeScroll() {
                     maxWidth: "48ch",
                   }}
                 >
-                  The CLIF Consortium conducts federated research: each site
-                  converts its EHR data to CLIF locally, runs shared analysis
-                  code, and returns only aggregate results. The Foundation’s work
-                  helps more sites reach that first step.
+                  The CLIF Consortium conducts federated research: each hospital
+                  converts its own electronic health records to CLIF, runs the
+                  shared analysis code itself, and returns only aggregate results.
+                  The Foundation’s work helps more hospitals reach that first step.
                 </p>
               </div>
 

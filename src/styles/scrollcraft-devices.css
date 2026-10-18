@@ -273,55 +273,6 @@
   align-items: start;
 }
 
-@media (max-width: 799px) {
-  .fed {
-    gap: 8px;
-  }
-
-  .fed__analysis {
-    min-height: 0;
-    padding-bottom: 6px;
-    font-size: 11px;
-  }
-
-  .fed__sites {
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: 4px;
-  }
-
-  .fed__site:last-child {
-    grid-column: auto;
-    max-width: none;
-    justify-self: stretch;
-  }
-
-  .fed__card {
-    padding: 7px 6px;
-    gap: 4px;
-    font-size: 11px;
-  }
-
-  .fed__card-body {
-    font-size: 0;
-    line-height: 1;
-  }
-
-  .fed__card-body::after {
-    content: "local run";
-    font-size: 11px;
-  }
-
-  .fed__arrow {
-    height: 22px;
-  }
-
-  .fed__aggregate {
-    padding: 9px 10px;
-    gap: 4px 12px;
-    font-size: 11px;
-  }
-}
-
 .fed__site {
   --site-t: 0;
   /* 0→1: how far this site’s arrow has grown */
@@ -429,6 +380,57 @@
 
 .fed__aggregate-trail {
   color: var(--ink-200);
+}
+
+/* Phones: five columns are too narrow for words, so each card shows its letter.
+   Declared after the base card rules so it wins the cascade. */
+@media (max-width: 799px) {
+  .fed {
+    gap: 8px;
+  }
+
+  .fed__analysis {
+    min-height: 0;
+    padding-bottom: 6px;
+  }
+
+  .fed__sites {
+    gap: 6px;
+  }
+
+  .fed__card {
+    padding: 10px 4px;
+    gap: 0;
+  }
+
+  .fed__card-head {
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 500;
+  }
+
+  .fed__card-word {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .fed__dot,
+  .fed__card-body {
+    display: none;
+  }
+
+  .fed__arrow {
+    height: 22px;
+  }
+
+  .fed__aggregate {
+    padding: 9px 10px;
+    gap: 4px 12px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
