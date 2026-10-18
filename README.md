@@ -76,7 +76,17 @@ For the **board portal**, `vercel.json` runs `npx convex deploy --cmd 'npm run b
 
 ### Backups
 
-`scripts/backup-convex-prod.sh` exports the production Convex deployment (tables and stored files) to `~/Dropbox/Work/CLIF Foundation/Backups/convex-prod/` and keeps the newest 30. On J.C.'s MacBook it runs daily at 03:15 via the LaunchAgent `com.jc.clif-convex-backup` (log: `~/Library/Logs/clif-convex-backup.log`). Restore with `npx convex import --deployment <name> <snapshot.zip>`.
+`scripts/backup-convex-prod.sh` exports the production Convex deployment (tables and stored files) and keeps the newest 30 snapshots. It runs daily at 03:15 on the always-on Omarchy box:
+
+| Piece | Location on Omarchy |
+| --- | --- |
+| Snapshots | `/srv/nas/Shared/Backups/clif-foundation/convex-prod/` |
+| Script + Convex CLI (mise Node 22) | `~/clif-backup/` |
+| Deploy key `omarchy-backup` (mode 600) | `~/.config/clif-backup/env` |
+| Schedule | systemd user timer `clif-convex-backup.timer` (`Persistent=true`) |
+| Logs | `journalctl --user -u clif-convex-backup` |
+
+Restore with `npx convex import --deployment <name> <snapshot.zip>`. To update the script there, `scp scripts/backup-convex-prod.sh jcrojas@100.82.23.59:clif-backup/`.
 
 ### Access
 
