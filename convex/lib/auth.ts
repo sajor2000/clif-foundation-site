@@ -85,3 +85,17 @@ export async function requireBoardRole(ctx: Ctx, allowed: BoardRole[]) {
   }
   return { identity, role };
 }
+
+/**
+ * Officers (President, Secretary, Treasurer) are full admins: they run
+ * meetings, motions, documents, policies and the allowlist. Directors vote,
+ * read documents and file their own COI. Legacy secretary/chair roles count
+ * as officers.
+ */
+export async function requireOfficer(ctx: Ctx) {
+  return requireBoardRole(ctx, ["admin", "secretary", "chair"]);
+}
+
+export function isOfficerRole(role: string | undefined): boolean {
+  return role === "admin" || role === "secretary" || role === "chair";
+}

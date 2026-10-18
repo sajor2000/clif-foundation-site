@@ -45,7 +45,8 @@ export function DocumentsWorkspace() {
   const restoreDocument = useMutation(api.documents.restoreDocument);
   const setLegalHold = useMutation(api.documents.setLegalHold);
   const role = useQuery(api.board.myRole);
-  const canManageDocs = role === "admin" || role === "secretary";
+  // Officers manage the library; directors read it.
+  const canManageDocs = role === "admin" || role === "secretary" || role === "chair";
 
   const [title, setTitle] = useState("");
   const [categoryOverride, setCategoryOverride] = useState<DocumentCategory | null>(
@@ -130,6 +131,7 @@ export function DocumentsWorkspace() {
         </select>
       </div>
 
+      {canManageDocs ? (
       <section style={{ display: "grid", gap: 14 }}>
         <h2 style={sectionTitle}>Upload</h2>
         <form
@@ -216,6 +218,7 @@ export function DocumentsWorkspace() {
           </Button>
         </form>
       </section>
+      ) : null}
 
       <section style={{ display: "grid", gap: 12 }}>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 16, alignItems: "baseline" }}>

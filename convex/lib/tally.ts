@@ -18,14 +18,20 @@ export type Tally = {
  * Nothing passes until the motion is closed.
  */
 export function tallyBallots(
-  ballots: ReadonlyArray<{ voterEmail?: string; choice: BallotChoice }>,
+  ballots: ReadonlyArray<{ voterEmail?: string; choice: BallotChoice; castAt?: number }>,
   directorEmails: ReadonlySet<string>,
   motionType: MotionType,
   status: MotionStatus,
 ): Tally {
-  const counted = ballots.filter(
-    (b) => b.voterEmail !== undefined && directorEmails.has(b.voterEmail.toLowerCase()),
-  );
+  // One ballot per director: their most recent one.
+  const latest = new Map<string, { choice: BallotChoice; castAt: number }>();
+  for (const b of ballots) {
+    const email = b.voterEmail?.toLowerCase();
+    if (!email || !directorEmails.has(email)) continue;
+    const prev = latest.get(email);
+    if (!prev || (b.castAt ?? 0) >= prev.castAt) latest.set(email, { choice: b.choice, castAt: b.castAt ?? 0 });
+  }
+  const counted = [...latest.values()];
   const count = (choice: BallotChoice) => counted.filter((b) => b.choice === choice).length;
   const yes = count("yes");
   const no = count("no");

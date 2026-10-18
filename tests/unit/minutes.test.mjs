@@ -11,14 +11,14 @@ describe("minutesTransitionError", () => {
     assert.equal(minutesTransitionError("published_for_review", "draft", true), null);
   });
 
-  it("approves only minutes that were published for review", () => {
-    assert.match(minutesTransitionError(null, "approved", true), /review/i);
-    assert.match(minutesTransitionError("draft", "approved", true), /review/i);
-    assert.equal(minutesTransitionError("published_for_review", "approved", true), null);
+  it("sends minutes for approval only for a held meeting", () => {
+    assert.match(minutesTransitionError("draft", "published_for_review", false), /held/i);
   });
 
-  it("approves only after the meeting is marked held", () => {
-    assert.match(minutesTransitionError("published_for_review", "approved", false), /held/i);
+  it("never approves directly: approval comes from a board vote", () => {
+    assert.match(minutesTransitionError(null, "approved", true), /vote/i);
+    assert.match(minutesTransitionError("draft", "approved", true), /vote/i);
+    assert.match(minutesTransitionError("published_for_review", "approved", true), /vote/i);
   });
 
   it("keeps approved minutes read-only", () => {

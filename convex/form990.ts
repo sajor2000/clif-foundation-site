@@ -1,7 +1,7 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { logAudit } from "./lib/audit";
-import { requireBoardIdentity, requireBoardRole } from "./lib/auth";
+import { requireBoardIdentity, requireOfficer } from "./lib/auth";
 
 export const getReview = query({
   args: { taxYear: v.number() },
@@ -42,11 +42,7 @@ export const upsertReview = mutation({
   },
   returns: v.null(),
   handler: async (ctx, args) => {
-    const { identity } = await requireBoardRole(ctx, [
-      "secretary",
-      "chair",
-      "admin",
-    ]);
+    const { identity } = await requireOfficer(ctx);
     if (args.boardReviewedBeforeFiled && !args.reviewMeetingId && !args.notes) {
       throw new Error(
         "Link a review meeting or add notes when marking 990 as board-reviewed",

@@ -5,6 +5,7 @@ import { useMutation, useQuery } from "convex/react";
 import { useState } from "react";
 import { api } from "../../../convex/_generated/api";
 import { Button } from "@/components/core/Button";
+import { RecordVote } from "@/components/portal/RecordVote";
 import { inputStyle, pageTitle, panelStyle, sectionTitle } from "@/components/portal/portal-styles";
 
 type StatusFilter = "open" | "closed" | "draft" | "all";
@@ -19,6 +20,8 @@ export function VotesView({ focusId }: { focusId?: string } = {}) {
   const setStatus = useMutation(api.motions.setMotionStatus);
   const castBallot = useMutation(api.motions.castBallot);
   const canVote = useQuery(api.board.amIDirector) === true;
+  const role = useQuery(api.board.myRole);
+  const isOfficer = role === "admin" || role === "secretary" || role === "chair";
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -63,6 +66,7 @@ export function VotesView({ focusId }: { focusId?: string } = {}) {
         ))}
       </div>
 
+      {isOfficer ? (
       <div style={{ ...panelStyle, maxWidth: 520 }}>
         <p style={{ margin: 0, fontWeight: 600 }}>New motion</p>
         <label style={{ display: "grid", gap: 6, fontSize: 14 }}>
@@ -92,6 +96,7 @@ export function VotesView({ focusId }: { focusId?: string } = {}) {
           Create draft motion
         </Button>
       </div>
+      ) : null}
 
       {error ? (
         <p role="alert" style={{ margin: 0, color: "var(--status-error)", fontSize: 14 }}>
@@ -127,12 +132,25 @@ export function VotesView({ focusId }: { focusId?: string } = {}) {
               {motion.description ? (
                 <p style={{ margin: 0, fontSize: 14 }}>{motion.description}</p>
               ) : null}
+              {motion.minutesId && motion.meetingId ? (
+                <Link
+                  href={`/portal/meetings/${motion.meetingId}`}
+                  style={{ color: "var(--link)", fontSize: 14, display: "inline-flex", alignItems: "center", minHeight: "var(--control-md)" }}
+                >
+                  Read the minutes →
+                </Link>
+              ) : null}
+              {motion.recordedBy ? (
+                <p style={{ margin: 0, fontSize: 13, color: "var(--text-muted)" }}>
+                  Votes recorded from a meeting by {motion.recordedBy}
+                </p>
+              ) : null}
               <p style={{ margin: 0, fontFamily: "var(--font-mono)", fontSize: 12 }}>
                 Yes {tally.yes} · No {tally.no} · Abstain {tally.abstain} · Recuse {tally.recuse} ·
                 Voted {tally.voted}/{tally.eligible}
               </p>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-                {motion.status === "draft" ? (
+                {motion.status === "draft" && isOfficer ? (
                   <Button
                     type="button"
                     onClick={() => setStatus({ motionId: motion._id, status: "open" })}
@@ -158,16 +176,19 @@ export function VotesView({ focusId }: { focusId?: string } = {}) {
                           </Button>
                         ))
                       : null}
-                    <Button
-                      type="button"
-                      onClick={() =>
-                        setStatus({ motionId: motion._id, status: "closed" }).catch((e: Error) =>
-                          setError(e.message),
-                        )
-                      }
-                    >
-                      Close voting
-                    </Button>
+                    {isOfficer ? (
+                      <Button
+                        type="button"
+                        onClick={() =>
+                          setStatus({ motionId: motion._id, status: "closed" }).catch((e: Error) =>
+                            setError(e.message),
+                          )
+                        }
+                      >
+                        Close voting
+                      </Button>
+                    ) : null}
+                    {isOfficer ? <RecordVote motionId={motion._id} motionTitle={motion.title} /> : null}
                   </>
                 ) : null}
                 {motion.status === "closed" ? (

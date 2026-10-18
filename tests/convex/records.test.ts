@@ -2,28 +2,57 @@ import { describe, expect, it } from "vitest";
 import { ADMIN, api, as, backend, seedBoard } from "./setup";
 
 describe("minutes", () => {
-  it("draft -> review -> approved, and only for a held meeting", async () => {
+  it("are approved only by a board vote on a held meeting", async () => {
     const t = backend();
-    await seedBoard(t, [{ email: "sec@x.org", role: "secretary" }]);
-    const sec = as(t, "sec@x.org");
-    const meetingId = await sec.mutation(api.meetings.createMeeting, { title: "Q4", scheduledAt: Date.now() });
-
+    await seedBoard(t, [{ email: "d1@x.org" }]);
+    const meetingId = await as(t, ADMIN).mutation(api.meetings.createMeeting, { title: "Q4", scheduledAt: Date.now() });
+    await as(t, ADMIN).mutation(api.meetings.upsertMinutes, { meetingId, body: "Call to order." });
     await expect(
-      sec.mutation(api.meetings.upsertMinutes, { meetingId, body: "x", status: "approved" }),
-    ).rejects.toThrow(/review/);
-    await sec.mutation(api.meetings.upsertMinutes, { meetingId, body: "x", status: "published_for_review" });
-    await expect(sec.mutation(api.meetings.upsertMinutes, { meetingId, status: "approved" })).rejects.toThrow(
-      /held/,
-    );
-    await sec.mutation(api.meetings.updateAttendance, {
-      meetingId,
-      attendeeEmails: [ADMIN, "sec@x.org"],
-      status: "held",
+      as(t, ADMIN).mutation(api.meetings.upsertMinutes, { meetingId, status: "approved" }),
+    ).rejects.toThrow(/Send to board/);
+    await expect(as(t, ADMIN).mutation(api.meetings.sendMinutesForApproval, { meetingId })).rejects.toThrow(/held/);
+    await as(t, ADMIN).mutation(api.meetings.updateAttendance, { meetingId, attendeeEmails: [ADMIN, "d1@x.org"], status: "held" });
+    const motionId = await as(t, ADMIN).mutation(api.meetings.sendMinutesForApproval, { meetingId });
+    await expect(as(t, ADMIN).mutation(api.meetings.upsertMinutes, { meetingId, body: "edit" })).rejects.toThrow(/out for a vote/);
+    await as(t, ADMIN).mutation(api.motions.castBallot, { motionId, choice: "yes" });
+    await as(t, "d1@x.org").mutation(api.motions.castBallot, { motionId, choice: "yes" });
+    await as(t, ADMIN).mutation(api.motions.setMotionStatus, { motionId, status: "closed" });
+    const detail = await as(t, ADMIN).query(api.meetings.getMeeting, { meetingId });
+    expect(detail?.minutes?.status).toBe("approved");
+    expect(detail?.approvalMotion?.status).toBe("closed");
+    await expect(as(t, ADMIN).mutation(api.meetings.upsertMinutes, { meetingId, body: "edit" })).rejects.toThrow(/read-only/);
+  });
+
+  it("a failed approval vote sends the minutes back to draft", async () => {
+    const t = backend();
+    await seedBoard(t, [{ email: "d1@x.org" }]);
+    const meetingId = await as(t, ADMIN).mutation(api.meetings.createMeeting, { title: "Q4", scheduledAt: Date.now() });
+    await as(t, ADMIN).mutation(api.meetings.upsertMinutes, { meetingId, body: "x" });
+    await as(t, ADMIN).mutation(api.meetings.updateAttendance, { meetingId, attendeeEmails: [ADMIN], status: "held" });
+    const motionId = await as(t, ADMIN).mutation(api.meetings.sendMinutesForApproval, { meetingId });
+    await as(t, ADMIN).mutation(api.motions.recordVote, {
+      motionId,
+      votes: [{ email: ADMIN, choice: "no" }, { email: "d1@x.org", choice: "no" }],
     });
-    await sec.mutation(api.meetings.upsertMinutes, { meetingId, status: "approved" });
-    await expect(sec.mutation(api.meetings.upsertMinutes, { meetingId, body: "edit" })).rejects.toThrow(
-      /read-only/,
-    );
+    const detail = await as(t, ADMIN).query(api.meetings.getMeeting, { meetingId });
+    expect(detail?.minutes?.status).toBe("draft");
+  });
+
+  it("an attached minutes file is enough to send for approval", async () => {
+    const t = backend();
+    await seedBoard(t, []);
+    const meetingId = await as(t, ADMIN).mutation(api.meetings.createMeeting, { title: "First", scheduledAt: Date.now() });
+    await as(t, ADMIN).mutation(api.meetings.updateAttendance, { meetingId, attendeeEmails: [ADMIN], status: "held" });
+    const storageId = await t.run((ctx) => ctx.storage.store(new Blob(["%PDF-1.4"], { type: "application/pdf" })));
+    const saved = await as(t, ADMIN).mutation(api.documents.saveDocument, {
+      storageId, title: "Minutes: First", category: "meeting", contentType: "application/pdf",
+    });
+    if (!saved.ok) throw new Error(saved.error);
+    await as(t, ADMIN).mutation(api.meetings.attachMinutesFile, { meetingId, documentId: saved.id });
+    const motionId = await as(t, ADMIN).mutation(api.meetings.sendMinutesForApproval, { meetingId });
+    const detail = await as(t, ADMIN).query(api.meetings.getMeeting, { meetingId });
+    expect(detail?.minutesFile?.title).toBe("Minutes: First");
+    expect(detail?.approvalMotion?.id).toBe(motionId);
   });
 
   it("an unknown meeting ID from the URL returns null instead of throwing", async () => {
@@ -116,9 +145,10 @@ describe("deferred gaps", () => {
     await as(t, ADMIN).mutation(api.motions.setMotionStatus, { motionId, status: "open" });
     await as(t, ADMIN).mutation(api.motions.castBallot, { motionId, choice: "yes" });
     await as(t, ADMIN).mutation(api.motions.setMotionStatus, { motionId, status: "closed" });
-    await as(t, ADMIN).mutation(api.meetings.upsertMinutes, { meetingId, body: "x", status: "published_for_review" });
+    await as(t, ADMIN).mutation(api.meetings.upsertMinutes, { meetingId, body: "x" });
     await as(t, ADMIN).mutation(api.meetings.updateAttendance, { meetingId, attendeeEmails: [ADMIN], status: "held", heldAt: Date.UTC(2025, 5, 1) });
-    await as(t, ADMIN).mutation(api.meetings.upsertMinutes, { meetingId, status: "approved" });
+    const approval = await as(t, ADMIN).mutation(api.meetings.sendMinutesForApproval, { meetingId });
+    await as(t, ADMIN).mutation(api.motions.recordVote, { motionId: approval, votes: [{ email: ADMIN, choice: "yes" }] });
 
     const all = await as(t, ADMIN).query(api.reporting.getReportingPack, {});
     expect(all.approvedMinutesExports[0].exportText).toContain("Passed");

@@ -7,8 +7,8 @@ import { isDirector } from "./lib/directors";
 import {
   getBoardMember,
   requireBoardIdentity,
-  requireBoardRole,
   requireClerkIdentity,
+  requireOfficer,
   verifiedEmail,
 } from "./lib/auth";
 
@@ -19,6 +19,7 @@ export const listMembers = query({
       email: v.string(),
       role: v.optional(v.string()),
       displayName: v.optional(v.string()),
+      title: v.optional(v.string()),
       isDirector: v.boolean(),
     }),
   ),
@@ -29,6 +30,7 @@ export const listMembers = query({
       email: m.email,
       role: m.role,
       displayName: m.displayName,
+      title: m.title,
       isDirector: m.isDirector !== false,
     }));
   },
@@ -70,11 +72,12 @@ export const upsertMember = mutation({
     email: v.string(),
     role: v.optional(boardRole),
     displayName: v.optional(v.string()),
+    title: v.optional(v.string()),
     isDirector: v.optional(v.boolean()),
   },
   returns: v.null(),
   handler: async (ctx, args) => {
-    const { identity } = await requireBoardRole(ctx, ["admin"]);
+    const { identity } = await requireOfficer(ctx);
     const email = args.email.trim().toLowerCase();
     const existing = await ctx.db
       .query("boardMembers")
@@ -90,6 +93,7 @@ export const upsertMember = mutation({
       await ctx.db.patch(existing._id, {
         role: args.role ?? existing.role,
         displayName: args.displayName ?? existing.displayName,
+        title: args.title ?? existing.title,
         isDirector: args.isDirector ?? existing.isDirector ?? true,
       });
     } else {
@@ -97,6 +101,7 @@ export const upsertMember = mutation({
         email,
         role: args.role ?? "member",
         displayName: args.displayName,
+        title: args.title,
         isDirector: args.isDirector ?? true,
       });
     }
@@ -115,7 +120,7 @@ export const removeMember = mutation({
   args: { email: v.string() },
   returns: v.null(),
   handler: async (ctx, args) => {
-    const { identity } = await requireBoardRole(ctx, ["admin"]);
+    const { identity } = await requireOfficer(ctx);
     const email = args.email.trim().toLowerCase();
     const member = await ctx.db
       .query("boardMembers")
@@ -268,7 +273,7 @@ export const listAccessRequests = query({
     }),
   ),
   handler: async (ctx) => {
-    await requireBoardRole(ctx, ["admin"]);
+    await requireOfficer(ctx);
     const rows = await ctx.db
       .query("accessRequests")
       .withIndex("by_status", (q) => q.eq("status", "pending"))
@@ -289,10 +294,11 @@ export const decideAccessRequest = mutation({
     approve: v.boolean(),
     role: v.optional(boardRole),
     isDirector: v.optional(v.boolean()),
+    title: v.optional(v.string()),
   },
   returns: v.null(),
   handler: async (ctx, args) => {
-    const { identity } = await requireBoardRole(ctx, ["admin"]);
+    const { identity } = await requireOfficer(ctx);
     const request = await ctx.db.get(args.id);
     if (!request || request.status !== "pending") {
       throw new Error("This request was already handled");
@@ -308,6 +314,7 @@ export const decideAccessRequest = mutation({
           email: request.email,
           role: args.role ?? "member",
           displayName: request.name,
+          title: args.title,
           isDirector: args.isDirector ?? true,
         });
       }

@@ -1,7 +1,7 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { logAudit } from "./lib/audit";
-import { requireBoardIdentity, requireBoardRole } from "./lib/auth";
+import { requireBoardIdentity, requireOfficer } from "./lib/auth";
 import { policyType } from "./lib/vocab";
 
 export const listPolicies = query({
@@ -47,7 +47,7 @@ export const registerPolicy = mutation({
   },
   returns: v.id("policies"),
   handler: async (ctx, args) => {
-    const { identity } = await requireBoardRole(ctx, ["secretary", "admin"]);
+    const { identity } = await requireOfficer(ctx);
     let adoptedAt = args.adoptedAt;
     if (args.motionId) {
       const motion = await ctx.db.get(args.motionId);

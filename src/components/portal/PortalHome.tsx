@@ -12,10 +12,9 @@ export function PortalHome() {
   const year = new Date().getFullYear();
   const role = useQuery(api.board.myRole);
   const canLoadBoard = role !== undefined && role !== null && role !== "bootstrap_eligible";
-  const dashboard = useQuery(
-    api.compliance.getDashboard,
-    canLoadBoard ? { year } : "skip",
-  );
+  const isOfficer = role === "admin" || role === "secretary" || role === "chair";
+  const dashboard = useQuery(api.compliance.getDashboard, isOfficer ? { year } : "skip");
+  const todos = useQuery(api.todos.myTodos, canLoadBoard ? {} : "skip");
 
   return (
     <div style={{ display: "grid", gap: 32 }}>
@@ -26,9 +25,17 @@ export function PortalHome() {
         </p>
       </div>
 
+      {role === undefined ? (
+        <p role="status" style={{ margin: 0, color: "var(--text-muted)" }}>
+          Loading your workspace…
+        </p>
+      ) : null}
+
       {role === "bootstrap_eligible" ? <ClaimAdminPanel /> : null}
 
       {role === null ? <RequestAccessPanel /> : null}
+
+      {canLoadBoard ? <YourTodos todos={todos} /> : null}
 
       {canLoadBoard ? (
         <>
@@ -98,6 +105,29 @@ export function PortalHome() {
   );
 }
 
+function YourTodos({ todos }: { todos: { kind: string; title: string; detail?: string; href: string }[] | undefined }) {
+  return (
+    <section aria-labelledby="todos-heading" style={{ display: "grid", gap: 12, maxWidth: 880 }}>
+      <h2 id="todos-heading" style={{ ...sectionTitle, fontSize: 24 }}>
+        Your to-dos
+      </h2>
+      {todos === undefined ? (
+        <p style={{ margin: 0, color: "var(--text-muted)" }}>Checking…</p>
+      ) : todos.length === 0 ? (
+        <p style={{ margin: 0, fontSize: 16, color: "var(--text-body)" }}>
+          You’re all caught up. Nothing needs your attention right now.
+        </p>
+      ) : (
+        <ul style={hairlineList}>
+          {todos.map((t) => (
+            <JobRow key={`${t.kind}-${t.href}-${t.title}`} href={t.href} title={t.title} body={t.detail ?? ""} small />
+          ))}
+        </ul>
+      )}
+    </section>
+  );
+}
+
 const hairlineList = {
   margin: 0,
   padding: 0,
@@ -117,7 +147,7 @@ const shortcut = {
 const policyLabel = (value: string) =>
   POLICY_TYPES.find((p) => p.value === value)?.label ?? value;
 
-function JobRow({ href, title, body }: { href: string; title: string; body: string }) {
+function JobRow({ href, title, body, small }: { href: string; title: string; body: string; small?: boolean }) {
   return (
     <li style={{ borderBottom: "1px solid var(--border)" }}>
       <Link
@@ -134,15 +164,17 @@ function JobRow({ href, title, body }: { href: string; title: string; body: stri
           minHeight: "var(--control-md)",
         }}
       >
-        <span style={{ fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 22, letterSpacing: "-0.015em" }}>
+        <span style={{ fontFamily: small ? "var(--font-sans)" : "var(--font-display)", fontWeight: 600, fontSize: small ? 17 : 22, letterSpacing: small ? "normal" : "-0.015em" }}>
           {title}
         </span>
         <span aria-hidden="true" style={{ gridRow: "1 / span 2", gridColumn: 2, color: "var(--link)", fontSize: 20 }}>
           →
         </span>
-        <span style={{ fontSize: 15, lineHeight: 1.5, color: "var(--text-body)", maxWidth: "62ch" }}>
-          {body}
-        </span>
+        {body ? (
+          <span style={{ fontSize: 15, lineHeight: 1.5, color: "var(--text-body)", maxWidth: "62ch" }}>
+            {body}
+          </span>
+        ) : null}
       </Link>
     </li>
   );

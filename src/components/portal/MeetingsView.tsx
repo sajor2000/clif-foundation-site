@@ -5,6 +5,7 @@ import { useMutation, useQuery } from "convex/react";
 import { useState } from "react";
 import { api } from "../../../convex/_generated/api";
 import { Button } from "@/components/core/Button";
+import { MinutesApproval } from "@/components/portal/MinutesApproval";
 import { MinutesItems } from "@/components/portal/MinutesItems";
 import { inputStyle, pageTitle, panelStyle, sectionTitle } from "@/components/portal/portal-styles";
 
@@ -14,6 +15,8 @@ export function MeetingsView({ meetingId }: { meetingId?: string } = {}) {
   const [pickedId, setPickedId] = useState<string | null>(null);
   const selected = meetingId ?? pickedId;
   const meetings = useQuery(api.meetings.listMeetings);
+  const role = useQuery(api.board.myRole);
+  const isOfficer = role === "admin" || role === "secretary" || role === "chair";
   const createMeeting = useMutation(api.meetings.createMeeting);
   const upsertMinutes = useMutation(api.meetings.upsertMinutes);
   const reviseMinutes = useMutation(api.meetings.reviseMinutes);
@@ -63,14 +66,13 @@ export function MeetingsView({ meetingId }: { meetingId?: string } = {}) {
     setTitle("");
   }
 
-  async function saveMinutes(status?: "draft" | "published_for_review" | "approved") {
+  async function saveMinutes() {
     if (!detail) return;
     setError(null);
     try {
       await upsertMinutes({
         meetingId: detail.meeting._id,
         body: minutesBody,
-        status,
       });
       setDraftMinutes(null);
     } catch (e) {
@@ -111,7 +113,7 @@ export function MeetingsView({ meetingId }: { meetingId?: string } = {}) {
     <div style={{ display: "grid", gap: 28 }}>
       <h1 style={pageTitle}>Meetings and minutes</h1>
 
-      {!meetingId ? (
+      {!meetingId && isOfficer ? (
         <div style={{ ...panelStyle, maxWidth: 520 }}>
           <p style={{ margin: 0, fontWeight: 600 }}>Schedule meeting</p>
           <label style={{ display: "grid", gap: 6, fontSize: 14 }}>
@@ -180,67 +182,66 @@ export function MeetingsView({ meetingId }: { meetingId?: string } = {}) {
             {detail.meeting.quorumMet !== undefined
               ? ` · Quorum met: ${detail.meeting.quorumMet ? "yes" : "no"}`
               : ""}
-            {detail.minutes
-              ? ` · Minutes v${detail.minutes.version} (${detail.minutes.status})`
-              : ""}
+
           </p>
-          <label style={{ display: "grid", gap: 6, fontSize: 14 }}>
-            Attendee emails (comma-separated)
-            <input
-              value={attendees}
-              onChange={(e) => editAttendees(e.target.value)}
-              style={inputStyle}
-            />
-          </label>
-          <Button type="button" variant="secondary" onClick={saveAttendance}>
-            Save attendance and mark held
-          </Button>
-          <label style={{ display: "grid", gap: 6, fontSize: 14 }}>
-            Minutes body
-            <textarea
-              value={minutesBody}
-              onChange={(e) => editMinutes(e.target.value)}
-              rows={8}
-              style={{ ...inputStyle, height: "auto", padding: 12 }}
-              disabled={detail.minutes?.status === "approved"}
-            />
-          </label>
+          {isOfficer ? (
+            <>
+              <label style={{ display: "grid", gap: 6, fontSize: 14 }}>
+                Attendee emails (comma-separated)
+                <input
+                  value={attendees}
+                  onChange={(e) => editAttendees(e.target.value)}
+                  style={inputStyle}
+                />
+              </label>
+              <Button type="button" variant="secondary" onClick={saveAttendance}>
+                Save attendance and mark held
+              </Button>
+            </>
+          ) : null}
+          <MinutesApproval
+            meeting={detail.meeting}
+            minutes={detail.minutes}
+            minutesFile={detail.minutesFile}
+            approvalMotion={detail.approvalMotion}
+            isOfficer={isOfficer}
+          />
+          {isOfficer && detail.minutes?.status !== "published_for_review" ? (
+            <>
+              <label style={{ display: "grid", gap: 6, fontSize: 14 }}>
+                Minutes text (optional if you attach a file)
+                <textarea
+                  value={minutesBody}
+                  onChange={(e) => editMinutes(e.target.value)}
+                  rows={8}
+                  style={{ ...inputStyle, height: "auto", padding: 12 }}
+                  disabled={detail.minutes?.status === "approved"}
+                />
+              </label>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
+                {detail.minutes?.status === "approved" ? (
+                  <Button type="button" variant="secondary" onClick={onRevise}>
+                    Revise (new version)
+                  </Button>
+                ) : (
+                  <Button type="button" variant="secondary" onClick={() => saveMinutes()}>
+                    Save minutes text
+                  </Button>
+                )}
+              </div>
+            </>
+          ) : detail.minutes?.body ? (
+            <div style={{ whiteSpace: "pre-wrap", fontSize: 15, lineHeight: 1.55, maxWidth: "70ch" }}>
+              {detail.minutes.body}
+            </div>
+          ) : null}
           {error ? (
             <p role="alert" style={{ margin: 0, color: "var(--status-error)", fontSize: 14 }}>
               {error}
             </p>
           ) : null}
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-            {detail.minutes?.status === "approved" ? (
-              <Button type="button" onClick={onRevise}>
-                Revise (new version)
-              </Button>
-            ) : (
-              <>
-                <Button type="button" variant="secondary" onClick={() => saveMinutes("draft")}>
-                  Save draft
-                </Button>
-                <Button
-                  type="button"
-                  variant="secondary"
-                  onClick={() => saveMinutes("published_for_review")}
-                >
-                  Publish for review
-                </Button>
-                {detail.minutes?.status === "published_for_review" ? (
-                  <Button
-                    type="button"
-                    onClick={() => saveMinutes("approved")}
-                    disabled={detail.meeting.status !== "held"}
-                  >
-                    Approve minutes
-                  </Button>
-                ) : null}
-              </>
-            )}
-          </div>
           {detail.minutes ? (
-            <MinutesItems minutes={detail.minutes} items={detail.items} />
+            <MinutesItems minutes={detail.minutes} items={detail.items} canEdit={isOfficer} />
           ) : (
             <p style={{ margin: 0, color: "var(--text-muted)", fontSize: 14 }}>
               Save a draft to start adding agenda items.

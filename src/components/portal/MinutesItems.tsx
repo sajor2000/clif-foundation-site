@@ -11,9 +11,11 @@ import { inputStyle, sectionTitle } from "@/components/portal/portal-styles";
 export function MinutesItems({
   minutes,
   items,
+  canEdit,
 }: {
   minutes: Doc<"minutes">;
   items: Doc<"minutesItems">[];
+  canEdit: boolean;
 }) {
   const members = useQuery(api.board.listMembers);
   const addItem = useMutation(api.meetings.addMinutesItem);
@@ -22,7 +24,7 @@ export function MinutesItems({
   const [recused, setRecused] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
   const directors = (members ?? []).filter((m) => m.isDirector);
-  const editable = minutes.status !== "approved";
+  const editable = canEdit && minutes.status === "draft";
   const sorted = [...items].sort((a, b) => a.sortOrder - b.sortOrder);
 
   async function onAdd() {

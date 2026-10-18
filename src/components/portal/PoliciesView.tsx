@@ -9,6 +9,8 @@ import { inputStyle, pageTitle, panelStyle } from "@/components/portal/portal-st
 
 export function PoliciesView() {
   const policies = useQuery(api.policies.listPolicies);
+  const role = useQuery(api.board.myRole);
+  const isOfficer = role === "admin" || role === "secretary" || role === "chair";
   const register = useMutation(api.policies.registerPolicy);
   const closedMotions = useQuery(api.motions.listMotions, { status: "closed" });
   const passed = (closedMotions ?? []).filter((m) => m.tally.passed).map((m) => m.motion);
@@ -44,6 +46,7 @@ export function PoliciesView() {
         Upload the signed PDF under Documents (category Governance policy).
       </p>
 
+      {isOfficer ? (
       <div style={{ ...panelStyle, maxWidth: 520 }}>
         <p style={{ margin: 0, fontWeight: 600 }}>Register policy</p>
         <label style={{ display: "grid", gap: 6, fontSize: 14 }}>
@@ -111,6 +114,7 @@ export function PoliciesView() {
           Register
         </Button>
       </div>
+      ) : null}
 
       <ul style={{ margin: 0, padding: 0, listStyle: "none" }}>
         {!policies ? (

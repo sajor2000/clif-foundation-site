@@ -3,7 +3,7 @@ import type { Doc } from "./_generated/dataModel";
 import { mutation, query, type QueryCtx } from "./_generated/server";
 import { logAudit } from "./lib/audit";
 import { uploadRejection } from "./lib/uploads";
-import { requireBoardIdentity, requireBoardRole } from "./lib/auth";
+import { requireBoardIdentity, requireOfficer } from "./lib/auth";
 import schema from "./schema";
 import { documentCategory, retentionClass } from "./lib/vocab";
 
@@ -19,7 +19,8 @@ export const generateUploadUrl = mutation({
   args: {},
   returns: v.string(),
   handler: async (ctx) => {
-    await requireBoardIdentity(ctx);
+    // Officers manage the library; directors read it.
+    await requireOfficer(ctx);
     return await ctx.storage.generateUploadUrl();
   },
 });
@@ -39,7 +40,7 @@ export const saveDocument = mutation({
     v.object({ ok: v.literal(false), error: v.string() }),
   ),
   handler: async (ctx, args) => {
-    const identity = await requireBoardIdentity(ctx);
+    const { identity } = await requireOfficer(ctx);
     if (!args.title.trim()) {
       throw new Error("Title is required");
     }
@@ -128,7 +129,7 @@ export const setLegalHold = mutation({
   args: { documentId: v.id("documents"), legalHold: v.boolean() },
   returns: v.null(),
   handler: async (ctx, args) => {
-    const { identity } = await requireBoardRole(ctx, ["admin", "secretary"]);
+    const { identity } = await requireOfficer(ctx);
     const doc = await ctx.db.get(args.documentId);
     if (!doc) throw new Error("Document not found");
     await ctx.db.patch(args.documentId, { legalHold: args.legalHold });
@@ -147,7 +148,7 @@ export const archiveDocument = mutation({
   args: { documentId: v.id("documents") },
   returns: v.null(),
   handler: async (ctx, args) => {
-    const { identity } = await requireBoardRole(ctx, ["admin", "secretary"]);
+    const { identity } = await requireOfficer(ctx);
     const doc = await ctx.db.get(args.documentId);
     if (!doc) throw new Error("Document not found");
     if (doc.legalHold) {
@@ -172,7 +173,7 @@ export const restoreDocument = mutation({
   args: { documentId: v.id("documents") },
   returns: v.null(),
   handler: async (ctx, args) => {
-    const { identity } = await requireBoardRole(ctx, ["admin", "secretary"]);
+    const { identity } = await requireOfficer(ctx);
     const doc = await ctx.db.get(args.documentId);
     if (!doc) throw new Error("Document not found");
     if (doc.archivedAt === undefined) return null;
