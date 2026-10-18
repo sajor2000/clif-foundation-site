@@ -3,7 +3,7 @@
 import { useMutation, useQuery } from "convex/react";
 import { Cause, Effect, Exit } from "effect";
 import { useSearchParams } from "next/navigation";
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { api } from "../../../convex/_generated/api";
 import type { Id } from "../../../convex/_generated/dataModel";
 import { ACCEPTED_UPLOAD_TYPES } from "../../../convex/lib/uploads";
@@ -18,7 +18,10 @@ import {
   uploadDocumentProgram,
   type UploadDocumentError,
 } from "@/lib/effect/upload";
+import { FormStatus } from "@/components/portal/FormStatus";
 import { inputStyle, pageTitle, sectionTitle } from "@/components/portal/portal-styles";
+import { useAction } from "@/components/portal/useAction";
+import { useStickyQuery } from "@/components/portal/useStickyQuery";
 
 function isCategory(v: string): v is DocumentCategory {
   return DOCUMENT_CATEGORIES.some((c) => c.value === v);
@@ -33,10 +36,17 @@ export function DocumentsWorkspace() {
   );
   const categoryFilter = filterOverride ?? urlFilter;
   const [search, setSearch] = useState("");
+  // Query on a pause in typing, not every keystroke.
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedSearch(search.trim()), 250);
+    return () => clearTimeout(t);
+  }, [search]);
   const [showArchived, setShowArchived] = useState(false);
-  const docs = useQuery(api.documents.listDocuments, {
+  // Keep the current list on screen (dimmed) while a new filter loads.
+  const { data: docs, stale } = useStickyQuery(api.documents.listDocuments, {
     category: categoryFilter || undefined,
-    search: search.trim() || undefined,
+    search: debouncedSearch || undefined,
     archived: showArchived || undefined,
   });
   const generateUploadUrl = useMutation(api.documents.generateUploadUrl);
@@ -57,49 +67,53 @@ export function DocumentsWorkspace() {
     useState<(typeof RETENTION_CLASSES)[number]["value"]>("permanent");
   const [taxYear, setTaxYear] = useState("");
   const [file, setFile] = useState<File | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [uploading, setUploading] = useState(false);
+  const upload = useAction("Uploaded.");
+  const rowAction = useAction();
+  const [busy, setBusy] = useState<string | null>(null);
+  // Bumped after an upload to clear the file picker.
+  const [fileKey, setFileKey] = useState(0);
+
+  async function onRow(key: string, fn: () => Promise<unknown>, message: string) {
+    setBusy(key);
+    await rowAction.run(fn, message);
+    setBusy(null);
+  }
 
   async function onUpload(e: FormEvent) {
     e.preventDefault();
-    setError(null);
-    setUploading(true);
-
-    const exit = await Effect.runPromiseExit(
-      uploadDocumentProgram(
-        { title, category, file },
-        {
-          generateUploadUrl,
-          saveDocument: async (args) => {
-            return await saveDocument({
-              storageId: args.storageId as Id<"_storage">,
-              title: args.title,
-              category: args.category as DocumentCategory,
-              contentType: args.contentType,
-              retentionClass,
-              taxYear: taxYear ? Number(taxYear) : undefined,
-              reportingTag:
-                category === "tax" ? "form_990" : undefined,
-            });
+    const ok = await upload.run(async () => {
+      const exit = await Effect.runPromiseExit(
+        uploadDocumentProgram(
+          { title, category, file },
+          {
+            generateUploadUrl,
+            saveDocument: async (args) => {
+              return await saveDocument({
+                storageId: args.storageId as Id<"_storage">,
+                title: args.title,
+                category: args.category as DocumentCategory,
+                contentType: args.contentType,
+                retentionClass,
+                taxYear: taxYear ? Number(taxYear) : undefined,
+                reportingTag: category === "tax" ? "form_990" : undefined,
+              });
+            },
           },
-        },
-      ),
-    );
-
-    setUploading(false);
-
-    if (Exit.isSuccess(exit)) {
+        ),
+      );
+      if (Exit.isSuccess(exit)) return true;
+      const squashed = Cause.squash(exit.cause);
+      throw new Error(
+        squashed && typeof squashed === "object" && "_tag" in squashed
+          ? formatUploadError(squashed as UploadDocumentError)
+          : "Upload failed",
+      );
+    });
+    if (ok) {
       setTitle("");
       setFile(null);
-      return;
+      setFileKey((k) => k + 1);
     }
-
-    const squashed = Cause.squash(exit.cause);
-    if (squashed && typeof squashed === "object" && "_tag" in squashed) {
-      setError(formatUploadError(squashed as UploadDocumentError));
-      return;
-    }
-    setError("Upload failed");
   }
 
   return (
@@ -202,19 +216,16 @@ export function DocumentsWorkspace() {
           <label style={{ display: "grid", gap: 6, fontSize: 14 }}>
             File (required)
             <input
+              key={fileKey}
               type="file"
               required
               accept={ACCEPTED_UPLOAD_TYPES}
               onChange={(e) => setFile(e.target.files?.[0] ?? null)}
             />
           </label>
-          {error ? (
-            <p role="alert" style={{ margin: 0, color: "var(--status-error)", fontSize: 14 }}>
-              {error}
-            </p>
-          ) : null}
-          <Button type="submit" disabled={uploading}>
-            {uploading ? "Uploading…" : "Upload document"}
+          <FormStatus error={upload.error} status={upload.status} />
+          <Button type="submit" pending={upload.pending}>
+            {upload.pending ? "Uploading…" : "Upload document"}
           </Button>
         </form>
       </section>
@@ -232,17 +243,20 @@ export function DocumentsWorkspace() {
             Show archived documents (hidden, never deleted)
           </label>
         </div>
+        <FormStatus error={rowAction.error} status={rowAction.status} />
         {docs === undefined ? (
-          <p style={{ color: "var(--text-muted)" }}>Loading…</p>
+          <p style={{ color: "var(--text-muted)" }}>Loading documents…</p>
         ) : docs.length === 0 ? (
           <p style={{ color: "var(--text-muted)" }}>No documents match.</p>
         ) : (
           <ul
+            aria-busy={stale || undefined}
             style={{
               margin: 0,
               padding: 0,
               listStyle: "none",
               borderTop: "1px solid var(--border-strong)",
+              opacity: stale ? 0.6 : 1,
             }}
           >
             {docs.map((doc) => (
@@ -263,6 +277,7 @@ export function DocumentsWorkspace() {
                       href={doc.downloadUrl}
                       target="_blank"
                       rel="noopener noreferrer"
+                      className="portal-row-link"
                       style={{ color: "var(--link)" }}
                     >
                       {doc.title} ↗
@@ -272,17 +287,22 @@ export function DocumentsWorkspace() {
                   )}
                 </span>
                 <span style={{ fontFamily: "var(--font-mono)", fontSize: 12, color: "var(--text-muted)" }}>
-                  {doc.category}
+                  {DOCUMENT_CATEGORIES.find((c) => c.value === doc.category)?.label ?? doc.category}
                   {doc.taxYear ? ` · ${doc.taxYear}` : ""}
-                  {doc.legalHold ? " · hold" : ""}
+                  {doc.legalHold ? " · on legal hold" : ""}
                 </span>
                 {canManageDocs ? (
                   <>
                     <Button
                       type="button"
                       variant="ghost"
+                      pending={busy === `hold:${doc._id}`}
                       onClick={() =>
-                        setLegalHold({ documentId: doc._id, legalHold: !doc.legalHold })
+                        onRow(
+                          `hold:${doc._id}`,
+                          () => setLegalHold({ documentId: doc._id, legalHold: !doc.legalHold }),
+                          doc.legalHold ? "Legal hold cleared." : "Legal hold set.",
+                        )
                       }
                     >
                       {doc.legalHold ? "Clear hold" : "Legal hold"}
@@ -291,27 +311,33 @@ export function DocumentsWorkspace() {
                       <Button
                         type="button"
                         variant="ghost"
+                        pending={busy === `restore:${doc._id}`}
                         onClick={() =>
-                          restoreDocument({ documentId: doc._id }).catch((e: Error) =>
-                            setError(e.message),
-                          )
+                          onRow(`restore:${doc._id}`, () => restoreDocument({ documentId: doc._id }), "Restored to the library.")
                         }
                       >
                         Restore
                       </Button>
                     ) : (
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        disabled={doc.legalHold}
-                        onClick={() =>
-                          archiveDocument({ documentId: doc._id }).catch((e: Error) =>
-                            setError(e.message),
-                          )
-                        }
-                      >
-                        Archive
-                      </Button>
+                      <>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          disabled={doc.legalHold}
+                          aria-describedby={doc.legalHold ? `hold-reason-${doc._id}` : undefined}
+                          pending={busy === `archive:${doc._id}`}
+                          onClick={() =>
+                            onRow(`archive:${doc._id}`, () => archiveDocument({ documentId: doc._id }), "Archived. Find it under Show archived.")
+                          }
+                        >
+                          Archive
+                        </Button>
+                        {doc.legalHold ? (
+                          <span id={`hold-reason-${doc._id}`} className="sr-only">
+                            Clear the legal hold before archiving.
+                          </span>
+                        ) : null}
+                      </>
                     )}
                   </>
                 ) : null}

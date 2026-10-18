@@ -1,12 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useQuery } from "convex/react";
 import { useMemo, useState } from "react";
-import JSZip from "jszip";
 import { api } from "../../../convex/_generated/api";
 import { Button } from "@/components/core/Button";
-import { pageTitle, panelStyle, sectionTitle } from "@/components/portal/portal-styles";
+import { inputStyle, pageTitle, panelStyle, sectionTitle } from "@/components/portal/portal-styles";
+import { useStickyQuery } from "@/components/portal/useStickyQuery";
+import { YearField } from "@/components/portal/YearField";
 
 export function ReportingHub() {
   // CPA paperwork is usually for the return being prepared: the prior calendar year.
@@ -15,7 +15,8 @@ export function ReportingHub() {
   const [zipError, setZipError] = useState<string | null>(null);
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
-  const pack = useQuery(api.reporting.getReportingPack, {
+  // Keep the last pack on screen (dimmed) while new filters load.
+  const { data: pack, stale } = useStickyQuery(api.reporting.getReportingPack, {
     taxYear,
     from: fromDate ? new Date(`${fromDate}T00:00:00`).getTime() : undefined,
     to: toDate ? new Date(`${toDate}T23:59:59.999`).getTime() : undefined,
@@ -64,21 +65,28 @@ export function ReportingHub() {
     setZipError(null);
     setZipping(true);
     try {
+      // JSZip is only needed here, so it loads on demand.
+      const { default: JSZip } = await import("jszip");
       const zip = new JSZip();
       zip.file(
         `manifest-${taxYear}.json`,
         downloadManifest ?? JSON.stringify({ generatedAt: pack.generatedAt }),
       );
-      for (const section of pack.sections) {
-        const folder = zip.folder(section.id) ?? zip;
-        for (const doc of section.documents) {
-          if (!doc.downloadUrl) continue;
-          const res = await fetch(doc.downloadUrl);
-          if (!res.ok) continue;
-          const buf = await res.arrayBuffer();
-          const safe = doc.title.replace(/[^\w.\-]+/g, "_").slice(0, 80);
-          folder.file(safe || `${doc._id}`, buf);
-        }
+      const jobs = pack.sections.flatMap((section) =>
+        section.documents
+          .filter((doc) => doc.downloadUrl)
+          .map((doc) => ({ folder: zip.folder(section.id) ?? zip, doc })),
+      );
+      // Fetch files four at a time instead of one by one.
+      for (let i = 0; i < jobs.length; i += 4) {
+        await Promise.all(
+          jobs.slice(i, i + 4).map(async ({ folder, doc }) => {
+            const res = await fetch(doc.downloadUrl!);
+            if (!res.ok) return;
+            const safe = doc.title.replace(/[^\w.\-]+/g, "_").slice(0, 80);
+            folder.file(safe || `${doc._id}`, await res.arrayBuffer());
+          }),
+        );
       }
       const minutesFolder = zip.folder("minutes") ?? zip;
       for (const m of pack.approvedMinutesExports) {
@@ -107,16 +115,7 @@ export function ReportingHub() {
           Board-ready downloads for Form 990, audits, and grant reporting. Open any file ↗ or
           download everything as a ZIP for your CPA.
         </p>
-        <label style={{ display: "flex", gap: 12, alignItems: "center", fontSize: 14 }}>
-          Tax year
-          <input
-            type="number"
-            value={taxYear}
-            onChange={(e) => setTaxYear(Number(e.target.value))}
-            style={{ width: 100, height: 44, padding: "0 10px" }}
-            aria-label="Tax year"
-          />
-        </label>
+        <YearField label="Tax year" value={taxYear} onCommit={setTaxYear} />
         <div style={{ display: "flex", flexWrap: "wrap", gap: 16, alignItems: "center", fontSize: 14 }}>
           <label style={{ display: "flex", gap: 8, alignItems: "center" }}>
             From
@@ -124,7 +123,7 @@ export function ReportingHub() {
               type="date"
               value={fromDate}
               onChange={(e) => setFromDate(e.target.value)}
-              style={{ height: 44, padding: "0 10px" }}
+              style={{ ...inputStyle, width: 170 }}
             />
           </label>
           <label style={{ display: "flex", gap: 8, alignItems: "center" }}>
@@ -133,7 +132,7 @@ export function ReportingHub() {
               type="date"
               value={toDate}
               onChange={(e) => setToDate(e.target.value)}
-              style={{ height: 44, padding: "0 10px" }}
+              style={{ ...inputStyle, width: 170 }}
             />
           </label>
           <span style={{ color: "var(--text-muted)" }}>
@@ -141,7 +140,7 @@ export function ReportingHub() {
           </span>
         </div>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-          <Button type="button" onClick={downloadZip} disabled={!pack || zipping}>
+          <Button type="button" onClick={downloadZip} disabled={!pack || stale} pending={zipping}>
             {zipping ? "Building ZIP…" : "Download all (ZIP)"}
           </Button>
           <Button type="button" variant="secondary" onClick={downloadManifestFile} disabled={!pack}>
@@ -158,7 +157,7 @@ export function ReportingHub() {
       {!pack ? (
         <p style={{ color: "var(--text-muted)" }}>Loading reporting pack…</p>
       ) : (
-        <>
+        <div style={{ display: "grid", gap: 28, opacity: stale ? 0.6 : 1 }} aria-busy={stale || undefined}>
           {pack.sections.map((section) => (
             <section key={section.id} style={{ display: "grid", gap: 12 }}>
               <div>
@@ -174,7 +173,7 @@ export function ReportingHub() {
                     href={`/portal/documents?category=${section.id === "policies" ? "policy" : section.id === "meetings" ? "meeting" : section.id}`}
                     style={{ color: "var(--link)" }}
                   >
-                    Upload under Documents →
+                    Upload under Documents
                   </Link>
                 </p>
               ) : (
@@ -234,7 +233,7 @@ export function ReportingHub() {
               <p style={{ fontSize: 14, color: "var(--text-muted)" }}>
                 No approved minutes yet.{" "}
                 <Link href="/portal/meetings" style={{ color: "var(--link)" }}>
-                  Approve minutes →
+                  Send minutes for approval
                 </Link>
               </p>
             ) : (
@@ -254,7 +253,7 @@ export function ReportingHub() {
               </div>
             )}
           </section>
-        </>
+        </div>
       )}
     </div>
   );

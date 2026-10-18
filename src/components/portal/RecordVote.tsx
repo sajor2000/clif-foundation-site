@@ -6,7 +6,9 @@ import { api } from "../../../convex/_generated/api";
 import type { Id } from "../../../convex/_generated/dataModel";
 import { BALLOT_CHOICES, type BallotChoice } from "../../../convex/lib/vocab";
 import { Button } from "@/components/core/Button";
+import { FormStatus } from "@/components/portal/FormStatus";
 import { inputStyle } from "@/components/portal/portal-styles";
+import { useAction } from "@/components/portal/useAction";
 
 type Entry = BallotChoice | "absent";
 
@@ -19,21 +21,12 @@ export function RecordVote({ motionId, motionTitle }: { motionId: Id<"motions">;
   const members = useQuery(api.board.listMembers);
   const record = useMutation(api.motions.recordVote);
   const [votes, setVotes] = useState<Record<string, Entry>>({});
-  const [error, setError] = useState<string | null>(null);
-  const [saving, setSaving] = useState(false);
+  const action = useAction("Votes recorded. The motion is closed.");
   const directors = (members ?? []).filter((m) => m.isDirector);
   const entered = Object.entries(votes).filter(([, c]) => c !== "absent") as [string, BallotChoice][];
 
   async function onRecord() {
-    setError(null);
-    setSaving(true);
-    try {
-      await record({ motionId, votes: entered.map(([email, choice]) => ({ email, choice })) });
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Could not record the vote");
-    } finally {
-      setSaving(false);
-    }
+    await action.run(() => record({ motionId, votes: entered.map(([email, choice]) => ({ email, choice })) }));
   }
 
   return (
@@ -70,13 +63,9 @@ export function RecordVote({ motionId, motionTitle }: { motionId: Id<"motions">;
             </select>
           </label>
         ))}
-        {error ? (
-          <p role="alert" style={{ margin: 0, color: "var(--status-error)", fontSize: 14 }}>
-            {error}
-          </p>
-        ) : null}
-        <Button type="button" onClick={onRecord} disabled={!entered.length || saving}>
-          {saving ? "Recording…" : `Record ${entered.length} ${entered.length === 1 ? "vote" : "votes"} and close`}
+        <FormStatus error={action.error} status={action.status} />
+        <Button type="button" onClick={onRecord} disabled={!entered.length} pending={action.pending}>
+          {action.pending ? "Recording…" : `Record ${entered.length} ${entered.length === 1 ? "vote" : "votes"} and close`}
         </Button>
       </div>
     </details>

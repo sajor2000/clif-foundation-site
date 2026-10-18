@@ -29,6 +29,8 @@ export function MemberNav() {
   const isMember = role !== undefined && role !== null && role !== "bootstrap_eligible";
   const isAdmin = role === "admin";
   const pending = useQuery(api.board.listAccessRequests, isAdmin ? {} : "skip");
+  // Hold the tab row's height while the role loads so the page doesn't jump.
+  if (role === undefined) return <div aria-hidden="true" className="portal-tabs-placeholder" />;
   if (!isMember) return null;
   const count = pending?.length ?? 0;
   return (

@@ -36,10 +36,12 @@ export const listMotions = query({
     v.object({
       motion: motionReturn,
       tally: tallyReturn,
+      /** The caller's own ballot, if they voted (in the portal or recorded). */
+      myChoice: v.union(ballotChoice, v.null()),
     }),
   ),
   handler: async (ctx, args) => {
-    await requireBoardIdentity(ctx);
+    const identity = await requireBoardIdentity(ctx);
     const motions = args.status
       ? await ctx.db
           .query("motions")
@@ -58,11 +60,28 @@ export const listMotions = query({
       results.push({
         motion,
         tally: await computeTally(ctx, motion, directorEmails),
+        myChoice: await myBallotChoice(ctx, motion._id, identity),
       });
     }
     return results;
   },
 });
+
+/** The caller's ballot on a motion: cast in the portal, or recorded from a meeting. */
+async function myBallotChoice(
+  ctx: QueryCtx,
+  motionId: Doc<"motions">["_id"],
+  identity: { subject: string; email?: string },
+) {
+  for (const voterSubject of [identity.subject, `recorded:${identity.email}`]) {
+    const b = await ctx.db
+      .query("ballots")
+      .withIndex("by_motion_voter", (q) => q.eq("motionId", motionId).eq("voterSubject", voterSubject))
+      .unique();
+    if (b) return b.choice;
+  }
+  return null;
+}
 
 /** Live tally for open/draft motions; the frozen result for closed ones. */
 async function computeTally(

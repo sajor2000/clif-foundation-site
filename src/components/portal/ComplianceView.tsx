@@ -5,7 +5,14 @@ import { useState } from "react";
 import { api } from "../../../convex/_generated/api";
 import type { Id } from "../../../convex/_generated/dataModel";
 import { Button } from "@/components/core/Button";
+import { FormStatus } from "@/components/portal/FormStatus";
 import { inputStyle, pageTitle, panelStyle, sectionTitle } from "@/components/portal/portal-styles";
+import { useAction } from "@/components/portal/useAction";
+import { useStickyQuery } from "@/components/portal/useStickyQuery";
+import { YearField } from "@/components/portal/YearField";
+import { POLICY_TYPES } from "../../../convex/lib/vocab";
+
+const policyLabel = (value: string) => POLICY_TYPES.find((p) => p.value === value)?.label ?? value;
 
 export function ComplianceView() {
   const [year, setYear] = useState(new Date().getFullYear());
@@ -13,9 +20,10 @@ export function ComplianceView() {
   const [taxYear, setTaxYear] = useState(new Date().getFullYear() - 1);
   const [notes, setNotes] = useState("");
   const [meetingId, setMeetingId] = useState<Id<"meetings"> | "">("");
-  const [error, setError] = useState<string | null>(null);
+  const review = useAction("Form 990 review recorded.");
   const role = useQuery(api.board.myRole);
-  const dashboard = useQuery(api.compliance.getDashboard, { year, taxYear });
+  // Keep the last dashboard on screen (dimmed) while a new year loads.
+  const { data: dashboard, stale } = useStickyQuery(api.compliance.getDashboard, { year, taxYear });
   const audit = useQuery(api.compliance.listAuditEvents, {});
   const meetings = useQuery(api.meetings.listMeetings);
   const upsert990 = useMutation(api.form990.upsertReview);
@@ -45,39 +53,30 @@ export function ComplianceView() {
   }
 
   async function mark990Reviewed() {
-    setError(null);
     if (!meetingId && !notes.trim()) {
-      setError("Select a review meeting or enter notes before recording.");
+      review.setError("Select a review meeting or enter notes before recording.");
       return;
     }
-    try {
-      await upsert990({
+    await review.run(() =>
+      upsert990({
         taxYear,
         boardReviewedBeforeFiled: true,
         reviewMeetingId: meetingId || undefined,
         notes: notes.trim() || undefined,
-      });
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Failed to record 990 review");
-    }
+      }),
+    );
   }
 
   return (
     <div style={{ display: "grid", gap: 28 }}>
       <h1 style={pageTitle}>Stay compliant</h1>
-      <label style={{ display: "flex", gap: 12, alignItems: "center" }}>
-        COI year
-        <input
-          type="number"
-          value={year}
-          onChange={(e) => setYear(Number(e.target.value))}
-          style={{ width: 100, height: 44 }}
-          aria-label="Conflict of interest year"
-        />
-      </label>
+      <YearField label="COI year" value={year} onCommit={setYear} />
 
       {dashboard ? (
-        <div style={{ display: "grid", gap: 16 }}>
+        <div
+          style={{ display: "grid", gap: 16, opacity: stale ? 0.6 : 1 }}
+          aria-busy={stale || undefined}
+        >
           <div style={panelStyle}>
             <h2 style={{ ...sectionTitle, fontSize: 20 }}>Conflict of interest</h2>
             <p style={{ margin: 0 }}>
@@ -91,21 +90,12 @@ export function ComplianceView() {
           </div>
           <div style={panelStyle}>
             <h2 style={{ ...sectionTitle, fontSize: 20 }}>Policies</h2>
-            <p style={{ margin: 0 }}>Adopted: {dashboard.policies.adopted.join(", ") || "none"}</p>
-            <p style={{ margin: 0 }}>Missing: {dashboard.policies.missing.join(", ") || "none"}</p>
+            <p style={{ margin: 0 }}>Adopted: {dashboard.policies.adopted.map(policyLabel).join(", ") || "none"}</p>
+            <p style={{ margin: 0 }}>Missing: {dashboard.policies.missing.map(policyLabel).join(", ") || "none"}</p>
           </div>
           <div style={panelStyle}>
             <h2 style={{ ...sectionTitle, fontSize: 20 }}>Form 990 review</h2>
-            <label style={{ display: "flex", gap: 12, alignItems: "center", fontSize: 14 }}>
-              Tax year
-              <input
-                type="number"
-                value={taxYear}
-                onChange={(e) => setTaxYear(Number(e.target.value))}
-                style={{ width: 100, height: 44 }}
-                aria-label="Form 990 tax year"
-              />
-            </label>
+            <YearField label="Tax year" value={taxYear} onCommit={setTaxYear} />
             <p style={{ margin: 0 }}>
               Board reviewed before filed:{" "}
               {dashboard.form990.boardReviewedBeforeFiled ? "yes" : "no"}
@@ -139,18 +129,14 @@ export function ComplianceView() {
                     placeholder="Describe the board review (date, attendees, outcome)"
                   />
                 </label>
-                {error ? (
-                  <p role="alert" style={{ margin: 0, color: "var(--status-error)", fontSize: 14 }}>
-                    {error}
-                  </p>
-                ) : null}
-                <Button type="button" variant="secondary" onClick={mark990Reviewed}>
+                <FormStatus error={review.error} status={review.status} />
+                <Button type="button" variant="secondary" onClick={mark990Reviewed} pending={review.pending}>
                   Mark {taxYear} 990 as board-reviewed
                 </Button>
               </>
             ) : (
               <p style={{ margin: 0, fontSize: 14, color: "var(--text-muted)" }}>
-                Secretary, chair, or admin can record the Form 990 board review.
+                Officers record the board’s Form 990 review.
               </p>
             )}
           </div>
@@ -179,12 +165,14 @@ export function ComplianceView() {
           </Button>
         </div>
         {!audit ? (
-          <p>Loading…</p>
+          <p style={{ color: "var(--text-muted)" }}>Loading activity…</p>
+        ) : audit.length === 0 ? (
+          <p style={{ color: "var(--text-muted)" }}>No activity yet.</p>
         ) : (
           <ul style={{ margin: 0, padding: 0, listStyle: "none" }}>
-            {audit.map((e, i) => (
+            {audit.map((e) => (
               <li
-                key={`${e.createdAt}-${i}`}
+                key={e.id}
                 style={{ padding: "10px 0", borderBottom: "1px solid var(--border)", fontSize: 14 }}
               >
                 {new Date(e.createdAt).toLocaleString()} · {e.kind} · {e.summary}

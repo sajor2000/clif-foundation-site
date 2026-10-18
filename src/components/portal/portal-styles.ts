@@ -8,7 +8,8 @@ export const inputStyle: CSSProperties = {
   background: "var(--bg-page)",
   color: "var(--text-primary)",
   fontFamily: "var(--font-sans)",
-  fontSize: 15,
+  // 16px keeps iOS Safari from zooming into a focused field.
+  fontSize: 16,
 };
 
 export const panelStyle: CSSProperties = {

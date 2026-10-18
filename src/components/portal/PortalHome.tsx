@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { useMutation, useQuery } from "convex/react";
-import { useState } from "react";
 import { api } from "../../../convex/_generated/api";
 import { Button } from "@/components/core/Button";
 import { POLICY_TYPES } from "../../../convex/lib/vocab";
+import { FormStatus } from "@/components/portal/FormStatus";
 import { panelStyle, pageTitle, sectionTitle } from "@/components/portal/portal-styles";
+import { useAction } from "@/components/portal/useAction";
 
 export function PortalHome() {
   const year = new Date().getFullYear();
@@ -203,20 +204,7 @@ function GlanceRow({ term, value }: { term: string; value: string }) {
 
 function ClaimAdminPanel() {
   const bootstrap = useMutation(api.board.bootstrapAdmin);
-  const [error, setError] = useState<string | null>(null);
-  const [claiming, setClaiming] = useState(false);
-
-  async function onClaim() {
-    setError(null);
-    setClaiming(true);
-    try {
-      await bootstrap({});
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Could not claim admin");
-    } finally {
-      setClaiming(false);
-    }
-  }
+  const claim = useAction();
 
   return (
     <div style={{ ...panelStyle, maxWidth: 640 }}>
@@ -225,13 +213,9 @@ function ClaimAdminPanel() {
         The board has no members yet. Claim admin for this account, then approve directors as they
         request access under Members.
       </p>
-      {error ? (
-        <p role="alert" style={{ margin: 0, color: "var(--status-error)", fontSize: 14 }}>
-          {error}
-        </p>
-      ) : null}
-      <Button type="button" onClick={onClaim} disabled={claiming}>
-        {claiming ? "Claiming…" : "Claim admin for my account"}
+      <FormStatus error={claim.error} />
+      <Button type="button" onClick={() => claim.run(() => bootstrap({}))} pending={claim.pending}>
+        {claim.pending ? "Claiming…" : "Claim admin for my account"}
       </Button>
     </div>
   );
@@ -240,22 +224,15 @@ function ClaimAdminPanel() {
 function RequestAccessPanel() {
   const status = useQuery(api.board.myAccessRequest);
   const requestAccess = useMutation(api.board.requestAccess);
-  const [error, setError] = useState<string | null>(null);
-  const [sending, setSending] = useState(false);
+  const send = useAction();
 
-  async function onRequest() {
-    setError(null);
-    setSending(true);
-    try {
-      await requestAccess({});
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Could not send your request");
-    } finally {
-      setSending(false);
-    }
+  if (status === undefined) {
+    return (
+      <p role="status" style={{ margin: 0, color: "var(--text-muted)" }}>
+        Checking your access…
+      </p>
+    );
   }
-
-  if (status === undefined) return null;
 
   if (status === "pending") {
     return (
@@ -278,15 +255,10 @@ function RequestAccessPanel() {
           ? "An admin did not approve your last request. If this is a mistake, you can ask again."
           : "Your account is not on the board allowlist yet. Send a request and an admin will review it."}
       </p>
-      {error ? (
-        <p role="alert" style={{ margin: 0, color: "var(--status-error)", fontSize: 14 }}>
-          {error}
-        </p>
-      ) : null}
-      <Button type="button" onClick={onRequest} disabled={sending}>
-        {status === "denied" ? "Ask again" : "Request access"}
+      <FormStatus error={send.error} />
+      <Button type="button" onClick={() => send.run(() => requestAccess({}))} pending={send.pending}>
+        {send.pending ? "Sending…" : status === "denied" ? "Ask again" : "Request access"}
       </Button>
     </div>
   );
 }
-

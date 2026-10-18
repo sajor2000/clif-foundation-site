@@ -48,4 +48,15 @@ describe("voting", () => {
       as(t, ADMIN).mutation(api.motions.castBallot, { motionId: id, choice: "yes" }),
     ).rejects.toThrow(/closed/);
   });
+
+  it("the motion list shows each director their own vote", async () => {
+    const t = backend();
+    await seedBoard(t, [{ email: "d1@x.org" }, { email: "d2@x.org" }]);
+    const id = await openMotion(t, "standard");
+    await as(t, "d1@x.org").mutation(api.motions.castBallot, { motionId: id, choice: "no" });
+    const mine = await as(t, "d1@x.org").query(api.motions.listMotions, {});
+    const theirs = await as(t, "d2@x.org").query(api.motions.listMotions, {});
+    expect(mine.find((m) => m.motion._id === id)?.myChoice).toBe("no");
+    expect(theirs.find((m) => m.motion._id === id)?.myChoice).toBeNull();
+  });
 });
