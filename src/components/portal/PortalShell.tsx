@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Suspense, type ReactNode } from "react";
+import { Suspense, useEffect, useRef, type ReactNode } from "react";
 import { UserButton } from "@clerk/nextjs";
 import { useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
@@ -45,14 +45,24 @@ export function MemberNav() {
 
 function PortalNav({ items }: { items: ReadonlyArray<{ href: string; label: string }> }) {
   const path = usePathname();
+  const navRef = useRef<HTMLElement>(null);
+  // On narrow screens the tabs scroll sideways; keep the current one in view.
+  useEffect(() => {
+    navRef.current
+      ?.querySelector('[aria-current="page"]')
+      ?.scrollIntoView({ block: "nearest", inline: "nearest" });
+  }, [path]);
   return (
     <nav
+      ref={navRef}
       aria-label="Board portal"
+      className="portal-tabs"
       style={{
         borderBottom: "1px solid var(--border)",
         padding: "0 var(--gutter)",
         display: "flex",
-        flexWrap: "wrap",
+        flexWrap: "nowrap",
+        overflowX: "auto",
         gap: 4,
       }}
     >
@@ -73,6 +83,8 @@ function PortalNav({ items }: { items: ReadonlyArray<{ href: string; label: stri
               alignItems: "center",
               fontSize: 14,
               fontWeight: active ? 600 : 500,
+              whiteSpace: "nowrap",
+              flexShrink: 0,
               color: active ? "var(--text-primary)" : "var(--link)",
               borderBottom: active
                 ? "2px solid var(--accent)"
@@ -141,7 +153,17 @@ export function PortalShell({
           </span>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-          <Link href="/" style={{ color: "var(--link)", fontSize: 14 }}>
+          <Link
+            href="/"
+            style={{
+              color: "var(--link)",
+              fontSize: 14,
+              display: "inline-flex",
+              alignItems: "center",
+              minHeight: "var(--control-md)",
+              padding: "0 4px",
+            }}
+          >
             Public site
           </Link>
           {isClerkConfigured ? <UserButton /> : null}

@@ -1,7 +1,7 @@
 import Script from "next/script";
 import { givebutterAccountId } from "@/lib/givebutter";
 
-/** Loads Givebutter widgets on every page (required by Givebutter embed docs). */
+/** Loads the Givebutter widget runtime; rendered only on /support, where the form lives. */
 export function GivebutterScript() {
   const accountId = givebutterAccountId();
 
