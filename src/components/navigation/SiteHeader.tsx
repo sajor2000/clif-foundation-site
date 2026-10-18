@@ -45,15 +45,33 @@ export function SiteHeader({ current }: { current?: string }) {
   useEffect(() => {
     // Widening past the mobile breakpoint closes the panel (desktop nav takes
     // over). If focus was inside the panel, keep it on the page.
+    // The browser may drop focus (CSS hides the panel) before this handler
+    // runs, so remember focus-in-panel ourselves; forget it only when focus
+    // moves to another element.
+    const panel = panelRef.current;
+    let focusInPanel = false;
+    const onFocusIn = () => {
+      focusInPanel = true;
+    };
+    const onFocusOut = (e: FocusEvent) => {
+      if (e.relatedTarget && !panel?.contains(e.relatedTarget as Node)) focusInPanel = false;
+    };
+    panel?.addEventListener("focusin", onFocusIn);
+    panel?.addEventListener("focusout", onFocusOut);
     const mq = window.matchMedia("(max-width: 999px)");
     const onChange = () => {
       if (mq.matches) return;
-      const hadFocus = panelRef.current?.contains(document.activeElement);
+      const hadFocus = focusInPanel || panel?.contains(document.activeElement);
+      focusInPanel = false;
       setOpen(false);
       if (hadFocus) headerRef.current?.querySelector<HTMLElement>(".site-header-brand a")?.focus();
     };
     mq.addEventListener("change", onChange);
-    return () => mq.removeEventListener("change", onChange);
+    return () => {
+      mq.removeEventListener("change", onChange);
+      panel?.removeEventListener("focusin", onFocusIn);
+      panel?.removeEventListener("focusout", onFocusOut);
+    };
   }, []);
 
   return (

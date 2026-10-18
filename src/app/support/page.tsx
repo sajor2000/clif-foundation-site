@@ -16,7 +16,7 @@ import { givebutterEmbed } from "@/lib/givebutter";
 export const metadata: Metadata = pageMetadata({
   title: "Support",
   description:
-    "Support CLIF Foundation with a secure online gift through Givebutter, or email an inquiry. Illinois nonprofit corporation; 501(c)(3) application pending with the IRS.",
+    "Support CLIF Foundation with a secure online gift through Givebutter, or email an inquiry. Illinois nonprofit corporation. 501(c)(3) application pending with the IRS.",
   path: "/support",
 });
 

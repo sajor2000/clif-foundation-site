@@ -135,8 +135,10 @@ export default function MissionPage() {
                   Guides the CLIF data standard and research methods
                 </li>
                 <li style={{ padding: "16px 20px", borderBottom: "1px solid var(--border-subtle)" }}>
-                  Credits research to the original investigators; patient data
-                  remains at each member site
+                  Credits research to the original investigators
+                </li>
+                <li style={{ padding: "16px 20px", borderBottom: "1px solid var(--border-subtle)" }}>
+                  Keeps patient data at each member site
                 </li>
                 <li style={{ padding: "16px 20px" }}>
                   <a href="https://clif-icu.com/" style={{ color: "var(--link)" }}>
@@ -179,8 +181,10 @@ export default function MissionPage() {
                   training
                 </li>
                 <li style={{ padding: "16px 20px", borderBottom: "1px solid var(--border-subtle)" }}>
-                  Does not conduct research or hold patient data; sets budgets
-                  for adoption work
+                  Does not conduct research or hold patient data
+                </li>
+                <li style={{ padding: "16px 20px", borderBottom: "1px solid var(--border-subtle)" }}>
+                  Sets budgets for adoption work
                 </li>
                 <li style={{ padding: "16px 20px" }}>
                   <Link href="/our-work" style={{ color: "var(--link)" }}>
