@@ -14,4 +14,4 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 ## Site checks
 
-`npm run check:site` runs the browser checks in `scripts/checks/` (keyboard menu, focus, axe, reduced motion) against a running production build: `npm run build && npx next start -p 43139` first, or set `SITE_URL`. Set `CHROME_PATH` off macOS. It exits non-zero on any failure. `npm run test:e2e` starts its own server.
+`npm run test:e2e` builds nothing itself: run `npm run build` first, and it starts `next start` on `E2E_PORT` (default 43199). It covers the header menu, focus and ids across kept-mounted pages, axe WCAG 2.1 A/AA on every public page (desktop, phone, 320px, light and dark), reduced motion, and the motion and interaction behaviour. Set `BASE_URL=https://www.clificufoundation.org` to run the same suite against the live site, and `CHROME_PATH` off macOS.

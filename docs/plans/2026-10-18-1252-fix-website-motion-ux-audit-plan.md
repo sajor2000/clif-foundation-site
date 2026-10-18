@@ -35,7 +35,7 @@ The home page motion was reworked earlier the same day and passed two audits. A 
 ### Requirements
 
 **Interaction states**
-- R1. Hover styles apply only on devices whose primary pointer can hover finely, and never stick after a tap.
+- R1. Hover styles apply only on devices whose primary pointer can hover finely, so hover never sticks after a tap on touch-first devices (phones, and tablets without a trackpad).
 - R2. Publication rows and inline text links share the row-link and prose-link hover treatment used on the home page, driven by CSS rather than React state.
 - R3. The copy-email button and filter chips have the same hover, press and colour-transition behaviour as other buttons, and a pressed chip keeps its pressed fill while hovered.
 - R4. The copy-email button keeps a stable width when its label changes, announces the change once to screen readers, and does not claim success when the copy failed.
@@ -48,6 +48,7 @@ The home page motion was reworked earlier the same day and passed two audits. A 
 - R7. The scroll engine does no per-frame work when nothing on the page needs it.
 - R8. Turning reduced motion on or off in the operating system takes effect without a reload.
 - R9. Under reduced motion, press feedback does not scale elements.
+- R11. Scroll-driven figures animate without forcing layout on each scroll frame.
 
 **Polish**
 - R10. Years, hour ticks and data-panel values use tabular figures. Body paragraphs avoid single-word last lines.
@@ -209,7 +210,7 @@ flowchart TB
 ### U6. Scroll engine idle work and ICU cursor
 
 - **Goal:** No per-frame engine work when nothing needs it, and the ICU cursor moves without layout.
-- **Requirements:** R7, KTD5, KTD7
+- **Requirements:** R7, R11, KTD5, KTD7
 - **Dependencies:** none
 - **Files:** `public/scrollcraft/scrollcraft.js`, `src/styles/scrollcraft-devices.css`, `src/components/home/IcuStayFigure.tsx`, `tests/e2e/motion-ux.test.mjs`
 - **Approach:**
@@ -266,7 +267,7 @@ The only expected site-check failure is "F12 hosted giving link", which the owne
 
 ## Definition of Done
 
-- All requirements R1-R10 hold, each verified by its unit's scenarios or screenshots.
+- All requirements R1-R11 hold, each verified by its unit's scenarios or screenshots.
 - Every gate in the Verification Contract passes, apart from the declined F12 check.
 - No file under `src/app/portal/**` or `src/components/portal/**` changed.
 - The portal session has been told about the `globals.css` changes before push.
