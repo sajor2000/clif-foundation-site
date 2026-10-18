@@ -13,6 +13,8 @@ import { clerkPublishableKey } from "@/lib/env";
 const clerkAppearance = {
   theme: "simple" as const,
   cssLayerName: "clerk",
+  // Steps swap without Clerk's card-height animation (flat, restrained motion).
+  options: { animations: false },
   variables: {
     colorPrimary: "var(--action-primary-bg)",
     colorPrimaryForeground: "var(--action-primary-fg)",
