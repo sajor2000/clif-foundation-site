@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, type CSSProperties, type FormEvent } from "react";
+import { useRef, useState, type CSSProperties, type FormEvent } from "react";
 import { Button } from "@/components/core/Button";
+import { CONTACT_EMAIL } from "@/lib/content";
 
 const KINDS = ["gift", "partnership", "program", "other"] as const;
 
@@ -12,10 +13,23 @@ export function InquiryForm() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  // After a draft opens, the button stays off until the visitor edits, so a
+  // second click cannot open a second draft.
+  const [sent, setSent] = useState(false);
+  const [status, setStatus] = useState("");
+  const busy = useRef(false);
+
+  function edited() {
+    setSent(false);
+    setStatus("");
+  }
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
+    if (busy.current || sent) return;
+    busy.current = true;
     setError(null);
+    setStatus("");
     setLoading(true);
     try {
       const res = await fetch("/api/inquiry", {
@@ -37,10 +51,15 @@ export function InquiryForm() {
         setError(data.message ?? "Invalid inquiry");
         return;
       }
+      setStatus(
+        `Opening your email app. If nothing opens, write to ${CONTACT_EMAIL}.`,
+      );
+      setSent(true);
       window.location.href = data.mailto;
     } catch {
       setError("Could not prepare inquiry email");
     } finally {
+      busy.current = false;
       setLoading(false);
     }
   }
@@ -93,7 +112,10 @@ export function InquiryForm() {
           autoComplete="name"
           aria-required="true"
           value={name}
-          onChange={(e) => setName(e.target.value)}
+          onChange={(e) => {
+            setName(e.target.value);
+            edited();
+          }}
           style={inputStyle}
         />
       </label>
@@ -103,7 +125,10 @@ export function InquiryForm() {
           name="organization"
           autoComplete="organization"
           value={organization}
-          onChange={(e) => setOrganization(e.target.value)}
+          onChange={(e) => {
+            setOrganization(e.target.value);
+            edited();
+          }}
           style={inputStyle}
         />
       </label>
@@ -113,7 +138,10 @@ export function InquiryForm() {
           name="kind"
           autoComplete="off"
           value={kind}
-          onChange={(e) => setKind(e.target.value as (typeof KINDS)[number])}
+          onChange={(e) => {
+            setKind(e.target.value as (typeof KINDS)[number]);
+            edited();
+          }}
           style={inputStyle}
         >
           {KINDS.map((k) => (
@@ -131,7 +159,10 @@ export function InquiryForm() {
           aria-describedby="inquiry-message-hint"
           autoComplete="off"
           value={message}
-          onChange={(e) => setMessage(e.target.value)}
+          onChange={(e) => {
+            setMessage(e.target.value);
+            edited();
+          }}
           rows={4}
           style={{ ...inputStyle, height: "auto", padding: 12 }}
         />
@@ -140,13 +171,20 @@ export function InquiryForm() {
         Do not include patient information.
       </p>
       {error ? (
-        <p role="alert" style={{ margin: 0, color: "var(--status-error)", fontSize: 14 }}>
+        <p role="alert" className="inquiry-error">
           {error}
         </p>
       ) : null}
-      <Button type="submit" disabled={loading}>
-        {loading ? "Preparing…" : "Open email draft"}
+      <Button type="submit" disabled={loading || sent}>
+        {/* Both labels share one cell, so the button keeps its width. */}
+        <span className="label-stack">
+          <span data-active={!loading}>Open email draft</span>
+          <span data-active={loading}>Preparing…</span>
+        </span>
       </Button>
+      <p role="status" className="inquiry-status">
+        {status}
+      </p>
     </form>
   );
 }

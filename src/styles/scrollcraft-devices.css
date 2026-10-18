@@ -1,6 +1,13 @@
 /* scroll-craft device floor, scoped to .sc-home so the CLIF design system stays law.
    Tokens map to existing CSS variables from DESIGN.md. */
 
+/* One motion vocabulary (spacing.css): ease-out for anything arriving,
+   standard for colour changes. On :root so row links work on every page. */
+:root {
+  --sc-ease-out: var(--ease-out);
+  --sc-d-hover: var(--duration-hover);
+}
+
 .sc-home {
   --sc-canvas: var(--bg-page);
   --sc-surface: var(--bg-panel);
@@ -13,10 +20,6 @@
   --sc-font-mono: var(--font-mono);
   --sc-hairline: var(--border);
   --sc-hairline-strong: var(--border-strong);
-  /* One motion vocabulary: ease-out for anything arriving, standard
-     (spacing.css) for colour changes. Three durations. */
-  --sc-ease-out: cubic-bezier(0.23, 1, 0.32, 1);
-  --sc-d-hover: 160ms;
   --sc-d-state: 200ms;
   --sc-d-reveal: 360ms;
   --sc-z-stage: 1;
@@ -164,8 +167,10 @@
   align-content: center;
 }
 
-.sc-folio__item:hover .sc-folio__t {
-  text-decoration: underline;
+@media (hover: hover) and (pointer: fine) {
+  .sc-folio__item:hover .sc-folio__t {
+    text-decoration: underline;
+  }
 }
 
 .sc-folio__item:focus-visible {
@@ -610,12 +615,20 @@
   display: none;
 }
 
+/* The track is the size container, so the cursor moves by transform (no
+   layout per scroll frame). 236px is the 220px label column plus its 16px
+   gap. Without container units it rests at 0h. */
+.icu-track {
+  container-type: inline-size;
+}
+
 .icu-scrub .icu-cursor {
   display: block;
   position: absolute;
   top: 0;
   bottom: 0;
-  left: calc(236px + (100% - 236px) * var(--icu-t));
+  left: 236px;
+  transform: translateX(calc((100cqw - 236px) * var(--icu-t)));
   width: 1px;
   background: var(--link);
   opacity: calc(1 - max(0, var(--icu-t) - 0.97) * 33);

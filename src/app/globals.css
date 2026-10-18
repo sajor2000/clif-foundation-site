@@ -1,4 +1,10 @@
 @import "tailwindcss";
+/* Skill notes and docs name classes as examples, not markup: keep Tailwind
+   from generating CSS for them. */
+@source not "../../.agents";
+@source not "../../.claude";
+@source not "../../.cursor";
+@source not "../../docs";
 @import "../styles/colors.css";
 @import "../styles/typography.css";
 @import "../styles/spacing.css";
@@ -86,8 +92,10 @@ html[data-theme="dark"] .clif-theme-label-dark {
   transition: background-color var(--duration-fast) var(--ease-standard);
 }
 
-.site-nav-link:hover {
-  background: var(--bg-hover);
+@media (hover: hover) and (pointer: fine) {
+  .site-nav-link:hover {
+    background: var(--bg-hover);
+  }
 }
 
 .site-nav-cta {
@@ -95,8 +103,10 @@ html[data-theme="dark"] .clif-theme-label-dark {
   transition: background-color var(--duration-fast) var(--ease-standard);
 }
 
-.site-nav-cta:hover {
-  background: var(--action-primary-hover);
+@media (hover: hover) and (pointer: fine) {
+  .site-nav-cta:hover {
+    background: var(--action-primary-hover);
+  }
 }
 
 .clif-theme-btn {
@@ -109,9 +119,11 @@ html[data-theme="dark"] .clif-theme-label-dark {
   transition: background-color var(--duration-fast) var(--ease-standard);
 }
 
-.clif-theme-btn:hover,
-.site-menu-btn:hover {
-  background: var(--action-secondary-hover);
+@media (hover: hover) and (pointer: fine) {
+  .clif-theme-btn:hover,
+  .site-menu-btn:hover {
+    background: var(--action-secondary-hover);
+  }
 }
 
 /* Theme control inside the open menu (below 1000px, per design/readme.md) */
@@ -132,8 +144,10 @@ html[data-theme="dark"] .clif-theme-label-dark {
   transition: background-color var(--duration-fast) var(--ease-standard);
 }
 
-.site-menu-theme:hover {
-  background: var(--action-secondary-hover);
+@media (hover: hover) and (pointer: fine) {
+  .site-menu-theme:hover {
+    background: var(--action-secondary-hover);
+  }
 }
 
 @media (max-width: 999px) {
@@ -149,6 +163,19 @@ html[data-theme="dark"] .clif-theme-label-dark {
      display:none, so its links are out of the tab order and the a11y tree. */
   .site-menu-panel[data-open="true"] {
     display: grid;
+    /* Opening settles in. Only this rule carries the transition, so closing
+       is instant and the no-JS fallback (data-open="false") never fades. */
+    transition:
+      opacity 180ms var(--ease-out),
+      transform 180ms var(--ease-out),
+      display 180ms allow-discrete;
+  }
+
+  @starting-style {
+    .site-menu-panel[data-open="true"] {
+      opacity: 0;
+      transform: translateY(-4px);
+    }
   }
 
   .site-menu-btn[aria-expanded="true"] {
@@ -245,8 +272,53 @@ html[data-theme="dark"] .clif-theme-label-dark {
   text-decoration: none;
 }
 
-.linkish:hover {
-  text-decoration: underline;
+@media (hover: hover) and (pointer: fine) {
+  .linkish:hover {
+    text-decoration: underline;
+  }
+}
+
+/* Inquiry form (components/support/InquiryForm.tsx) */
+.inquiry-error {
+  margin: 0;
+  color: var(--status-error);
+  font-size: 14px;
+  transition:
+    opacity 160ms var(--ease-out),
+    transform 160ms var(--ease-out);
+}
+
+@starting-style {
+  .inquiry-error {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+.inquiry-status {
+  margin: 0;
+  color: var(--text-body);
+  font-size: 14px;
+}
+
+/* Button labels that swap in place: each sits in one grid cell. */
+.label-stack {
+  display: inline-grid;
+}
+
+.label-stack > * {
+  grid-area: 1 / 1;
+}
+
+.label-stack > [data-active="false"] {
+  visibility: hidden;
+}
+
+/* Inline links in running text keep a full underline (WCAG 1.4.1); the base
+   link rule thickens it on hover. */
+.prose-link {
+  color: var(--link);
+  text-underline-offset: 0.2em;
 }
 
 /* Givebutter giving panel — flat ink/petrol surface, no gradients */
@@ -489,7 +561,7 @@ input[type="file"]::file-selector-button:hover {
   transition:
     background-color var(--duration-fast) var(--ease-standard),
     border-color var(--duration-fast) var(--ease-standard),
-    transform 160ms cubic-bezier(0.23, 1, 0.32, 1);
+    transform 160ms var(--ease-out);
 }
 
 .btn--primary {
@@ -535,5 +607,76 @@ input[type="file"]::file-selector-button:hover {
 }
 
 .btn:not(:disabled):active {
+  transform: scale(0.97);
+}
+
+/* Filter chips (components/core/FilterChip.tsx): pressed state from
+   aria-pressed, which keeps its fill under the pointer. */
+.chip {
+  height: var(--control-md);
+  padding: 0 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--text-primary);
+  font: 500 14px var(--font-sans);
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color var(--duration-fast) var(--ease-standard),
+    color var(--duration-fast) var(--ease-standard),
+    transform 160ms var(--ease-out);
+}
+
+.chip[aria-pressed="true"] {
+  background: var(--action-primary-bg);
+  color: var(--action-primary-fg);
+}
+
+.chip__count {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+/* Copy-address button (components/support/CopyEmailButton.tsx): its labels
+   share one grid cell and crossfade, so the width never jumps. */
+.copy-btn {
+  display: inline-grid;
+  place-items: center;
+  min-height: 48px;
+  padding: 0 18px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--text-primary);
+  font: 500 15px var(--font-sans);
+  cursor: pointer;
+  transition:
+    background-color var(--duration-fast) var(--ease-standard),
+    transform 160ms var(--ease-out);
+}
+
+.copy-btn__label {
+  grid-area: 1 / 1;
+  transition: opacity var(--duration-fast) var(--ease-out);
+}
+
+.copy-btn__label[data-active="false"] {
+  opacity: 0;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .chip:not([aria-pressed="true"]):hover,
+  .copy-btn:hover {
+    background: var(--action-secondary-hover);
+  }
+}
+
+.chip:active,
+.copy-btn:active {
   transform: scale(0.97);
 }

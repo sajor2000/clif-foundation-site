@@ -141,7 +141,7 @@ export default function MissionPage() {
                   Keeps patient data at each member site
                 </li>
                 <li style={{ padding: "16px 20px" }}>
-                  <a href="https://clif-icu.com/" style={{ color: "var(--link)" }}>
+                  <a href="https://clif-icu.com/" className="prose-link">
                     clif-icu.com ↗
                   </a>
                 </li>
@@ -187,7 +187,7 @@ export default function MissionPage() {
                   Sets budgets for adoption work
                 </li>
                 <li style={{ padding: "16px 20px" }}>
-                  <Link href="/our-work" style={{ color: "var(--link)" }}>
+                  <Link href="/our-work" className="prose-link">
                     Programs
                   </Link>
                 </li>

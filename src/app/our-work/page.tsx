@@ -170,7 +170,7 @@ export default function OurWorkPage() {
                     builds_on
                   </dt>
                   <dd style={{ margin: 0, flex: "1 1 180px" }}>
-                    <a href={p.baseUrl} style={{ color: "var(--link)" }}>
+                    <a href={p.baseUrl} className="prose-link">
                       {p.base} ↗
                     </a>
                   </dd>

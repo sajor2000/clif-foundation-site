@@ -631,6 +631,7 @@ export function HomeScroll() {
                         fontFamily: "var(--font-mono)",
                         fontSize: 13,
                         color: "var(--text-muted)",
+                        fontVariantNumeric: "tabular-nums",
                       }}
                     >
                       {p.year}

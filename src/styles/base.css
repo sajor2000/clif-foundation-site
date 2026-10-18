@@ -1,7 +1,12 @@
 *, *::before, *::after { box-sizing: border-box; }
 html, body { margin: 0; background: var(--bg-page); color: var(--text-primary); font-family: var(--font-sans); font-size: var(--type-body); line-height: var(--leading-body); -webkit-font-smoothing: antialiased; }
+/* Body paragraphs avoid a lone last word. */
+p { text-wrap: pretty; }
 a { color: inherit; text-decoration-thickness: 1px; text-underline-offset: 3px; }
-a:hover { text-decoration-thickness: 2px; }
+/* Hover only where a pointer can hover, so a tap never leaves it stuck. */
+@media (hover: hover) and (pointer: fine) {
+  a:hover { text-decoration-thickness: 2px; }
+}
 /* Dual-ring focus: outer halo keeps 3:1 contrast on ink-filled controls (WCAG 2.4.7 / 2.4.11) */
 :focus-visible {
   outline: 2px solid var(--focus-ring);
@@ -17,5 +22,12 @@ a:hover { text-decoration-thickness: 2px; }
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+  /* Press feedback stays, but without scaling. */
+  .btn:active,
+  .chip:active,
+  .copy-btn:active,
+  .sc-program-card:active {
+    transform: none !important;
   }
 }

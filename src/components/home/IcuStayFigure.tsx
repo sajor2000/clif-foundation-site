@@ -126,7 +126,7 @@ export function IcuStayFigure() {
             maintained by the CLIF Consortium at{" "}
             <a
               href="https://clif-icu.com/data-dictionary"
-              style={{ color: "var(--link)" }}
+              className="prose-link"
             >
               clif-icu.com ↗
             </a>
@@ -184,6 +184,7 @@ export function IcuStayFigure() {
         aria-label="ICU stay schematic timeline. Scroll horizontally on small screens."
       >
         <div
+          className="icu-track"
           style={{
             minWidth: 640,
             position: "relative",
@@ -206,6 +207,7 @@ export function IcuStayFigure() {
               fontFamily: "var(--font-mono)",
               fontSize: 12,
               color: "var(--text-muted)",
+              fontVariantNumeric: "tabular-nums",
             }}
           >
             {hourTicks.map((t) => (

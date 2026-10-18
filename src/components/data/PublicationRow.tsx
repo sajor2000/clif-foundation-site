@@ -1,7 +1,3 @@
-"use client";
-
-import { useState } from "react";
-
 export function PublicationRow({
   year,
   title,
@@ -15,7 +11,6 @@ export function PublicationRow({
   type?: string;
   href: string;
 }) {
-  const [hover, setHover] = useState(false);
   return (
     <div
       style={{
@@ -35,6 +30,7 @@ export function PublicationRow({
           fontFamily: "var(--font-mono)",
           fontSize: "var(--type-mono)",
           color: "var(--text-muted)",
+          fontVariantNumeric: "tabular-nums",
         }}
       >
         {year}
@@ -45,8 +41,7 @@ export function PublicationRow({
           href={href}
           target="_blank"
           rel="noopener noreferrer"
-          onMouseEnter={() => setHover(true)}
-          onMouseLeave={() => setHover(false)}
+          className="sc-row-link"
           style={{
             display: "block",
             paddingBlock: 9,
@@ -54,11 +49,11 @@ export function PublicationRow({
             fontSize: 19,
             fontWeight: 500,
             lineHeight: 1.35,
-            textDecoration: hover ? "underline" : "none",
-            color: hover ? "var(--link)" : "var(--text-primary)",
+            textDecoration: "none",
+            color: "var(--text-primary)",
           }}
         >
-          {title}
+          <span className="sc-row-link__t">{title}</span>
         </a>
         <span
           style={{
