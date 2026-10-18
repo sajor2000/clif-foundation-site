@@ -48,9 +48,14 @@ function PortalNav({ items }: { items: ReadonlyArray<{ href: string; label: stri
   const navRef = useRef<HTMLElement>(null);
   // On narrow screens the tabs scroll sideways; keep the current one in view.
   useEffect(() => {
-    navRef.current
-      ?.querySelector('[aria-current="page"]')
-      ?.scrollIntoView({ block: "nearest", inline: "nearest" });
+    const nav = navRef.current;
+    const active = nav?.querySelector<HTMLElement>('[aria-current="page"]');
+    if (!nav || !active) return;
+    // Scroll the tab row sideways only; never move the page.
+    const left = active.offsetLeft - nav.offsetLeft;
+    const right = left + active.offsetWidth;
+    if (left < nav.scrollLeft) nav.scrollLeft = left;
+    else if (right > nav.scrollLeft + nav.clientWidth) nav.scrollLeft = right - nav.clientWidth;
   }, [path]);
   return (
     <nav
