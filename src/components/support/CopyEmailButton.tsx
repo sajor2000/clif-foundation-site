@@ -21,7 +21,7 @@ export function CopyEmailButton() {
       style={{
         minHeight: 48,
         padding: "0 18px",
-        borderRadius: 3,
+        borderRadius: "var(--radius-control)",
         border: "1px solid var(--border-strong)",
         background: "transparent",
         font: "500 15px var(--font-sans)",

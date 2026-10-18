@@ -4,7 +4,8 @@ import { logAudit } from "./lib/audit";
 import { requireBoardIdentity, requireBoardRole } from "./lib/auth";
 import { isDirector, loadDirectorEmails } from "./lib/directors";
 import { minutesTransitionError } from "./lib/minutes";
-import { tallyBallots } from "./lib/tally";
+import { buildMinutesText } from "./lib/minutesText";
+import { meetingStatus, minutesStatus } from "./lib/vocab";
 import { quorumMet, quorumRequired } from "./lib/quorum";
 import schema from "./schema";
 
@@ -35,7 +36,8 @@ export const listMeetings = query({
 });
 
 export const getMeeting = query({
-  args: { meetingId: v.id("meetings") },
+  // Accepts any string (it comes from the URL); an unknown ID returns null.
+  args: { meetingId: v.string() },
   returns: v.union(
     v.object({
       meeting: meetingReturn,
@@ -52,11 +54,12 @@ export const getMeeting = query({
   ),
   handler: async (ctx, args) => {
     await requireBoardIdentity(ctx);
-    const meeting = await ctx.db.get(args.meetingId);
+    const meetingId = ctx.db.normalizeId("meetings", args.meetingId);
+    const meeting = meetingId ? await ctx.db.get(meetingId) : null;
     if (!meeting) return null;
     const minutes = await ctx.db
       .query("minutes")
-      .withIndex("by_meeting", (q) => q.eq("meetingId", args.meetingId))
+      .withIndex("by_meeting", (q) => q.eq("meetingId", meeting._id))
       .order("desc")
       .first();
     const items = minutes
@@ -110,9 +113,7 @@ export const updateAttendance = mutation({
   args: {
     meetingId: v.id("meetings"),
     attendeeEmails: v.array(v.string()),
-    status: v.optional(
-      v.union(v.literal("scheduled"), v.literal("held"), v.literal("cancelled")),
-    ),
+    status: v.optional(meetingStatus),
     heldAt: v.optional(v.number()),
   },
   returns: v.null(),
@@ -154,13 +155,7 @@ export const upsertMinutes = mutation({
   args: {
     meetingId: v.id("meetings"),
     body: v.optional(v.string()),
-    status: v.optional(
-      v.union(
-        v.literal("draft"),
-        v.literal("published_for_review"),
-        v.literal("approved"),
-      ),
-    ),
+    status: v.optional(minutesStatus),
   },
   returns: v.id("minutes"),
   handler: async (ctx, args) => {
@@ -273,6 +268,8 @@ export const addMinutesItem = mutation({
     title: v.string(),
     discussion: v.optional(v.string()),
     sortOrder: v.number(),
+    /** Directors who recused from this item for a conflict of interest. */
+    coiRecusals: v.optional(v.array(v.string())),
   },
   returns: v.id("minutesItems"),
   handler: async (ctx, args) => {
@@ -282,12 +279,19 @@ export const addMinutesItem = mutation({
     if (minutes.status === "approved") {
       throw new Error("Cannot edit approved minutes");
     }
+    if (!args.title.trim()) throw new Error("Item title is required");
+    const directors = await loadDirectorEmails(ctx);
+    const recusals = [...new Set((args.coiRecusals ?? []).map((e) => e.trim().toLowerCase()))];
+    const unknown = recusals.filter((e) => !directors.has(e));
+    if (unknown.length) {
+      throw new Error(`Only directors can recuse: ${unknown.join(", ")}`);
+    }
     const id = await ctx.db.insert("minutesItems", {
       minutesId: args.minutesId,
       title: args.title.trim(),
       discussion: args.discussion,
       sortOrder: args.sortOrder,
-      coiRecusals: [],
+      coiRecusals: recusals,
     });
     await logAudit(ctx, {
       kind: "minutes.item_add",
@@ -300,71 +304,18 @@ export const addMinutesItem = mutation({
 });
 
 export const getMinutesExport = query({
-  args: { meetingId: v.id("meetings") },
+  args: { meetingId: v.string() },
   returns: v.string(),
   handler: async (ctx, args) => {
     await requireBoardIdentity(ctx);
-    const meeting = await ctx.db.get(args.meetingId);
+    const meetingId = ctx.db.normalizeId("meetings", args.meetingId);
+    const meeting = meetingId ? await ctx.db.get(meetingId) : null;
     if (!meeting) return "";
     const minutes = await ctx.db
       .query("minutes")
-      .withIndex("by_meeting", (q) => q.eq("meetingId", args.meetingId))
+      .withIndex("by_meeting", (q) => q.eq("meetingId", meeting._id))
       .order("desc")
       .first();
-    const items = minutes
-      ? await ctx.db
-          .query("minutesItems")
-          .withIndex("by_minutes", (q) => q.eq("minutesId", minutes._id))
-          .take(200)
-      : [];
-    const lines = [
-      `# ${meeting.title}`,
-      ``,
-      `Scheduled: ${new Date(meeting.scheduledAt).toISOString()}`,
-      `Status: ${meeting.status}`,
-      `Quorum required: ${meeting.quorumRequired}`,
-      `Present (${meeting.attendeeEmails.length}): ${meeting.attendeeEmails.join(", ") || "—"}`,
-      `Quorum met: ${meeting.quorumMet ? "yes" : "no"}`,
-      ``,
-    ];
-    if (minutes) {
-      lines.push(`## Minutes (v${minutes.version}, ${minutes.status})`, ``);
-      if (minutes.body) lines.push(minutes.body, ``);
-      for (const item of items) {
-        lines.push(`### ${item.title}`);
-        if (item.discussion) lines.push(item.discussion);
-        if (item.coiRecusals.length) {
-          lines.push(`Recused: ${item.coiRecusals.join(", ")}`);
-        }
-        lines.push(``);
-      }
-    }
-
-    const motions = await ctx.db
-      .query("motions")
-      .withIndex("by_meeting", (q) => q.eq("meetingId", args.meetingId))
-      .take(50);
-    if (motions.length) {
-      const directorEmails = await loadDirectorEmails(ctx);
-      lines.push(`## Motions and votes`, ``);
-      for (const motion of motions) {
-        const ballots = await ctx.db
-          .query("ballots")
-          .withIndex("by_motion", (q) => q.eq("motionId", motion._id))
-          .take(200);
-        const t =
-          motion.status === "closed" && motion.finalTally
-            ? motion.finalTally
-            : tallyBallots(ballots, directorEmails, motion.motionType, motion.status);
-        lines.push(
-          `### ${motion.title} (${motion.status}, ${motion.motionType})`,
-          `Yes ${t.yes} · No ${t.no} · Abstain ${t.abstain} · Recuse ${t.recuse}` +
-            (motion.status === "closed" ? ` · ${t.passed ? "Passed" : "Not passed"}` : ""),
-          ``,
-        );
-      }
-    }
-
-    return lines.join("\n");
+    return buildMinutesText(ctx, meeting, minutes);
   },
 });

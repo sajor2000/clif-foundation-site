@@ -1,4 +1,5 @@
 import { Data, Effect, Schema } from "effect";
+import { DOCUMENT_CATEGORIES } from "../../../convex/lib/vocab";
 
 export class InvalidDocumentMeta extends Data.TaggedError(
   "InvalidDocumentMeta",
@@ -8,15 +9,7 @@ export class InvalidDocumentMeta extends Data.TaggedError(
 
 const DocumentMeta = Schema.Struct({
   title: Schema.String.check(Schema.isMinLength(1), Schema.isMaxLength(200)),
-  category: Schema.Literals([
-    "governance",
-    "legal",
-    "meeting",
-    "policy",
-    "tax",
-    "financial",
-    "other",
-  ]),
+  category: Schema.Literals(DOCUMENT_CATEGORIES.map((c) => c.value)),
   contentType: Schema.String,
 });
 
@@ -29,7 +22,3 @@ export const validateDocumentMeta = (input: unknown) =>
       (e) => new InvalidDocumentMeta({ reason: String(e.message ?? e) }),
     ),
   );
-
-export async function validateDocumentMetaPromise(input: unknown) {
-  return Effect.runPromise(validateDocumentMeta(input));
-}

@@ -12,7 +12,7 @@ import {
   DOCUMENT_CATEGORIES,
   RETENTION_CLASSES,
   type DocumentCategory,
-} from "@/lib/portal/categories";
+} from "../../../convex/lib/vocab";
 import {
   formatUploadError,
   uploadDocumentProgram,
@@ -139,7 +139,7 @@ export function DocumentsWorkspace() {
             gap: 14,
             maxWidth: 560,
             border: "1px solid var(--border-strong)",
-            borderRadius: 6,
+            borderRadius: "var(--radius-panel)",
             padding: 20,
             background: "var(--bg-figure)",
           }}

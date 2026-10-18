@@ -98,7 +98,7 @@ export default function SupportPage() {
                 gap: 12,
                 padding: "22px 20px",
                 border: "1px solid var(--border-strong)",
-                borderRadius: 6,
+                borderRadius: "var(--radius-panel)",
                 background: "var(--bg-figure)",
               }}
             >
@@ -313,7 +313,7 @@ export default function SupportPage() {
               [
                 "4",
                 "Tax status, stated plainly",
-                "CLIF Foundation is an Illinois nonprofit corporation with an EIN. Our application for 501(c)(3) recognition is pending with the IRS. Until it is approved, we cannot promise that a gift is tax-deductible; please ask your tax adviser. If recognition is granted effective as of formation, some earlier gifts may qualify under IRS rules.",
+                "CLIF Foundation is an Illinois nonprofit corporation with an EIN. Its application for 501(c)(3) recognition is pending with the IRS. Until a determination letter is issued, the Foundation cannot say that a gift is tax-deductible. Please ask your tax adviser.",
               ],
             ].map(([n, t, d]) => (
               <li

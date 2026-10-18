@@ -4,7 +4,6 @@ import { givebutterAccountId } from "@/lib/givebutter";
 /** Loads Givebutter widgets on every page (required by Givebutter embed docs). */
 export function GivebutterScript() {
   const accountId = givebutterAccountId();
-  if (!accountId) return null;
 
   return (
     <Script

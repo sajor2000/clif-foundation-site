@@ -4,10 +4,10 @@ import { useMutation, useQuery } from "convex/react";
 import { useState } from "react";
 import { api } from "../../../convex/_generated/api";
 import type { Id } from "../../../convex/_generated/dataModel";
+import { BOARD_ROLES, type BoardRole } from "../../../convex/lib/vocab";
 import { Button } from "@/components/core/Button";
 import { inputStyle, pageTitle, panelStyle } from "@/components/portal/portal-styles";
 
-const ROLES = ["member", "secretary", "chair", "admin"] as const;
 
 export function MembersView() {
   const members = useQuery(api.board.listMembers);
@@ -18,7 +18,7 @@ export function MembersView() {
   const [listError, setListError] = useState<string | null>(null);
   const [email, setEmail] = useState("");
   const [displayName, setDisplayName] = useState("");
-  const [memberRole, setMemberRole] = useState<(typeof ROLES)[number]>("member");
+  const [memberRole, setMemberRole] = useState<BoardRole>("member");
   const [isDirector, setIsDirector] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
@@ -102,10 +102,10 @@ export function MembersView() {
           Role
           <select
             value={memberRole}
-            onChange={(e) => setMemberRole(e.target.value as (typeof ROLES)[number])}
+            onChange={(e) => setMemberRole(e.target.value as BoardRole)}
             style={inputStyle}
           >
-            {ROLES.map((r) => (
+            {BOARD_ROLES.map((r) => (
               <option key={r} value={r}>
                 {r}
               </option>
@@ -202,7 +202,7 @@ export function MembersView() {
 function PendingRequests() {
   const requests = useQuery(api.board.listAccessRequests);
   const decide = useMutation(api.board.decideAccessRequest);
-  const [roles, setRoles] = useState<Record<string, (typeof ROLES)[number]>>({});
+  const [roles, setRoles] = useState<Record<string, BoardRole>>({});
   const [error, setError] = useState<string | null>(null);
 
   async function onDecide(id: Id<"accessRequests">, approve: boolean) {
@@ -247,11 +247,11 @@ function PendingRequests() {
               aria-label={`Role for ${r.email}`}
               value={roles[r.id] ?? "member"}
               onChange={(e) =>
-                setRoles((prev) => ({ ...prev, [r.id]: e.target.value as (typeof ROLES)[number] }))
+                setRoles((prev) => ({ ...prev, [r.id]: e.target.value as BoardRole }))
               }
               style={inputStyle}
             >
-              {ROLES.map((role) => (
+              {BOARD_ROLES.map((role) => (
                 <option key={role} value={role}>
                   {role}
                 </option>

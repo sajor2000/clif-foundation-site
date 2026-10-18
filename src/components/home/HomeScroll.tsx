@@ -334,7 +334,7 @@ export function HomeScroll() {
                       fontSize: 11.5,
                       background: "var(--bg-inverse)",
                       color: "var(--accent-text)",
-                      borderRadius: 3,
+                      borderRadius: "var(--radius-control)",
                       padding: "4px 8px",
                     }}
                   >
@@ -492,7 +492,7 @@ export function HomeScroll() {
                 flex: "1 1 440px",
                 minWidth: 0,
                 border: "1px solid var(--border-strong)",
-                borderRadius: 6,
+                borderRadius: "var(--radius-panel)",
                 background: "var(--bg-figure)",
                 fontFamily: "var(--font-mono)",
                 fontSize: 13,

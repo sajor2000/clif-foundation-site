@@ -133,7 +133,7 @@ export function IcuStayFigure() {
                 width: 14,
                 height: 10,
                 background: "var(--status-existing-bg)",
-                borderRadius: 2,
+                borderRadius: "var(--radius-tag)",
               }}
             />
             Interval
@@ -145,7 +145,7 @@ export function IcuStayFigure() {
                 height: 10,
                 background: "var(--accent)",
                 border: "1px solid var(--border-strong)",
-                borderRadius: 2,
+                borderRadius: "var(--radius-tag)",
               }}
             />
             Highlighted interval

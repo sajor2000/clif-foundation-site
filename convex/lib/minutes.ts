@@ -1,4 +1,4 @@
-export type MinutesStatus = "draft" | "published_for_review" | "approved";
+import type { MinutesStatus } from "./vocab";
 
 /**
  * Why a minutes status change is not allowed, or null if it is.

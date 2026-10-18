@@ -1,14 +1,11 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
+import { isClerkServerConfigured } from "@/lib/env";
 
 const isBoardPortal = createRouteMatcher(["/portal(.*)"]);
 const isPortalSignIn = createRouteMatcher(["/portal/sign-in(.*)"]);
 
-const clerkReady = Boolean(
-  process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY && process.env.CLERK_SECRET_KEY,
-);
-
-export default clerkReady
+export default isClerkServerConfigured()
   ? clerkMiddleware(async (auth, req) => {
       if (isBoardPortal(req) && !isPortalSignIn(req)) {
         const signIn = new URL("/portal/sign-in", req.url);

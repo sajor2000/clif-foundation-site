@@ -50,7 +50,7 @@ export function InquiryForm() {
       onSubmit={onSubmit}
       style={{
         border: "1px solid var(--border-strong)",
-        borderRadius: 6,
+        borderRadius: "var(--radius-panel)",
         background: "var(--bg-figure)",
         padding: "28px 24px",
         display: "grid",
@@ -150,7 +150,7 @@ const inputStyle: CSSProperties = {
   height: 44,
   padding: "0 12px",
   border: "1px solid var(--border-strong)",
-  borderRadius: 3,
+  borderRadius: "var(--radius-control)",
   background: "var(--bg-page)",
   color: "var(--text-primary)",
   fontFamily: "var(--font-sans)",

@@ -1,4 +1,4 @@
-export type BallotChoice = "yes" | "no" | "abstain" | "recuse";
+import type { BallotChoice, MotionStatus, MotionType } from "./vocab";
 
 export type Tally = {
   yes: number;
@@ -20,8 +20,8 @@ export type Tally = {
 export function tallyBallots(
   ballots: ReadonlyArray<{ voterEmail?: string; choice: BallotChoice }>,
   directorEmails: ReadonlySet<string>,
-  motionType: "standard" | "consent",
-  status: "draft" | "open" | "closed",
+  motionType: MotionType,
+  status: MotionStatus,
 ): Tally {
   const counted = ballots.filter(
     (b) => b.voterEmail !== undefined && directorEmails.has(b.voterEmail.toLowerCase()),

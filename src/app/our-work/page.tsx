@@ -58,7 +58,7 @@ export default function OurWorkPage() {
             key={p.id}
             style={{
               border: "1px solid var(--border-strong)",
-              borderRadius: 6,
+              borderRadius: "var(--radius-panel)",
               background: "var(--bg-figure)",
               overflow: "hidden",
             }}

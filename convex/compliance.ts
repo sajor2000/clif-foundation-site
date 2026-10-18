@@ -3,13 +3,7 @@ import { query } from "./_generated/server";
 import { requireBoardIdentity } from "./lib/auth";
 import { coiCompletion } from "./lib/compliance";
 import { loadDirectorEmails } from "./lib/directors";
-
-const POLICY_TYPES = [
-  "conflict_of_interest",
-  "whistleblower",
-  "document_retention",
-  "gift_acceptance",
-] as const;
+import { POLICY_TYPES } from "./lib/vocab";
 
 export const getDashboard = query({
   args: {
@@ -55,8 +49,9 @@ export const getDashboard = query({
 
     const policies = await ctx.db.query("policies").take(100);
     const adoptedTypes = new Set(policies.map((p) => p.policyType));
-    const adopted = POLICY_TYPES.filter((t) => adoptedTypes.has(t));
-    const missing = POLICY_TYPES.filter((t) => !adoptedTypes.has(t));
+    const types = POLICY_TYPES.map((p) => p.value);
+    const adopted = types.filter((t) => adoptedTypes.has(t));
+    const missing = types.filter((t) => !adoptedTypes.has(t));
 
     const review = await ctx.db
       .query("form990Reviews")
