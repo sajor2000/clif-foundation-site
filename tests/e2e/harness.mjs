@@ -81,6 +81,7 @@ export async function open(path, viewport = DESKTOP, opts = {}) {
     isMobile: !!isMobile,
     hasTouch: !!hasTouch,
     reducedMotion: opts.reducedMotion ?? "no-preference",
+    colorScheme: opts.colorScheme ?? "light",
     javaScriptEnabled: opts.javaScriptEnabled ?? true,
   });
   if (opts.permissions) {

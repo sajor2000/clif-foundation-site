@@ -11,7 +11,6 @@
     "start": "next start --hostname 0.0.0.0 --port 43127",
     "lint": "eslint",
     "test:e2e": "node --test --test-concurrency=1 tests/e2e/*.test.mjs",
-    "check:site": "node scripts/checks/webcheck.mjs && node scripts/checks/review-checks.mjs && node scripts/checks/webaxe.mjs && node scripts/checks/r01.mjs",
     "test:unit": "node --experimental-strip-types --test tests/unit/*.test.mjs",
     "convex:dev": "npx convex dev",
     "test:convex": "vitest run"
@@ -31,6 +30,7 @@
     "@types/node": "22.20.5",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "axe-core": "4.14.0",
     "convex-test": "0.0.62",
     "eslint": "^9",
     "eslint-config-next": "16.4.0",
