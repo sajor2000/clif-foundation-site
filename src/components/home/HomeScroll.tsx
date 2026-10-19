@@ -47,7 +47,7 @@ export function HomeScroll() {
           >
             <div style={{ flex: "1 1 560px", minWidth: 0, display: "grid", gap: 28 }}>
               <h1 id="home-title" className="display-xl">
-                Help more healthcare teams learn from intensive care data.
+                Help more healthcare teams learn from intensive care data
               </h1>
               <p
                 style={{
@@ -110,8 +110,7 @@ export function HomeScroll() {
               },
               {
                 key: "why",
-                title:
-                  "Research built CLIF. Adoption needs its own infrastructure.",
+                title: "Helping more organizations adopt what research built",
                 body: "The CLIF Consortium develops the standard and supports federated research. Bringing CLIF to health systems, research groups, societies, and EHR vendors requires conversion tools, terminology mapping, implementation support, and training. The Foundation helps organize and fund that work.",
                 pad: "28px 24px 32px",
               },
@@ -201,8 +200,8 @@ export function HomeScroll() {
                     className="h2"
                     style={{ color: "var(--text-inverse)", margin: 0 }}
                   >
-                    <span data-sc-cue="0">Data stays at each hospital.</span>{" "}
-                    <span data-sc-cue="0.1 1 0.16 0">Code travels.</span>
+                    <span data-sc-cue="0">The data stays at each hospital,</span>{" "}
+                    <span data-sc-cue="0.1 1 0.16 0">and the analysis goes to it</span>
                   </h2>
                 </div>
                 <p
@@ -259,7 +258,7 @@ export function HomeScroll() {
           >
             <div style={{ flex: "1 1 480px", display: "grid", gap: 14 }}>
               <h2 id="fig-stay" className="h2">
-                Life support, as connected tables.
+                Life support, recorded as connected tables
               </h2>
             </div>
             <p
@@ -458,8 +457,7 @@ export function HomeScroll() {
                   margin: 0,
                 }}
               >
-                Every hospital names things differently. CLIF gives them one shared
-                name.
+                CLIF maps each hospital’s own names to one shared set
               </h2>
               <p
                 style={{
@@ -574,7 +572,7 @@ export function HomeScroll() {
                   margin: 0,
                 }}
               >
-                A treatment that saves lives was used unevenly.
+                A treatment that saves lives was used unevenly
               </h2>
               <p
                 style={{

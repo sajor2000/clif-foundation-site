@@ -44,7 +44,7 @@ export default function SupportPage() {
             className="display-xl"
             style={{ fontSize: "var(--type-display-xl)" }}
           >
-            Give online, or start with an email.
+            Give online, or start with an email
           </h1>
         </div>
         <div style={{ flex: "1 1 380px", display: "grid", gap: 20 }}>

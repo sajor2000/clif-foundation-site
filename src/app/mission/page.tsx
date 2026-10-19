@@ -25,7 +25,7 @@ export default function MissionPage() {
       >
         <span className="eyebrow">01 / mission</span>
         <h1 className="display-l" style={{ maxWidth: 1100 }}>
-          Make shared critical care data practical beyond research.
+          Make shared critical care data practical beyond research
         </h1>
       </section>
 
