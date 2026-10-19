@@ -35,7 +35,8 @@ export const PROGRAMS = [
     id: "impl_support",
     name: "Implementation support",
     scope:
-      "Guidance for health systems converting EHR data to CLIF, including ETL workflows, quality checks, and reusable implementation support.",
+      "Guidance for health systems converting electronic health record (EHR) data to CLIF, including ETL pipelines (the steps that copy records out of a hospital system and reshape them into CLIF) and quality checks.",
+    why: "Converting its records is the first step before a hospital’s ICU data can be compared with other hospitals’.",
     serves: "Health system data teams",
     base: "ETL Guide",
     baseUrl: "https://clif-icu.com/etl-guide",
@@ -45,6 +46,7 @@ export const PROGRAMS = [
     name: "Education",
     scope:
       "Courses and workshops for clinicians and data scientists learning to work with CLIF-formatted data.",
+    why: "Clinicians and data teams learn to use CLIF data to study and improve ICU care.",
     serves: "Clinicians, data scientists, trainees",
     base: "CLIF 101",
     baseUrl: "https://clif-icu.com/clif-101",
@@ -53,7 +55,8 @@ export const PROGRAMS = [
     id: "oss_stewardship",
     name: "Open-source stewardship",
     scope:
-      "Sustained maintenance of the specification, mapping resources, conversion tools, tests, and documentation released under the Apache License 2.0.",
+      "Maintenance of the specification, mapping resources, conversion tools, tests, and documentation released under the Apache License 2.0.",
+    why: "Keeps the standard free and working for every hospital that uses it.",
     serves: "Technical contributors, adopting sites",
     base: "GitHub repository",
     baseUrl: GITHUB_URL,
@@ -63,6 +66,7 @@ export const PROGRAMS = [
     name: "Convening",
     scope:
       "Forums for sites and contributors to coordinate on future versions of the standard.",
+    why: "Brings CLIF users, clinicians, and technical contributors together to share needs and experience.",
     serves: "Adopting sites and contributors",
     base: "mCIDE expansion process",
     baseUrl: "https://clif-icu.com/mcide-explorer",
@@ -176,7 +180,7 @@ export const PRINCIPLES = [
   {
     n: "02",
     t: "Adoption beyond research",
-    d: "CLIF is for health systems, research groups, professional societies, and EHR vendors, not only observational research networks.",
+    d: "CLIF is for organizations that use ICU data, including hospitals measuring quality of care, not only research networks.",
   },
   {
     n: "03",

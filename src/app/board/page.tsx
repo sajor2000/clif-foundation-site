@@ -31,7 +31,7 @@ export default function BoardPage() {
         }}
       >
         <div style={{ flex: "1 1 560px", display: "grid", gap: 24 }}>
-          <span className="eyebrow">04 / board_and_governance</span>
+          <span className="eyebrow">04 / Board and governance</span>
           <h1 className="display-l">Board of directors</h1>
         </div>
         <p

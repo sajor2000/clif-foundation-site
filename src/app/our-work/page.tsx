@@ -26,7 +26,7 @@ export default function OurWorkPage() {
         }}
       >
         <div style={{ flex: "1 1 560px", display: "grid", gap: 24 }}>
-          <span className="eyebrow">02 / our_work</span>
+          <span className="eyebrow">02 / Our work</span>
           <h1 className="display-l">Programs</h1>
         </div>
         <p
@@ -53,7 +53,7 @@ export default function OurWorkPage() {
           gap: 20,
         }}
       >
-        {PROGRAMS.map((p) => (
+        {PROGRAMS.map((p, i) => (
           <article
             key={p.id}
             id={p.id}
@@ -76,7 +76,9 @@ export default function OurWorkPage() {
                 fontSize: 12,
               }}
             >
-              <span style={{ color: "var(--link)" }}>{p.id}</span>
+              <span style={{ color: "var(--link)" }}>
+                Program {String(i + 1).padStart(2, "0")}
+              </span>
             </div>
             <div
               style={{
@@ -117,6 +119,17 @@ export default function OurWorkPage() {
                 >
                   {p.scope}
                 </p>
+                <p
+                  style={{
+                    margin: 0,
+                    fontSize: 16,
+                    lineHeight: 1.55,
+                    color: "var(--text-primary)",
+                    maxWidth: 560,
+                  }}
+                >
+                  {p.why}
+                </p>
               </div>
               <dl
                 style={{
@@ -145,7 +158,7 @@ export default function OurWorkPage() {
                       paddingTop: 2,
                     }}
                   >
-                    serves
+                    For
                   </dt>
                   <dd style={{ margin: 0, flex: "1 1 180px" }}>{p.serves}</dd>
                 </div>
@@ -167,7 +180,7 @@ export default function OurWorkPage() {
                       paddingTop: 2,
                     }}
                   >
-                    builds_on
+                    Builds on
                   </dt>
                   <dd style={{ margin: 0, flex: "1 1 180px" }}>
                     <a href={p.baseUrl} className="prose-link">

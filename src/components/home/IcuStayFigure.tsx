@@ -72,15 +72,18 @@ for (let h = 0; h <= 71; h += h > 4 && h < 52 ? 1 : 2) {
   vit.push(tick(h + 0.5));
 }
 
-const rows: Array<{ table: string; marks: Mark[] }> = [
-  { table: "adt", marks: [out(0, 5, "ed"), seg(5, 52, "icu"), out(52, 72, "ward")] },
-  { table: "vitals", marks: vit },
+// `plain` is the everyday name shown under each CLIF table name.
+const rows: Array<{ table: string; plain: string; marks: Mark[] }> = [
+  { table: "adt", plain: "Where the patient is", marks: [out(0, 5, "ed"), seg(5, 52, "icu"), out(52, 72, "ward")] },
+  { table: "vitals", plain: "Vital signs", marks: vit },
   {
     table: "labs",
+    plain: "Lab results",
     marks: [1, 6, 12, 18, 24, 30, 36, 48, 60, 70].map(dot),
   },
   {
     table: "respiratory_support",
+    plain: "Breathing support",
     marks: [
       seg(6, 30, "IMV"),
       out(30, 40, "NIPPV"),
@@ -88,16 +91,18 @@ const rows: Array<{ table: string; marks: Mark[] }> = [
       out(54, 72, "Room Air"),
     ],
   },
-  { table: "position", marks: [seg(10, 26, "prone", true)] },
+  { table: "position", plain: "Body position", marks: [seg(10, 26, "prone", true)] },
   {
     table: "medication_admin_continuous",
+    plain: "Continuous IV medications",
     marks: [seg(8, 26, "norepinephrine", true), out(27, 42, "propofol")],
   },
   {
     table: "patient_assessments",
+    plain: "Bedside assessments",
     marks: [2, 8, 12, 16, 20, 24, 28, 32, 36, 44, 52, 64].map(dot),
   },
-  { table: "hospitalization", marks: [out(0, 72, "admission → discharge")] },
+  { table: "hospitalization", plain: "The hospital stay", marks: [out(0, 72, "admission → discharge")] },
 ];
 
 const hourTicks = [0, 12, 24, 36, 48, 60, 72].map((h, i, a) => ({
@@ -122,6 +127,8 @@ export function IcuStayFigure() {
           }}
         >
           <span>
+            IMV: ventilator through a breathing tube. NIPPV: mask ventilation
+            such as BiPAP. High Flow NC: high-flow oxygen through the nose.
             Simplified to show the idea. The full specification and mCIDE are
             maintained by the CLIF Consortium at{" "}
             <a
@@ -240,10 +247,21 @@ export function IcuStayFigure() {
                 flex: "0 0 220px",
                 fontFamily: "var(--font-mono)",
                 fontSize: 13,
-                padding: "8px 0 2px",
+                padding: "6px 0",
+                display: "grid",
+                gap: 2,
               }}
             >
               {r.table}
+              <span
+                style={{
+                  fontFamily: "var(--font-sans)",
+                  fontSize: 12,
+                  color: "var(--text-muted)",
+                }}
+              >
+                {r.plain}
+              </span>
             </span>
             <div
               style={{

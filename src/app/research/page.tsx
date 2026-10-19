@@ -26,7 +26,7 @@ export default function ResearchPage() {
         }}
       >
         <div style={{ flex: "1 1 560px", display: "grid", gap: 24 }}>
-          <span className="eyebrow">03 / research_and_resources</span>
+          <span className="eyebrow">03 / Research and resources</span>
           <h1 className="display-l">Research built on CLIF</h1>
         </div>
         <p
