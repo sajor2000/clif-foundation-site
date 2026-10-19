@@ -11,6 +11,7 @@ import { ScrollCraftMount } from "@/components/home/ScrollCraftMount";
 import { SiteShell } from "@/components/layout/SiteShell";
 import {
   CONTACT_EMAIL,
+  HOME_FINDING,
   HOME_PATHS,
   HOME_PUBS,
   MAPPINGS,
@@ -552,6 +553,91 @@ export function HomeScroll() {
               </div>
             </div>
           </div>
+
+          <section
+            aria-labelledby="finding-heading"
+            data-sc-in
+            style={{ display: "grid", gap: 28 }}
+          >
+            <div style={{ display: "grid", gap: 14, maxWidth: 720 }}>
+              <p className="eyebrow" style={{ margin: 0 }}>
+                What CLIF has shown
+              </p>
+              <h2
+                id="finding-heading"
+                style={{
+                  fontFamily: "var(--font-display)",
+                  fontWeight: 600,
+                  fontSize: "var(--type-display-m)",
+                  lineHeight: 1.08,
+                  letterSpacing: "-0.025em",
+                  margin: 0,
+                }}
+              >
+                A treatment that saves lives was used unevenly.
+              </h2>
+              <p
+                style={{
+                  margin: 0,
+                  fontSize: 17,
+                  lineHeight: 1.6,
+                  color: "var(--text-body)",
+                }}
+              >
+                {HOME_FINDING.lead}
+              </p>
+            </div>
+            <dl
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,200px),1fr))",
+                margin: 0,
+                borderTop: "1px solid var(--border-strong)",
+              }}
+            >
+              {HOME_FINDING.stats.map((st) => (
+                <div
+                  key={st.value}
+                  style={{
+                    display: "flex",
+                    flexDirection: "column-reverse",
+                    gap: 6,
+                    padding: "20px 24px 20px 0",
+                    borderBottom: "1px solid var(--border)",
+                  }}
+                >
+                  <dt style={{ fontSize: 15, lineHeight: 1.45, color: "var(--text-muted)" }}>
+                    {st.label}
+                  </dt>
+                  <dd
+                    style={{
+                      margin: 0,
+                      fontFamily: "var(--font-display)",
+                      fontWeight: 600,
+                      fontSize: "clamp(40px,5vw,56px)",
+                      lineHeight: 1,
+                      letterSpacing: "-0.02em",
+                      fontVariantNumeric: "tabular-nums",
+                    }}
+                  >
+                    {st.value}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+            <p style={{ margin: 0, fontSize: 14, lineHeight: 1.55, color: "var(--text-muted)" }}>
+              <a
+                href={HOME_FINDING.url}
+                className="linkish"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {HOME_FINDING.source} ↗
+              </a>
+              <br />
+              {HOME_FINDING.note}
+            </p>
+          </section>
 
           <div className="band" style={{ marginInline: "calc(-1 * var(--gutter))" }}>
             <div
