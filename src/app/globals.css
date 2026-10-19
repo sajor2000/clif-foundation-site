@@ -337,9 +337,16 @@ html[data-theme="dark"] .clif-theme-label-dark {
   max-width: 42rem;
 }
 
+/* Reserve the loaded form's height so the page doesn't jump while
+   Givebutter fills it in (about 510px wide, 600px on phones). */
 .givebutter-panel__form {
   width: 100%;
-  min-height: 320px;
+  min-height: 520px;
+}
+@media (max-width: 600px) {
+  .givebutter-panel__form {
+    min-height: 600px;
+  }
 }
 
 .givebutter-panel__footnote {
