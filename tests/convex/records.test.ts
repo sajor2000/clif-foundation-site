@@ -38,6 +38,25 @@ describe("minutes", () => {
     expect(detail?.minutes?.status).toBe("draft");
   });
 
+  it("need every director's yes: a missing vote fails the approval", async () => {
+    const t = backend();
+    await seedBoard(t, [{ email: "d1@x.org" }, { email: "d2@x.org" }]);
+    const meetingId = await as(t, ADMIN).mutation(api.meetings.createMeeting, { title: "Q4", scheduledAt: Date.now() });
+    await as(t, ADMIN).mutation(api.meetings.upsertMinutes, { meetingId, body: "x" });
+    await as(t, ADMIN).mutation(api.meetings.updateAttendance, { meetingId, attendeeEmails: [ADMIN], status: "held" });
+    const motionId = await as(t, ADMIN).mutation(api.meetings.sendMinutesForApproval, { meetingId });
+    // Two of three directors approve; a majority, but not unanimous.
+    await as(t, ADMIN).mutation(api.motions.recordVote, {
+      motionId,
+      votes: [{ email: ADMIN, choice: "yes" }, { email: "d1@x.org", choice: "yes" }],
+    });
+    const detail = await as(t, ADMIN).query(api.meetings.getMeeting, { meetingId });
+    expect(detail?.minutes?.status).toBe("draft");
+    const motion = await as(t, ADMIN).query(api.motions.getMotion, { motionId });
+    expect(motion?.motion.motionType).toBe("consent");
+    expect(motion?.tally.passed).toBe(false);
+  });
+
   it("an attached minutes file is enough to send for approval", async () => {
     const t = backend();
     await seedBoard(t, []);

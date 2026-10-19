@@ -299,8 +299,9 @@ export const sendMinutesForApproval = mutation({
       meetingId: meeting._id,
       minutesId: minutes._id,
       title: `Approve minutes: ${meeting.title}${minutes.version > 1 ? ` (v${minutes.version})` : ""}`,
-      description: "Approve the minutes as recorded.",
-      motionType: "standard",
+      // Minutes are approved by unanimous written consent: every director must vote yes.
+      description: "Approve the minutes as recorded. Written consent: every director must vote yes.",
+      motionType: "consent",
       status: "open",
       openedAt: Date.now(),
       createdBy: identity.subject,

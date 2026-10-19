@@ -25,7 +25,8 @@ const STATUS_TEXT: Record<Doc<"minutes">["status"], string> = {
 
 /**
  * Minutes are approved by the board, not by one person: attach the minutes
- * file (PDF or Word), then send it to a vote. Passing the vote approves them.
+ * file (PDF or Word), then send it to a vote. The vote is written consent, so
+ * the minutes are approved only when every director votes yes.
  */
 export function MinutesApproval({
   meeting,
@@ -145,6 +146,9 @@ export function MinutesApproval({
               {send.pending ? "Sending…" : "Send to board for approval"}
             </Button>
           </div>
+          <p style={{ margin: 0, fontSize: 14, color: "var(--text-body)" }}>
+            Approval is by written consent: the minutes pass only when every director votes yes.
+          </p>
           {!held ? (
             <p style={{ margin: 0, fontSize: 14, color: "var(--text-muted)" }}>
               Mark the meeting as held before sending its minutes for approval.
