@@ -89,7 +89,9 @@ export async function open(path, viewport = DESKTOP, opts = {}) {
   }
   const page = await context.newPage();
   if (opts.initScript) await page.addInitScript(opts.initScript);
-  await page.goto(baseUrl + path, { waitUntil: "networkidle" });
+  // Portal pages load Clerk's bot-protection script, which can hold a request
+  // open indefinitely; their tests pass waitUntil "load" and wait for content.
+  await page.goto(baseUrl + path, { waitUntil: opts.waitUntil ?? "networkidle" });
   if (path === "/" && opts.javaScriptEnabled !== false) {
     await page.waitForFunction(() =>
       document.querySelector(".sc-home")?.classList.contains("sc-ready"),

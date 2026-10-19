@@ -13,6 +13,25 @@ async function visitThreePages(page) {
   await page.waitForTimeout(500);
 }
 
+// Polls until the target's top stops moving (fonts, embeds and the hash
+// scroll can still shift layout after load), then returns header and target.
+async function settledLanding(page, id) {
+  let last;
+  for (let i = 0; i < 40; i++) {
+    const m = await page.evaluate(async (target) => {
+      await document.fonts.ready;
+      return {
+        header: document.querySelector("header").getBoundingClientRect().bottom,
+        top: document.getElementById(target).getBoundingClientRect().top,
+      };
+    }, id);
+    if (last && Math.abs(m.top - last.top) < 1) return m;
+    last = m;
+    await page.waitForTimeout(150);
+  }
+  return last;
+}
+
 test("element ids stay unique while visited pages stay mounted", async () => {
   const page = await open("/", DESKTOP);
   await visitThreePages(page);
@@ -66,12 +85,8 @@ for (const [name, viewport] of [
 ]) {
   test(`/support#give lands below the sticky header on a ${name}`, async () => {
     const page = await open("/support#give", viewport);
-    await page.waitForTimeout(800);
-    const m = await page.evaluate(() => ({
-      header: document.querySelector("header").getBoundingClientRect().bottom,
-      heading: document.getElementById("give-heading").getBoundingClientRect().top,
-    }));
-    assert.ok(m.heading >= m.header, JSON.stringify(m));
+    const m = await settledLanding(page, "give-heading");
+    assert.ok(m.top >= m.header, JSON.stringify(m));
     await page.context().close();
   });
 }
@@ -84,14 +99,7 @@ test("program cards link to their sections and land below the header", async () 
   assert.equal(hrefs.length, 4);
   for (const h of hrefs) assert.match(h, /^\/our-work#[a-z_]+$/);
   await page.goto(new URL(hrefs[1], page.url()).href);
-  await page.waitForTimeout(800);
-  const land = await page.evaluate(
-    (id) => ({
-      header: document.querySelector("header").getBoundingClientRect().bottom,
-      top: document.getElementById(id).getBoundingClientRect().top,
-    }),
-    hrefs[1].split("#")[1],
-  );
+  const land = await settledLanding(page, hrefs[1].split("#")[1]);
   assert.ok(land.top >= land.header && land.top < 400, JSON.stringify(land));
   await page.context().close();
 });
