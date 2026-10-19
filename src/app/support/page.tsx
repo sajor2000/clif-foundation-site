@@ -12,7 +12,7 @@ import { GivebutterScript } from "@/components/support/GivebutterScript";
 import { InquiryForm } from "@/components/support/InquiryForm";
 import { CONTACT_EMAIL, GIFT_PROGRAMS, SUPPORT_PATHS } from "@/lib/content";
 import { givebutterEmbed } from "@/lib/givebutter";
-import { GIVING_TAX_NOTE, IRS_STATUS, IRS_STATUS_SHORT } from "@/lib/legal";
+import { IRS_STATUS, IRS_STATUS_SHORT } from "@/lib/legal";
 
 export const metadata: Metadata = pageMetadata({
   title: "Support",
@@ -316,7 +316,7 @@ export default function SupportPage() {
               [
                 "4",
                 "Tax status",
-                `CLIF Foundation is an Illinois nonprofit corporation. ${IRS_STATUS} ${GIVING_TAX_NOTE} Please ask your tax adviser.`,
+                `CLIF Foundation is an Illinois nonprofit corporation. ${IRS_STATUS} Please ask your tax adviser.`,
               ],
             ].map(([n, t, d]) => (
               <li
