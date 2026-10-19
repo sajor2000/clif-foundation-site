@@ -36,7 +36,7 @@ export const PROGRAMS = [
     name: "Implementation support",
     scope:
       "Guidance for health systems converting electronic health record (EHR) data to CLIF, including ETL pipelines (the steps that copy records out of a hospital system and reshape them into CLIF) and quality checks.",
-    why: "Converting its records is the first step before a hospital’s ICU data can be compared with other hospitals’.",
+    why: "A hospital has to convert its records before its ICU data can be compared with other hospitals’ data.",
     serves: "Health system data teams",
     base: "ETL Guide",
     baseUrl: "https://clif-icu.com/etl-guide",
@@ -156,7 +156,7 @@ export const RESOURCES = [
   },
   {
     name: "DQA Framework",
-    note: "data quality assessment",
+    note: "automated data quality checks",
     url: "https://clif-icu.com/data-quality",
   },
   {
@@ -179,8 +179,8 @@ export const PRINCIPLES = [
   },
   {
     n: "02",
-    t: "Adoption beyond research",
-    d: "CLIF is for organizations that use ICU data, including hospitals measuring quality of care, not only research networks.",
+    t: "Research, quality, and safety",
+    d: "CLIF serves any organization that uses ICU data, from research networks to hospitals measuring quality and safety of care.",
   },
   {
     n: "03",
@@ -323,25 +323,25 @@ export const NEEDS = [
   {
     n: "01",
     need: "Minute-level timing",
-    how: "Every row carries a timestamp, so ventilator changes, infusion titrations, and labs line up on one clock.",
+    how: "Every row carries a timestamp, so ventilator changes, IV drip dose changes, and lab results line up on one clock.",
     ex: "recorded_dttm · admin_dttm",
   },
   {
     n: "02",
     need: "Life support over time",
-    how: "Device, mode, and medication categories describe when each therapy starts, changes, and stops.",
+    how: "Standard categories record when each treatment, such as a ventilator or a blood-pressure drip, starts, changes, and stops.",
     ex: 'device_category = "IMV"',
   },
   {
     n: "03",
     need: "Same meaning at every site",
-    how: "mCIDE maps local terms to shared permissible values.",
+    how: "A shared vocabulary (mCIDE) translates each hospital’s own labels, like “Vent - Servo-u,” into one standard term, like “IMV.”",
     ex: 'med_category = "norepinephrine"',
   },
   {
     n: "04",
     need: "Quality you can check",
-    how: "The DQA Framework tests completeness and plausibility before analysis.",
+    how: "Automated checks flag missing data and impossible values, such as a ventilator that stops before it starts, before anyone analyzes the data.",
     ex: "DQA Framework",
   },
   {
@@ -353,7 +353,7 @@ export const NEEDS = [
   {
     n: "06",
     need: "Open and testable",
-    how: "Open-source tools under Apache 2.0, and MIMIC-IV in CLIF format, which lets eligible researchers develop code without access to their own institution's EHR data. PhysioNet credentialing and applicable data-use requirements still apply.",
+    how: "Free, open-source tools, plus a public practice dataset (MIMIC-IV in CLIF format) so researchers can build and test code before touching their own hospital’s data. Access requires PhysioNet credentialing.",
     ex: "MIMIC-IV-Ext-CLIF",
   },
 ] as const;

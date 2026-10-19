@@ -7,7 +7,7 @@ import { PRINCIPLES } from "@/lib/content";
 export const metadata: Metadata = pageMetadata({
   title: "Mission",
   description:
-    "Why CLIF Foundation exists: to scale adoption of the Common Longitudinal ICU data Format, an open critical care EHR data standard, beyond research.",
+    "Why CLIF Foundation exists: to help hospitals and researchers adopt the Common Longitudinal ICU data Format, an open critical care data standard, to improve the research, quality, and safety of ICU care.",
   path: "/mission",
 });
 
@@ -25,7 +25,7 @@ export default function MissionPage() {
       >
         <span className="eyebrow">01 / mission</span>
         <h1 className="display-l" style={{ maxWidth: 1100 }}>
-          Make shared critical care data practical beyond research
+          Standardized ICU data for research, quality, and safety
         </h1>
       </section>
 
@@ -126,7 +126,6 @@ export default function MissionPage() {
                 }}
               >
                 <span>CLIF Consortium</span>
-                <span style={{ color: "var(--text-muted)" }}>existing</span>
               </div>
               <ul style={{ margin: 0, padding: 0, listStyle: "none" }}>
                 <li style={{ padding: "16px 20px", borderBottom: "1px solid var(--border-subtle)" }}>

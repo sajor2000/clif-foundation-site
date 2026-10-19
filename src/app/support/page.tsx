@@ -187,8 +187,8 @@ export default function SupportPage() {
               textWrap: "pretty",
             }}
           >
-            Four programs aimed at scaling CLIF adoption beyond observational
-            research. Gifts support implementation help, education, open-source
+            Four programs that help more hospitals and researchers use CLIF to
+            improve ICU care. Gifts support implementation help, education, open-source
             stewardship, and convening.
           </p>
           <Link href="/our-work" className="linkish">
@@ -398,8 +398,8 @@ export default function SupportPage() {
           <p style={{ margin: 0 }}>
             CLIF was built by the CLIF Consortium, a network of clinician-scientists
             and data scientists at academic medical centers. CLIF Foundation was
-            incorporated in Illinois to help more organizations use CLIF beyond
-            observational research, through tools, mapping, training, and
+            incorporated in Illinois to help more organizations use CLIF to
+            improve the research, quality, and safety of ICU care, through tools, mapping, training, and
             implementation help.
           </p>
           <p style={{ margin: 0 }}>

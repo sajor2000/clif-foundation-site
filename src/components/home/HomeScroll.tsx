@@ -270,8 +270,8 @@ export function HomeScroll() {
                 color: "var(--text-body)",
               }}
             >
-              Ventilation, vasoactive infusions, renal replacement, and ECMO are
-              recorded by different devices and systems. CLIF gives each its own
+              Breathing machines, blood-pressure drips, dialysis, and ECMO
+              (heart-lung bypass) are recorded by different devices and systems. CLIF gives each its own
               table, timestamps every row, and links them all to the same
               hospitalization.
             </p>
@@ -374,7 +374,7 @@ export function HomeScroll() {
                   maxWidth: "36ch",
                 }}
               >
-                Training, implementation help, stewardship, and convening.
+                Implementation help, training, open-source upkeep, and convening.
               </p>
               <Link href="/our-work" className="linkish">
                 Program details
@@ -468,9 +468,8 @@ export function HomeScroll() {
                   maxWidth: 520,
                 }}
               >
-                CLIF’s minimum Common ICU Data Elements (mCIDE) map each site’s
-                local terms to the same permissible values, so the same analysis
-                code can be shared and run across sites.
+                A shared vocabulary, called mCIDE, gives every hospital the same
+                standard terms, so one analysis can run at every site.
               </p>
               <a
                 href="https://clif-icu.com/data-dictionary"
