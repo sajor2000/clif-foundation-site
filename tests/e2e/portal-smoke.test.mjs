@@ -10,7 +10,7 @@ after(teardown);
  * Full auth flows require secrets and are not run in CI by default.
  */
 test("/portal shows configure, sign-in, or workspace without crashing", async () => {
-  const page = await open("/portal", DESKTOP);
+  const page = await open("/portal", DESKTOP, { waitUntil: "load" });
   const expected =
     /Board portal unavailable|Board sign-in|Board workspace|Connecting|Board sign-in is not available/;
   // Wait for the portal to settle (Clerk loads client-side) instead of
@@ -26,7 +26,7 @@ test("/portal shows configure, sign-in, or workspace without crashing", async ()
 });
 
 test("/portal/reporting renders, or sends signed-out visitors to portal sign-in", async () => {
-  const page = await open("/portal/reporting", DESKTOP);
+  const page = await open("/portal/reporting", DESKTOP, { waitUntil: "load" });
   // A signed-out redirect may land after the first load event.
   await page
     .waitForURL((u) => u.pathname === "/portal/reporting" || u.pathname.startsWith("/portal/sign-in"), {
