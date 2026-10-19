@@ -60,7 +60,8 @@ export function HomeScroll() {
               >
                 Hospitals organize intensive care unit (ICU) records differently.
                 CLIF is a free, shared format that lets teams describe those records
-                the same way. The Foundation helps more organizations use it, with
+                the same way, so ICU care can be studied, compared, and improved
+                across hospitals. The Foundation helps more organizations use it, with
                 open-source software and guides, training, and help converting
                 hospital records into CLIF and checking their quality.
               </p>
@@ -374,14 +375,13 @@ export function HomeScroll() {
                 }}
               >
                 Training, implementation help, stewardship, and convening.
-                Choose a program, then continue.
               </p>
               <Link href="/our-work" className="linkish">
                 Program details
               </Link>
             </div>
             <div className="sc-programs__grid">
-              {PROGRAMS.map((p) => (
+              {PROGRAMS.map((p, i) => (
                 <Link
                   key={p.id}
                   href={`/our-work#${p.id}`}
@@ -394,7 +394,7 @@ export function HomeScroll() {
                       color: "var(--link)",
                     }}
                   >
-                    {p.id}
+                    {String(i + 1).padStart(2, "0")}
                   </span>
                   <span
                     style={{
@@ -457,7 +457,8 @@ export function HomeScroll() {
                   margin: 0,
                 }}
               >
-                Shared vocabularies make multicenter code portable.
+                Every hospital names things differently. CLIF gives them one shared
+                name.
               </h2>
               <p
                 style={{
@@ -732,8 +733,7 @@ export function HomeScroll() {
               the CLIF Consortium.
             </p>
             <p style={{ margin: 0, fontSize: 18, lineHeight: 1.5 }}>
-              Give online:{" "}
-              <a href="/support#give">/support#give</a>
+              <a href="/support#give">Give online</a>
               {" · "}
               <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
             </p>

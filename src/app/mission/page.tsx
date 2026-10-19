@@ -62,16 +62,18 @@ export default function MissionPage() {
           }}
         >
           <p style={{ margin: 0 }}>
-            CLIF Foundation exists to scale adoption of the Common Longitudinal
-            ICU data Format, an open standard for organizing critical care EHR
-            data, across health systems, research groups, professional societies,
-            and EHR vendors.
+            The CLIF Foundation promotes the health of critically ill patients
+            by improving the research, quality, and safety of intensive care
+            through standardized data. It helps hospitals and researchers adopt
+            the Common Longitudinal ICU data Format (CLIF), a free, open data
+            standard that makes ICU data comparable across hospitals, so that
+            what one ICU learns can be tested and applied in many.
           </p>
           <p style={{ margin: 0, color: "var(--text-body)" }}>
-            CLIF was built for federated observational research. Wider adoption
-            needs different support: conversion tools, terminology mapping,
-            implementation help, training, and long-term care of the open
-            specification and tools. That is why the Foundation exists.
+            The CLIF Consortium built CLIF for federated research. Using it more
+            widely takes other help: conversion tools, terminology mapping,
+            implementation help, training, and upkeep of the open specification
+            and tools. The Foundation organizes and funds that work.
           </p>
         </div>
       </section>
@@ -173,8 +175,8 @@ export default function MissionPage() {
               </div>
               <ul style={{ margin: 0, padding: 0, listStyle: "none" }}>
                 <li style={{ padding: "16px 20px", borderBottom: "1px solid var(--border-subtle)" }}>
-                  Scales CLIF adoption across organizations beyond observational
-                  research
+                  Helps organizations adopt CLIF, including uses outside
+                  Consortium research such as ICU quality measurement
                 </li>
                 <li style={{ padding: "16px 20px", borderBottom: "1px solid var(--border-subtle)" }}>
                   Supports shared tools, terminology mapping, ETL help, and
@@ -184,7 +186,8 @@ export default function MissionPage() {
                   Does not conduct research or hold patient data
                 </li>
                 <li style={{ padding: "16px 20px", borderBottom: "1px solid var(--border-subtle)" }}>
-                  Sets budgets for adoption work
+                  Raises and spends funds for adoption work under board
+                  oversight
                 </li>
                 <li style={{ padding: "16px 20px" }}>
                   <Link href="/our-work" className="prose-link">
