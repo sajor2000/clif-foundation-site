@@ -571,7 +571,7 @@ export function HomeScroll() {
                   margin: 0,
                 }}
               >
-                A treatment that saves lives was used unevenly
+                A treatment that can save lives was used unevenly
               </h2>
               <p
                 style={{

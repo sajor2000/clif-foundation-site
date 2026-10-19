@@ -99,12 +99,12 @@ export const PUBLICATIONS: Array<{
     url: "https://academic.oup.com/annalsats/advance-article/doi/10.1093/annalsats/aaoaf067/8435347",
   },
   {
-    year: 2025,
+    year: 2026,
     title:
       "Prone Positioning in a North American Cohort of Hypoxemic Patients on Mechanical Ventilation",
-    venue: "medRxiv",
-    type: "Preprint",
-    url: "https://www.medrxiv.org/content/10.1101/2025.09.03.25334942v1",
+    venue: "Critical Care Medicine",
+    type: "Journal",
+    url: "https://doi.org/10.1097/CCM.0000000000007148",
   },
   {
     year: 2025,
@@ -269,15 +269,15 @@ export const SUPPORT_PATHS = [
 
 /** One plain-language finding for the home page. Keep the numbers as the paper reports them. */
 export const HOME_FINDING = {
-  lead: "Turning a patient onto their stomach, called prone positioning, helps people with severe lung failure survive. Using CLIF data from 37 hospitals, researchers found its use jumped during the COVID-19 pandemic, then fell back afterward. Whether a patient was proned also depended a great deal on which hospital treated them.",
+  lead: "Turning a patient onto their stomach, called prone positioning, is a recommended treatment that can help people with severe lung failure survive. Using CLIF data from 37 hospitals, researchers found its use jumped during the COVID-19 pandemic, then fell back afterward. Whether a patient was proned also depended a great deal on which hospital treated them.",
   stats: [
-    { value: "8%", label: "of eligible patients proned before the pandemic" },
-    { value: "45%", label: "during the pandemic" },
-    { value: "20%", label: "after the pandemic" },
+    { value: "11%", label: "of eligible patients proned before the pandemic" },
+    { value: "52%", label: "during the pandemic" },
+    { value: "26%", label: "after the pandemic" },
   ],
   source: "Prone Positioning in a North American Cohort of Hypoxemic Patients on Mechanical Ventilation",
-  note: "medRxiv preprint, 2025; not yet peer reviewed. 5,760 eligible patients.",
-  url: "https://www.medrxiv.org/content/10.1101/2025.09.03.25334942v1",
+  note: "Critical Care Medicine, 2026. 5,944 eligible patients at 37 hospitals.",
+  url: "https://doi.org/10.1097/CCM.0000000000007148",
 };
 
 export const HOME_PATHS = [
