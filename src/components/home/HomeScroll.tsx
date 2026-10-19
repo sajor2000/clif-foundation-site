@@ -509,41 +509,33 @@ export function HomeScroll() {
                 <span style={{ color: "var(--text-muted)" }}>mCIDE</span>
               </div>
               <div
+                className="sc-crosswalk-grid"
                 style={{
-                  display: "flex",
-                  gap: 16,
                   padding: "10px 20px",
                   color: "var(--text-muted)",
                   borderBottom: "1px solid var(--border-subtle)",
                   fontSize: 12,
                 }}
               >
-                <span style={{ flex: "1 1 0" }}>site-local device_name</span>
-                <span style={{ flex: "1 1 0" }}>device_category</span>
+                <span>site-local device_name</span>
+                <span aria-hidden="true" />
+                <span>device_category</span>
               </div>
               {MAPPINGS.map((m, i) => (
                 <div
                   key={m.local}
-                  className="sc-crosswalk-row"
+                  className="sc-crosswalk-grid sc-crosswalk-row"
                   style={{
                     ["--i" as string]: i,
-                    display: "flex",
-                    gap: 16,
                     padding: "11px 20px",
                     borderBottom: "1px solid var(--border-subtle)",
-                    alignItems: "center",
                   }}
                 >
-                  <span
-                    style={{
-                      flex: "1 1 0",
-                      color: "var(--text-body)",
-                      minWidth: 0,
-                    }}
-                  >
+                  <span style={{ color: "var(--text-body)", minWidth: 0 }}>
                     {m.local}
                   </span>
-                  <span style={{ flex: "1 1 0", minWidth: 0 }}>
+                  <span aria-hidden="true" className="sc-crosswalk-link" />
+                  <span style={{ minWidth: 0 }}>
                     <Tag status="existing">{m.cat}</Tag>
                   </span>
                 </div>

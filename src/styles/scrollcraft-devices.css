@@ -485,32 +485,36 @@
 }
 
 /* Crosswalk join bars */
-.sc-crosswalk-row {
-  --i: 0;
-  position: relative;
+/* Crosswalk: local name | connector | category. The connector has its own
+   column, so a long local name or tag can never run under the line. */
+.sc-crosswalk-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 40px minmax(0, 1fr);
+  column-gap: 12px;
+  align-items: center;
 }
 
-.sc-crosswalk-row::after {
-  content: "";
-  position: absolute;
-  left: 42%;
-  right: 42%;
-  top: 50%;
+.sc-crosswalk-row {
+  --i: 0;
+}
+
+.sc-crosswalk-link {
   height: 1px;
   background: var(--link);
-  transform: translateY(-50%);
   transform-origin: left center;
-  pointer-events: none;
   /* The page's one stagger: each local name joins its category in turn. */
   transition: transform 380ms var(--sc-ease-out) calc(160ms + var(--i) * 70ms);
 }
 
-.sc-home.sc-ready [data-sc-in]:not(.sc-in) .sc-crosswalk-row::after {
-  transform: translateY(-50%) scaleX(0);
+.sc-home.sc-ready [data-sc-in]:not(.sc-in) .sc-crosswalk-link {
+  transform: scaleX(0);
 }
 
 @media (max-width: 699px) {
-  .sc-crosswalk-row::after {
+  .sc-crosswalk-grid {
+    grid-template-columns: minmax(0, 1fr) 0 minmax(0, 1fr);
+  }
+  .sc-crosswalk-link {
     display: none;
   }
 }
@@ -687,7 +691,7 @@
     scroll-snap-align: center;
   }
 
-  .sc-home.sc-ready [data-sc-in]:not(.sc-in) .sc-crosswalk-row::after {
-    transform: translateY(-50%);
+  .sc-home.sc-ready [data-sc-in]:not(.sc-in) .sc-crosswalk-link {
+    transform: none;
   }
 }
