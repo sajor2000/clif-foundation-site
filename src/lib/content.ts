@@ -267,6 +267,19 @@ export const SUPPORT_PATHS = [
   },
 ] as const;
 
+/** One plain-language finding for the home page. Keep the numbers as the paper reports them. */
+export const HOME_FINDING = {
+  lead: "Turning a patient onto their stomach, called prone positioning, helps people with severe lung failure survive. Using CLIF data from 37 hospitals, researchers found its use jumped during the COVID-19 pandemic, then fell back afterward. Whether a patient was proned also depended a great deal on which hospital treated them.",
+  stats: [
+    { value: "8%", label: "of eligible patients proned before the pandemic" },
+    { value: "45%", label: "during the pandemic" },
+    { value: "20%", label: "after the pandemic" },
+  ],
+  source: "Prone Positioning in a North American Cohort of Hypoxemic Patients on Mechanical Ventilation",
+  note: "medRxiv preprint, 2025; not yet peer reviewed. 5,760 eligible patients.",
+  url: "https://www.medrxiv.org/content/10.1101/2025.09.03.25334942v1",
+};
+
 export const HOME_PATHS = [
   {
     n: "01",
