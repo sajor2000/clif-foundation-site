@@ -47,7 +47,7 @@ export function HomeScroll() {
           >
             <div style={{ flex: "1 1 560px", minWidth: 0, display: "grid", gap: 28 }}>
               <h1 id="home-title" className="display-xl">
-                Help more healthcare teams learn from intensive care data.
+                Help more healthcare teams learn from intensive care data
               </h1>
               <p
                 style={{
@@ -110,8 +110,7 @@ export function HomeScroll() {
               },
               {
                 key: "why",
-                title:
-                  "Research built CLIF. Adoption needs its own infrastructure.",
+                title: "Helping more organizations adopt what research built",
                 body: "The CLIF Consortium develops the standard and supports federated research. Bringing CLIF to health systems, research groups, societies, and EHR vendors requires conversion tools, terminology mapping, implementation support, and training. The Foundation helps organize and fund that work.",
                 pad: "28px 24px 32px",
               },
@@ -201,8 +200,8 @@ export function HomeScroll() {
                     className="h2"
                     style={{ color: "var(--text-inverse)", margin: 0 }}
                   >
-                    <span data-sc-cue="0">Data stays at each hospital.</span>{" "}
-                    <span data-sc-cue="0.1 1 0.16 0">Code travels.</span>
+                    <span data-sc-cue="0">The data stays at each hospital,</span>{" "}
+                    <span data-sc-cue="0.1 1 0.16 0">and the analysis goes to it</span>
                   </h2>
                 </div>
                 <p
@@ -259,7 +258,7 @@ export function HomeScroll() {
           >
             <div style={{ flex: "1 1 480px", display: "grid", gap: 14 }}>
               <h2 id="fig-stay" className="h2">
-                Life support, as connected tables.
+                Life support, recorded as connected tables
               </h2>
             </div>
             <p
@@ -271,8 +270,8 @@ export function HomeScroll() {
                 color: "var(--text-body)",
               }}
             >
-              Ventilation, vasoactive infusions, renal replacement, and ECMO are
-              recorded by different devices and systems. CLIF gives each its own
+              Breathing machines, blood-pressure drips, dialysis, and ECMO
+              (heart-lung bypass) are recorded by different devices and systems. CLIF gives each its own
               table, timestamps every row, and links them all to the same
               hospitalization.
             </p>
@@ -375,7 +374,7 @@ export function HomeScroll() {
                   maxWidth: "36ch",
                 }}
               >
-                Training, implementation help, stewardship, and convening.
+                Implementation help, training, open-source upkeep, and convening.
               </p>
               <Link href="/our-work" className="linkish">
                 Program details
@@ -458,8 +457,7 @@ export function HomeScroll() {
                   margin: 0,
                 }}
               >
-                Every hospital names things differently. CLIF gives them one shared
-                name.
+                CLIF maps each hospital’s own names to one shared set
               </h2>
               <p
                 style={{
@@ -470,9 +468,8 @@ export function HomeScroll() {
                   maxWidth: 520,
                 }}
               >
-                CLIF’s minimum Common ICU Data Elements (mCIDE) map each site’s
-                local terms to the same permissible values, so the same analysis
-                code can be shared and run across sites.
+                A shared vocabulary, called mCIDE, gives every hospital the same
+                standard terms, so one analysis can run at every site.
               </p>
               <a
                 href="https://clif-icu.com/data-dictionary"
@@ -574,7 +571,7 @@ export function HomeScroll() {
                   margin: 0,
                 }}
               >
-                A treatment that saves lives was used unevenly.
+                A treatment that saves lives was used unevenly
               </h2>
               <p
                 style={{

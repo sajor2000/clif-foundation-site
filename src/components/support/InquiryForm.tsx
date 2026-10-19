@@ -129,7 +129,7 @@ export function InquiryForm() {
         />
       </label>
       <label style={{ display: "grid", gap: 6, fontSize: 14 }}>
-        Kind
+        Topic
         <select
           name="kind"
           autoComplete="off"
