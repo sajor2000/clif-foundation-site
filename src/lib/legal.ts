@@ -9,6 +9,6 @@
  * board confirms the stage (e.g. the application is filed, or a determination
  * letter arrives). An EIN is not evidence of tax exemption.
  */
-export const IRS_STATUS_SHORT = "501(c)(3) application pending";
+export const IRS_STATUS_SHORT = "501(c)(3) application in preparation";
 export const IRS_STATUS =
-  "Its application for IRS recognition under section 501(c)(3) is pending.";
+  "Its application for IRS recognition under section 501(c)(3) is in preparation.";
