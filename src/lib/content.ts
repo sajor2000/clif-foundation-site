@@ -3,6 +3,8 @@ export const CONTACT_EMAIL = "info@clificufoundation.org";
 export const CONSORTIUM_URL = "https://clif-icu.com/";
 export const GITHUB_URL =
   "https://github.com/Common-Longitudinal-ICU-data-Format/CLIF";
+export const GITHUB_ORG_URL =
+  "https://github.com/Common-Longitudinal-ICU-data-Format";
 
 export const NAV_ITEMS = [
   { href: "/mission", label: "Mission", id: "mission", index: "01" },
@@ -262,7 +264,7 @@ export const SUPPORT_PATHS = [
     who: "Technical contributors",
     body: "Specifications, ETL pipelines, and tools are open source.",
     cta: "Contribute on GitHub ↗",
-    href: GITHUB_URL,
+    href: GITHUB_ORG_URL,
     external: true,
   },
 ] as const;
@@ -307,7 +309,7 @@ export const HOME_PATHS = [
     who: "Technical contributors",
     arrow: "↗",
     cta: "Contribute on GitHub",
-    href: GITHUB_URL,
+    href: GITHUB_ORG_URL,
   },
 ] as const;
 
